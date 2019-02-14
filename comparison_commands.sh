@@ -10,15 +10,27 @@ PHY_COMPARE=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # get paths to the full read directory and phycorder directory
 source $1
 
+# PHYCORDER RUNS BLOCK
+
 mkdir first_5_assembly
 
-taxon_splitter.py -m --taxa_dir $master_reads --new_dir first_5_assembly --max_num 5
+$phycorder_path/taxon_splitter.py -m --taxa_dir $master_reads --new_dir $PHY_COMPARE/first_5_assembly --max_num 5
 
-# run gon_phyling to assemble the first tree for phycorder to use
-$phycorder_path/gon_phyling.sh $phycorder_path/comparison_5_gon_phyling.cfg
+# # run gon_phyling to assemble the first tree for phycorder to use
+$phycorder_path/gon_phyling.sh $PHY_COMPARE/comparison_5_gon_phyling.cfg
+#
+mkdir phycorder_5_plus_20
+#
+$phycorder_path/taxon_splitter.py -m --taxa_dir $master_reads --new_dir $PHY_COMPARE/phycorder_5_plus_20 --max_num 25
+#
+$phycorder_path/taxon_splitter.py -d --taxa_dir $PHY_COMPARE/phycorder_5_plus_20/ --max_num 5
 
-mkdir phyorder_5_plus_20
+$phycorder_path/multi_map.sh $PHY_COMPARE/phycorder_20_to_5.cfg
 
-taxon_splitter.py move 25 taxa files to phycorder_5_plus_20
+mkdir phycorder_25_plus_25_first
 
-taxon_splitter.py delete 5 original taxa files
+$phycorder_path/taxon_splitter.py -m --taxa_dir $master_reads --new_dir $PHY_COMPARE/phycorder_25_plus_25_first --max_num 50
+
+$phycorder_path/taxon_splitter.py -d --taxa_dir $PHY_COMPARE/phycorder_25_plus_25_first/ --max_num 25
+
+$phycorder_path/multi_map.sh $PHY_COMPARE/phycorder_25_plus_25_first.cfg

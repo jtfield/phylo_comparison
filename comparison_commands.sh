@@ -34,3 +34,11 @@ $phycorder_path/taxon_splitter.py -m --taxa_dir $master_reads --new_dir $PHY_COM
 $phycorder_path/taxon_splitter.py -d --taxa_dir $PHY_COMPARE/phycorder_25_plus_25_first/ --max_num 25
 
 $phycorder_path/multi_map.sh $PHY_COMPARE/phycorder_25_plus_25_first.cfg
+
+mkdir phycorder_50_plus_25_second
+
+$phycorder_path/taxon_splitter.py -m --taxa_dir $master_reads --new_dir $PHY_COMPARE/phycorder_50_plus_25_second --max_num 75
+
+$phycorder_path/taxon_splitter.py -d --taxa_dir $PHY_COMPARE/phycorder_50_plus_25_second/ --max_num 50
+
+$phycorder_path/multi_map.sh $PHY_COMPARE/phycorder_50_plus_25_second.cfg

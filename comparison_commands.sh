@@ -121,9 +121,9 @@ phy_loop
 
     $phycorder_path/multi_map.sh ./basic.cfg
 
-    cp $workd/$dir/combine_and_infer/RAxML_bestTree.consensusFULL ./updated_phycorder_required_files/
+    cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL ./updated_phycorder_required_files/
 
-    cp $workd/$dir/combine_and_infer/extended.aln ./updated_phycorder_required_files/
+    cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln ./updated_phycorder_required_files/
 
   else
 
@@ -174,9 +174,9 @@ phy_loop
 
     $phycorder_path/multi_map.sh ./basic.cfg
 
-    cp $workd/$dir/combine_and_infer/RAxML_bestTree.consensusFULL ./updated_phycorder_required_files/
+    cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL ./updated_phycorder_required_files/
 
-    cp $workd/$dir/combine_and_infer/extended.aln ./updated_phycorder_required_files/
+    cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln ./updated_phycorder_required_files/
 
   fi
 

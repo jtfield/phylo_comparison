@@ -174,6 +174,10 @@ phy_loop
 
     $phycorder_path/multi_map.sh ./basic.cfg
 
+    rm ./updated_phycorder_required_files/RAxML_bestTree.consensusFULL
+
+    rm ./updated_phycorder_required_files/extended.aln
+
     cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL ./updated_phycorder_required_files/
 
     cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln ./updated_phycorder_required_files/

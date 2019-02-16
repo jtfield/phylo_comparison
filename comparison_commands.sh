@@ -207,106 +207,119 @@ echo 0 > $TEMPFILE
 for dir in $(ls -d */ ); do
   COUNTER=$[$(cat $TEMPFILE) + 1]
 
-  cp $dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL $maind/phycorder_results/RAxML_bestTree.consensusFULL-$COUNTER.out
+  if [ "$dir" == "$first_tree_dir" ]; then
 
-  cp $dir/phycorder-out/combine_and_infer/extended.aln $maind/phycorder_results/extended-$COUNTER.aln
+    printf "skipping first first tree file"
+
+  else
+
+
+    cp $workd/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL $maind/phycorder_results/RAxML_bestTree.consensusFULL-$COUNTER.out
+
+    cp $workd/phycorder-out/combine_and_infer/extended.aln $maind/phycorder_results/extended-$COUNTER.aln
+
+    echo "$COUNTER"
+
+    echo $COUNTER > $TEMPFILE
+
+
+  fi
+  wait
+
+done
+
+unlink $TEMPFILE
+
+# GON PHYLING SECTION
+
+
+cd $maind
+
+gon_results=gon_phy_results
+
+gon_runs=gon_phy_runs_dir
+
+mkdir $gon_results
+
+mkdir $gon_runs
+
+TEMPFILE=/tmp/$$.tmp
+echo 0 > $TEMPFILE
+
+cd $workd
+for dir in $(ls -d */ ); do
+  # if [ "$dir" != "$gon_results" ] || [ "$dir" != "$gon_runs" ]; then
+  if [ "$dir" == "$first_tree_dir" ]; then
+
+    printf "skipping first tree file"
+
+      # Fetch the value and increase it
+    COUNTER=$[$(cat $TEMPFILE) + 1]
+
+    cp $dir/*.fastq $maind/gon_phy_runs_dir/
+
+    echo $COUNTER > $TEMPFILE
+#     fi
+#
+#   elif [ "$dir" != "$gon_results" ] || [ "$dir" != "$gon_runs" ]; then
+
+else
+  printf "$dir"
+  # Fetch the value and increase it
+  COUNTER=$[$(cat $TEMPFILE) + 1]
+
+  cp $dir/*.fastq $maind/gon_phy_runs_dir/
+
+  printf "copied $dir files to gon_phy_runs_dir"
+
+  wait
+
+  cat <<gon_phy_loop > gon_phy_basic.cfg
+
+  ## Config file for gon_phyling pipeline
+  # change the values of the variables to control the pipeline
+  # the variables are structured like this:
+  # variable_name="value_of_the_variable"
+  # value of the variable can be a path to a file or directory of files
+
+  # Path to the reference genome required for Parsnp
+  ref_genome="/path/to/reference/genome"
+
+  # Path to the directory of reads for assembly
+  read_dir="$maind/gon_phy_runs_dir"
+
+  # number of threads for Spades assembly and RAxML inference
+  threads="4"
+
+  # File stubs required to assemble paired end reads
+  r1_tail="R1.fastq"
+  r2_tail="R2.fastq"
+
+gon_phy_loop
+
+#   else
+#     printf "$dir"
+ $phycorder_path/gon_phyling.sh ./gon_phy_basic.cfg
+
+  wait
+
+  mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.core_genome_run-$COUNTER.out
+
+  mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $maind/gon_phy_results/combo-$COUNTER.fas
 
   echo "$COUNTER"
 
   echo $COUNTER > $TEMPFILE
 
+  rm -r $maind/gon_phy_runs_dir/trimmed*
+
+  wait
+
+  fi
+
 done
 
-# GON PHYLING SECTION
-
-
-# cd $maind
-#
-# gon_results=gon_phy_results
-#
-# gon_runs=gon_phy_runs_dir
-#
-# mkdir $gon_results
-#
-# mkdir $gon_runs
-#
-# TEMPFILE=/tmp/$$.tmp
-# echo 0 > $TEMPFILE
-#
-# cd $workd
-# for dir in $(ls -d */ ); do
-#   # if [ "$dir" != "$gon_results" ] || [ "$dir" != "$gon_runs" ]; then
-#   if [ "$dir" == "$first_tree_dir" ]; then
-#
-#     printf "skipping first tree file"
-#
-#       # Fetch the value and increase it
-#     COUNTER=$[$(cat $TEMPFILE) + 1]
-#
-#     cp $dir/*.fastq $maind/gon_phy_runs_dir/
-#
-#     echo $COUNTER > $TEMPFILE
-# #     fi
-# #
-# #   elif [ "$dir" != "$gon_results" ] || [ "$dir" != "$gon_runs" ]; then
-#
-# else
-#   printf "$dir"
-#   # Fetch the value and increase it
-#   COUNTER=$[$(cat $TEMPFILE) + 1]
-#
-#   cp $dir/*.fastq $maind/gon_phy_runs_dir/
-#
-#   printf "copied $dir files to gon_phy_runs_dir"
-#
-#   wait
-#
-#   cat <<gon_phy_loop > gon_phy_basic.cfg
-#
-#   ## Config file for gon_phyling pipeline
-#   # change the values of the variables to control the pipeline
-#   # the variables are structured like this:
-#   # variable_name="value_of_the_variable"
-#   # value of the variable can be a path to a file or directory of files
-#
-#   # Path to the reference genome required for Parsnp
-#   ref_genome="/path/to/reference/genome"
-#
-#   # Path to the directory of reads for assembly
-#   read_dir="$maind/gon_phy_runs_dir"
-#
-#   # number of threads for Spades assembly and RAxML inference
-#   threads="4"
-#
-#   # File stubs required to assemble paired end reads
-#   r1_tail="R1.fastq"
-#   r2_tail="R2.fastq"
-#
-# gon_phy_loop
-#
-# #   else
-# #     printf "$dir"
-#  $phycorder_path/gon_phyling.sh ./gon_phy_basic.cfg
-#
-#   wait
-#
-#   mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.core_genome_run-$COUNTER.out
-#
-#   mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $maind/gon_phy_results/combo-$COUNTER.fas
-#
-#   echo "$COUNTER"
-#
-#   echo $COUNTER > $TEMPFILE
-#
-#   rm -r $maind/gon_phy_runs_dir/trimmed*
-#
-#   wait
-#
-#   fi
-#
-# done
-#
-# unlink $TEMPFILE
+unlink $TEMPFILE
 
 printf "finished file"
 

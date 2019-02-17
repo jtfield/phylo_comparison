@@ -201,6 +201,7 @@ rm -r ./updated_phycorder_required_files/
 
 mkdir $maind/phycorder_results
 
+
 TEMPFILE=/tmp/$$.tmp
 echo 0 > $TEMPFILE
 
@@ -211,12 +212,16 @@ for dir in $(ls -d */ ); do
 
     printf "skipping first first tree file"
 
+    echo "$COUNTER"
+
+    echo $COUNTER > $TEMPFILE
+
   else
 
 
-    cp $workd/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL $maind/phycorder_results/RAxML_bestTree.consensusFULL-$COUNTER.out
+    cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL $maind/phycorder_results/RAxML_bestTree.consensusFULL-$COUNTER.out
 
-    cp $workd/phycorder-out/combine_and_infer/extended.aln $maind/phycorder_results/extended-$COUNTER.aln
+    cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln $maind/phycorder_results/extended-$COUNTER.aln
 
     echo "$COUNTER"
 

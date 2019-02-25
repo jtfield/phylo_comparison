@@ -344,20 +344,34 @@ cp $maind/phycorder_results/* $maind/combined_outputs/
 # ANALYSES SUMMARY SECTION
 
 # produce data outputs for gon_phyling alignments
+
+cd $maind/phycorder_results
+
+TEMPFILE=/tmp/$$.tmp
+echo 1 > $TEMPFILE
 for seq_file in $(ls $maind/combine_outputs/*.fas); do
+  COUNTER=$[$(cat $TEMPFILE) + 1]
 
-  $phycorder_path/phy_stats.py --align_file $seq_file
+  $phycorder_path/phy_stats.py --align_file $seq_file --taxon_output_file phycorder_taxon_stats-$COUNTER-.csv --align_output_file phycorder_total_align_stats-$COUNTER-.csv
 
+  echo $COUNTER > $TEMPFILE
 done
+
+unlink $TEMPFILE
 
 # produce data outputs for phycorder alignments
+
+TEMPFILE=/tmp/$$.tmp
+echo 1 > $TEMPFILE
 for seq_file in $(ls $maind/combine_outputs/*.aln); do
+  COUNTER=$[$(cat $TEMPFILE) + 1]
 
-  $phycorder_path/phy_stats.py --align_file $seq_file
+  $phycorder_path/phy_stats.py --align_file $seq_file --taxon_output_file gon_phy_taxon_stats-$COUNTER-.csv --align_output_file gon_phy_total_align_stats-$COUNTER-.csv
 
+  echo $COUNTER > $TEMPFILE
 done
 
-
+unlink $TEMPFILE
 
 
 printf "Stepwise phylogenetic analyses finished"

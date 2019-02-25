@@ -345,11 +345,11 @@ cp $maind/phycorder_results/* $maind/combined_outputs/
 
 # produce data outputs for gon_phyling alignments
 
-cd $maind/phycorder_results
+cd $maind/phycorder_results/combine_outputs
 
 TEMPFILE=/tmp/$$.tmp
 echo 1 > $TEMPFILE
-for seq_file in $(ls $maind/combine_outputs/*.fas); do
+for seq_file in $(ls *.fas); do
   COUNTER=$[$(cat $TEMPFILE) + 1]
 
   $phycorder_path/phy_stats.py --align_file $seq_file --taxon_output_file phycorder_taxon_stats-$COUNTER-.csv --align_output_file phycorder_total_align_stats-$COUNTER-.csv
@@ -363,7 +363,7 @@ unlink $TEMPFILE
 
 TEMPFILE=/tmp/$$.tmp
 echo 1 > $TEMPFILE
-for seq_file in $(ls $maind/combine_outputs/*.aln); do
+for seq_file in $(ls *.aln); do
   COUNTER=$[$(cat $TEMPFILE) + 1]
 
   $phycorder_path/phy_stats.py --align_file $seq_file --taxon_output_file gon_phy_taxon_stats-$COUNTER-.csv --align_output_file gon_phy_total_align_stats-$COUNTER-.csv

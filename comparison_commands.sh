@@ -19,6 +19,10 @@ workd=$(pwd)
 
 ls ${master_reads}/*$r1_tail | split -a 20 -l $file_split_num
 
+# potential randomization command
+#ls ${master_reads}/*$r1_tail | sort -R | split -a 20 -l $file_split_num
+
+
 for j in $(ls xa*); do
   mkdir $j-read-dir
   for i in $(cat $j); do
@@ -219,9 +223,11 @@ for dir in $(ls -d */ ); do
   else
 
 
-    cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL $maind/phycorder_results/RAxML_bestTree.consensusFULL-$COUNTER.out
+    cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL $maind/phycorder_results/RAxML_bestTree.phycorder-$COUNTER-.out
 
-    cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln $maind/phycorder_results/extended-$COUNTER.aln
+    cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln $maind/phycorder_results/phycorder-$COUNTER-.aln
+
+    cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bipartitions.majority_rule_bootstrap_consensus $maind/phycorder_results/RAxML_bipartitions.phycorder_majority_rule-$COUNTER-.out
 
     echo "$COUNTER"
 
@@ -308,9 +314,11 @@ gon_phy_loop
 
   wait
 
-  mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.core_genome_run-$COUNTER.out
+  mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.gon_phy-$COUNTER-.out
 
-  mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $maind/gon_phy_results/combo-$COUNTER.fas
+  mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $maind/gon_phy_results/gon_phy-$COUNTER-.fas
+
+  mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bipartitions.core_genome_run.out $maind/gon_phy_results/RAxML_bipartitions.gon_phy_majority_rule-$COUNTER-.out
 
   echo "$COUNTER"
 
@@ -326,53 +334,30 @@ done
 
 unlink $TEMPFILE
 
-printf "finished file"
+mkdir $maind/combined_outputs
+
+cp $maind/gon_phy_results/* $maind/combined_outputs/
+
+cp $maind/phycorder_results/* $maind/combined_outputs/
+
+
+# ANALYSES SUMMARY SECTION
+
+# produce data outputs for gon_phyling alignments
+for seq_file in $(ls $maind/combine_outputs/*.fas); do
+
+  $phycorder_path/phy_stats.py --align_file $seq_file
+
+done
+
+# produce data outputs for phycorder alignments
+for seq_file in $(ls $maind/combine_outputs/*.aln); do
+
+  $phycorder_path/phy_stats.py --align_file $seq_file
+
+done
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-# # get paths to the full read directory and phycorder directory
-# source $1
-#
-# # PHYCORDER RUNS BLOCK
-#
-# mkdir first_5_assembly
-#
-# $phycorder_path/taxon_splitter.py -m --taxa_dir $master_reads --new_dir $PHY_COMPARE/first_5_assembly --max_num 5
-#
-# # # run gon_phyling to assemble the first tree for phycorder to use
-# $phycorder_path/gon_phyling.sh $PHY_COMPARE/comparison_5_gon_phyling.cfg
-# #
-# mkdir phycorder_5_plus_20
-# #
-# $phycorder_path/taxon_splitter.py -m --taxa_dir $master_reads --new_dir $PHY_COMPARE/phycorder_5_plus_20 --max_num 25
-# #
-# $phycorder_path/taxon_splitter.py -d --taxa_dir $PHY_COMPARE/phycorder_5_plus_20/ --max_num 5
-#
-# $phycorder_path/multi_map.sh $PHY_COMPARE/phycorder_20_to_5.cfg
-#
-# mkdir phycorder_25_plus_25_first
-#
-# $phycorder_path/taxon_splitter.py -m --taxa_dir $master_reads --new_dir $PHY_COMPARE/phycorder_25_plus_25_first --max_num 50
-#
-# $phycorder_path/taxon_splitter.py -d --taxa_dir $PHY_COMPARE/phycorder_25_plus_25_first/ --max_num 25
-#
-# $phycorder_path/multi_map.sh $PHY_COMPARE/phycorder_25_plus_25_first.cfg
-#
-# mkdir phycorder_50_plus_25_second
-#
-# $phycorder_path/taxon_splitter.py -m --taxa_dir $master_reads --new_dir $PHY_COMPARE/phycorder_50_plus_25_second --max_num 75
-#
-# $phycorder_path/taxon_splitter.py -d --taxa_dir $PHY_COMPARE/phycorder_50_plus_25_second/ --max_num 50
-#
-# $phycorder_path/multi_map.sh $PHY_COMPARE/phycorder_50_plus_25_second.cfg
+printf "Stepwise phylogenetic analyses finished"

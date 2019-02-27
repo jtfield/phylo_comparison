@@ -357,7 +357,7 @@ gon_phy_loop
 
   # produce data outputs for gon_phyling alignments
 
-  cd $maind/combine_outputs
+  cd $maind/combined_outputs
 
   TEMPFILE=/tmp/$$.tmp
   echo 1 > $TEMPFILE
@@ -387,12 +387,13 @@ gon_phy_loop
 
   cd $maind
 
-  mv ./combined_outputs ./combined_output-$REP_COUNTER
+  # move all the valuable files into a folder that shows which run its a part of
 
-  rm -r phycorder_runs_out
-  rm -r phycorder_results
-  rm -r gon_phy_runs_dir
-  rm -r gon_phy_results
+  mv ./combined_outputs ./combined_output-$REP_COUNTER
+  mv ./phycorder_runs_out ./phycorder_runs_out-$REP_COUNTER
+  mv ./phycorder_results ./phycorder_results-$REP_COUNTER
+  mv ./gon_phy_runs_dir ./gon_phy_runs_dir-$REP_COUNTER
+  mv ./gon_phy_results ./gon_phy_results-$REP_COUNTER
 
   echo $REP_COUNTER > $REP_TEMPFILE
 

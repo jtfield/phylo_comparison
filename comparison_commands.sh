@@ -65,7 +65,7 @@ ref_genome="/path/to/reference/genome"
 read_dir="$workd/$first_tree_dir"
 
 # number of threads for Spades assembly and RAxML inference
-threads="4"
+threads="$THREADS"
 
 # File stubs required to assemble paired end reads
 r1_tail="R1.fastq"
@@ -116,12 +116,12 @@ for dir in $(ls -d */ ); do
     # should be less than the number of cores available
     # should be balanced with the number of threads you will assign to the programs within phycorder
 
-    phycorder_runs="2"
+    phycorder_runs="$phycorder_runs"
 
     # the number of threads you wish to make available to each phycorder run
     # for mapping with bowtie and inference with RAxML
 
-    threads="2"
+    threads="$phycorder_threads"
 
     # the tail identifiers of the read pairs
     # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
@@ -174,12 +174,12 @@ phy_loop
     # should be less than the number of cores available
     # should be balanced with the number of threads you will assign to the programs within phycorder
 
-    phycorder_runs="2"
+    phycorder_runs="$phycorder_runs"
 
     # the number of threads you wish to make available to each phycorder run
     # for mapping with bowtie and inference with RAxML
 
-    threads="2"
+    threads="$phycorder_threads"
 
     # the tail identifiers of the read pairs
     # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
@@ -315,7 +315,7 @@ for dir in $(ls -d */ ); do
     read_dir="$maind/gon_phy_runs_dir"
 
     # number of threads for Spades assembly and RAxML inference
-    threads="4"
+    threads="$THREADS"
 
     # File stubs required to assemble paired end reads
     r1_tail="R1.fastq"

@@ -9,7 +9,7 @@ for ((n=0;n<$2;n++)); do
 
   REP_COUNTER=$[$(cat $REP_TEMPFILE) + 1]
 
-  ./comparison_commands.sh ./$1 > comparison_run_log.txt 2>&1
+  ./comparison_commands.sh $1 > comparison_run_log.txt 2>&1
 
   wait
 

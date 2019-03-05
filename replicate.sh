@@ -2,6 +2,8 @@
 
 # Wrapper script to loop our comparison bash script
 
+current_dir=$(pwd)
+
 source $1
 
 REP_TEMPFILE=/tmp/rep_temp.tmp
@@ -11,7 +13,7 @@ for ((n=0;n<$2;n++)); do
 
   REP_COUNTER=$[$(cat $REP_TEMPFILE) + 1]
 
-  ./comparison_commands.sh $1 > comparison_run_log.txt 2>&1
+  $current_dir/comparison_commands.sh $1 > comparison_run_log.txt 2>&1
 
   wait
 

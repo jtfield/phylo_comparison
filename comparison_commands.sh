@@ -24,7 +24,7 @@ cd $outdir
 
 workd=$(pwd)
 
-ls ${master_reads}/*$r1_tail | split -a 20 -l $file_split_num
+ls "${master_reads}"/*$r1_tail | split -a 20 -l $file_split_num
 
 # potential randomization command
 #ls ${master_reads}/*$r1_tail | sort -R | split -a 20 -l $file_split_num
@@ -34,8 +34,8 @@ wait
 for j in $(ls xa*); do
   mkdir $j-read-dir
   for i in $(cat $j); do
-    cp ${read_dir}/$i $j-read-dir/
-    cp ${read_dir}/${i%$r1_tail}$r2_tail $j-read-dir/
+    cp "${read_dir}"/$i $j-read-dir/
+    cp "${read_dir}"/${i%$r1_tail}$r2_tail $j-read-dir/
     wait
   done
   wait

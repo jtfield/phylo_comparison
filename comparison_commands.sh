@@ -72,7 +72,7 @@ r1_tail="R1.fastq"
 r2_tail="R2.fastq"
 EOF
 
-$phycorder_path/gon_phyling.sh ./first_tree_assembly.cfg
+time $phycorder_path/gon_phyling.sh ./first_tree_assembly.cfg
 
 mkdir updated_phycorder_required_files
 

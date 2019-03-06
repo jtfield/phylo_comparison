@@ -2,7 +2,7 @@
 
 # Wrapper script to loop our comparison bash script
 
-current_dir=$(pwd)
+compare_dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 source $1
 
@@ -13,7 +13,7 @@ for ((n=0;n<$2;n++)); do
 
   REP_COUNTER=$[$(cat $REP_TEMPFILE) + 1]
 
-  $current_dir/comparison_commands.sh $1 > comparison_run_log.txt 2>&1
+  $compare_dir/comparison_commands.sh $1 > comparison_run_log.txt 2>&1
 
   wait
 

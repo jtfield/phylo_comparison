@@ -34,8 +34,8 @@ wait
 for j in $(ls xa*); do
   mkdir $j-read-dir
   for i in $(cat $j); do
-    cp "${read_dir}"/$i $j-read-dir/
-    cp "${read_dir}"/${i%$r1_tail}$r2_tail $j-read-dir/
+    ln -s "${read_dir}"/$i $j-read-dir/
+    ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $j-read-dir/
     wait
   done
   wait
@@ -282,7 +282,7 @@ for dir in $(ls -d */ ); do
       # Fetch the value and increase it
     COUNTER=$[$(cat $TEMPFILE) + 1]
 
-    cp $dir/*.fastq $maind/gon_phy_runs_dir/
+    ln -s $dir/*.fastq $maind/gon_phy_runs_dir/
 
     echo $COUNTER > $TEMPFILE
 #     fi
@@ -294,7 +294,7 @@ for dir in $(ls -d */ ); do
     # Fetch the value and increase it
     COUNTER=$[$(cat $TEMPFILE) + 1]
 
-    cp $dir/*.fastq $maind/gon_phy_runs_dir/
+    ln -s $dir/*.fastq $maind/gon_phy_runs_dir/
 
     printf "copied $dir files to gon_phy_runs_dir"
 

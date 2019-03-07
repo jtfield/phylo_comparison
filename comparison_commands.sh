@@ -29,9 +29,13 @@ ls "${master_reads}"/*$r1_tail | split -a 20 -l $file_split_num
 # potential randomization command
 #ls ${master_reads}/*$r1_tail | sort -R | split -a 20 -l $file_split_num
 
+for j in $(ls xa*); do
+  mv $j $j.txt
+done
+
 wait
 
-for j in $(ls xa*); do
+for j in $(ls xa*.txt); do
   mkdir $j-read-dir
   for i in $(cat $j); do
     ln -s "${read_dir}"/$i $j-read-dir/
@@ -273,75 +277,96 @@ TEMPFILE=/tmp/$$.tmp
 echo 0 > $TEMPFILE
 
 cd $workd
-for dir in $(ls -d */ ); do
-  # if [ "$dir" != "$gon_results" ] || [ "$dir" != "$gon_runs" ]; then
-  if [ "$dir" == "$first_tree_dir" ]; then
 
-    printf "skipping first tree file"
+for j in $(ls xa*.txt); do
 
-      # Fetch the value and increase it
-    COUNTER=$[$(cat $TEMPFILE) + 1]
+  COUNTER=$[$(cat $TEMPFILE) + 1]
+  if [ "$COUNTER" -eq 1 ]; then
 
-    ln -s $dir/*.fastq $maind/gon_phy_runs_dir/
+    printf "First tree already assembled, skipping to second tree."
 
     echo $COUNTER > $TEMPFILE
+
+  else
+    for i in $(cat $j); do
+      ln -s "${read_dir}"/$i $maind/gon_phy_runs_dir/
+      ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $maind/gon_phy_runs_dir/
+
+
+      wait
+
+    done
+
+# cd $workd
+# for dir in $(ls -d */ ); do
+#   # if [ "$dir" != "$gon_results" ] || [ "$dir" != "$gon_runs" ]; then
+#   if [ "$dir" == "$first_tree_dir" ]; then
+#
+#     printf "skipping first tree file"
+#
+#       # Fetch the value and increase it
+#     COUNTER=$[$(cat $TEMPFILE) + 1]
+#
+#     ln -s $dir/*.fastq $maind/gon_phy_runs_dir/
+#
+#     echo $COUNTER > $TEMPFILE
 #     fi
 #
 #   elif [ "$dir" != "$gon_results" ] || [ "$dir" != "$gon_runs" ]; then
 
-  else
-    printf "$dir"
-    # Fetch the value and increase it
-    COUNTER=$[$(cat $TEMPFILE) + 1]
+  # else
+  #   printf "$dir"
+  #   # Fetch the value and increase it
+  #   COUNTER=$[$(cat $TEMPFILE) + 1]
+  #
+  #   ln -s $dir/*.fastq $maind/gon_phy_runs_dir/
+  #
+  #   printf "copied $dir files to gon_phy_runs_dir"
+  #
+  #   wait
 
-    ln -s $dir/*.fastq $maind/gon_phy_runs_dir/
+      cat <<gon_phy_loop > gon_phy_basic.cfg
 
-    printf "copied $dir files to gon_phy_runs_dir"
+      ## Config file for gon_phyling pipeline
+      # change the values of the variables to control the pipeline
+      # the variables are structured like this:
+      # variable_name="value_of_the_variable"
+      # value of the variable can be a path to a file or directory of files
 
-    wait
+      # Path to the reference genome required for Parsnp
+      ref_genome="/path/to/reference/genome"
 
-    cat <<gon_phy_loop > gon_phy_basic.cfg
+      # Path to the directory of reads for assembly
+      read_dir="$maind/gon_phy_runs_dir"
 
-    ## Config file for gon_phyling pipeline
-    # change the values of the variables to control the pipeline
-    # the variables are structured like this:
-    # variable_name="value_of_the_variable"
-    # value of the variable can be a path to a file or directory of files
+      # number of threads for Spades assembly and RAxML inference
+      threads="$THREADS"
 
-    # Path to the reference genome required for Parsnp
-    ref_genome="/path/to/reference/genome"
-
-    # Path to the directory of reads for assembly
-    read_dir="$maind/gon_phy_runs_dir"
-
-    # number of threads for Spades assembly and RAxML inference
-    threads="$THREADS"
-
-    # File stubs required to assemble paired end reads
-    r1_tail="R1.fastq"
-    r2_tail="R2.fastq"
+      # File stubs required to assemble paired end reads
+      r1_tail="R1.fastq"
+      r2_tail="R2.fastq"
 
 gon_phy_loop
 
-  #   else
-  #     printf "$dir"
-    $phycorder_path/gon_phyling.sh ./gon_phy_basic.cfg
+    #   else
+    #     printf "$dir"
+      $phycorder_path/gon_phyling.sh ./gon_phy_basic.cfg
 
-    wait
+      wait
 
-    mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.gon_phy-$COUNTER-.out
+      mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.gon_phy-$COUNTER-.out
 
-    mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $maind/gon_phy_results/gon_phy-$COUNTER-.fas
+      mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $maind/gon_phy_results/gon_phy-$COUNTER-.fas
 
-    mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bipartitions.core_genome_run.out $maind/gon_phy_results/RAxML_bipartitions.gon_phy_majority_rule-$COUNTER-.out
+      mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bipartitions.core_genome_run.out $maind/gon_phy_results/RAxML_bipartitions.gon_phy_majority_rule-$COUNTER-.out
 
-    echo "$COUNTER"
+      echo "$COUNTER"
 
-    echo $COUNTER > $TEMPFILE
+      echo $COUNTER > $TEMPFILE
 
-    rm -r $maind/gon_phy_runs_dir/trimmed*
+      rm -r $maind/gon_phy_runs_dir/trimmed*
 
-    wait
+      wait
 
   fi
 

@@ -74,6 +74,9 @@ threads="$THREADS"
 # File stubs required to assemble paired end reads
 r1_tail="R1.fastq"
 r2_tail="R2.fastq"
+
+#bootstrapping
+bootstrapping=$bootstrapping
 EOF
 
 time $phycorder_path/gon_phyling.sh ./first_tree_assembly.cfg
@@ -139,6 +142,9 @@ for dir in $(ls -d */ ); do
 
     outdir="$workd/$dir/phycorder-out"
 
+    #bootstrapping
+    bootstrapping=$bootstrapping
+
 phy_loop
 
     wait
@@ -196,6 +202,9 @@ phy_loop
     # the output directory for your final information
 
     outdir="$workd/$dir/phycorder-out"
+
+    #bootstrapping
+    bootstrapping=$bootstrapping
 
 phy_loop
 
@@ -283,9 +292,18 @@ for j in $(ls xa*.txt); do
   COUNTER=$[$(cat $TEMPFILE) + 1]
   if [ "$COUNTER" -eq 1 ]; then
 
-    printf "First tree already assembled, skipping to second tree."
+    for i in $(cat $j); do
 
-    echo $COUNTER > $TEMPFILE
+      printf "First tree already assembled, skipping to second tree."
+
+      ln -s "${read_dir}"/$i $maind/gon_phy_runs_dir/
+      ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $maind/gon_phy_runs_dir/
+
+      wait
+
+      echo $COUNTER > $TEMPFILE
+
+    done
 
   else
     for i in $(cat $j); do
@@ -345,6 +363,9 @@ for j in $(ls xa*.txt); do
       # File stubs required to assemble paired end reads
       r1_tail="R1.fastq"
       r2_tail="R2.fastq"
+
+      #bootstrapping
+      bootstrapping=$bootstrapping
 
 gon_phy_loop
 

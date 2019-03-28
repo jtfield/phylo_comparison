@@ -24,17 +24,21 @@ cd $outdir
 
 workd=$(pwd)
 
+# split reads up into different groups
 ls "${master_reads}"/*$r1_tail | split -a 20 -l $file_split_num
 
 # potential randomization command
 #ls ${master_reads}/*$r1_tail | sort -R | split -a 20 -l $file_split_num
 
+# change file name for easier processing
 for j in $(ls xa*); do
   mv $j $j.txt
 done
 
 wait
 
+# make new dirs for all the files that need to be processed
+# make symlinks in those dirs for the update files
 for j in $(ls xa*.txt); do
   mkdir $j-read-dir
   for i in $(cat $j); do
@@ -45,6 +49,7 @@ for j in $(ls xa*.txt); do
   wait
 done
 
+# establish first and second tree directories for logical updating. Skipp first tree directory if in updating step
 first_tree_dir=$(ls -d */ | head -1)
 
 second_tree_dir=$(ls -d */ | head -2 | tail -1)
@@ -55,6 +60,7 @@ printf "$second_tree_dir"
 
 wait
 
+# create a config file on the fly with current settings
 cat <<EOF > first_tree_assembly.cfg
 ## Config file for gon_phyling pipeline
 # change the values of the variables to control the pipeline
@@ -72,13 +78,14 @@ read_dir="$workd/$first_tree_dir"
 threads="$THREADS"
 
 # File stubs required to assemble paired end reads
-r1_tail="R1.fastq"
-r2_tail="R2.fastq"
+r1_tail="$r1_tail"
+r2_tail="$r2_tail"
 
 #bootstrapping
-bootstrapping=$bootstrapping
+bootstrapping="OFF"
 EOF
 
+# run gon_phyling to create the first starting tree
 time $phycorder_path/gon_phyling.sh ./first_tree_assembly.cfg
 
 mkdir updated_phycorder_required_files
@@ -89,6 +96,8 @@ cp $workd/$first_tree_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignme
 
 wait
 
+# begin looping through dirs of files to update with
+# and start running phycorder
 for dir in $(ls -d */ ); do
   # printf $dir
   # printf $first_tree_dir
@@ -135,8 +144,8 @@ for dir in $(ls -d */ ); do
     # then only put the portion of the file names that change to correspond to the read pairs
     # in this example, Clade_1_01_ identify the taxons and so must not be included
 
-    r1_tail="R1.fastq"
-    r2_tail="R2.fastq"
+    r1_tail="$r1_tail"
+    r2_tail="$r2_tail"
 
     # the output directory for your final information
 
@@ -196,8 +205,8 @@ phy_loop
     # then only put the portion of the file names that change to correspond to the read pairs
     # in this example, Clade_1_01_ identify the taxons and so must not be included
 
-    r1_tail="R1.fastq"
-    r2_tail="R2.fastq"
+    r1_tail="$r1_tail"
+    r2_tail="$r2_tail"
 
     # the output directory for your final information
 
@@ -233,7 +242,7 @@ rm -r ./updated_phycorder_required_files/
 
 mkdir $maind/phycorder_results
 
-
+# generate temp file to start a counter
 TEMPFILE=/tmp/$$.tmp
 echo 0 > $TEMPFILE
 
@@ -315,33 +324,7 @@ for j in $(ls xa*.txt); do
 
     done
 
-# cd $workd
-# for dir in $(ls -d */ ); do
-#   # if [ "$dir" != "$gon_results" ] || [ "$dir" != "$gon_runs" ]; then
-#   if [ "$dir" == "$first_tree_dir" ]; then
-#
-#     printf "skipping first tree file"
-#
-#       # Fetch the value and increase it
-#     COUNTER=$[$(cat $TEMPFILE) + 1]
-#
-#     ln -s $dir/*.fastq $maind/gon_phy_runs_dir/
-#
-#     echo $COUNTER > $TEMPFILE
-#     fi
-#
-#   elif [ "$dir" != "$gon_results" ] || [ "$dir" != "$gon_runs" ]; then
 
-  # else
-  #   printf "$dir"
-  #   # Fetch the value and increase it
-  #   COUNTER=$[$(cat $TEMPFILE) + 1]
-  #
-  #   ln -s $dir/*.fastq $maind/gon_phy_runs_dir/
-  #
-  #   printf "copied $dir files to gon_phy_runs_dir"
-  #
-  #   wait
 
       cat <<gon_phy_loop > gon_phy_basic.cfg
 
@@ -361,8 +344,8 @@ for j in $(ls xa*.txt); do
       threads="$THREADS"
 
       # File stubs required to assemble paired end reads
-      r1_tail="R1.fastq"
-      r2_tail="R2.fastq"
+      r1_tail="$r1_tail"
+      r2_tail="$r2_tail"
 
       #bootstrapping
       bootstrapping=$bootstrapping

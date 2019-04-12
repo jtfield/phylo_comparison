@@ -372,7 +372,7 @@ gon_phy_loop
 
     #   else
     #     printf "$dir"
-      $phycorder_path/gon_phyling.sh ./gon_phy_basic.cfg
+      time $phycorder_path/gon_phyling.sh ./gon_phy_basic.cfg
 
       wait
 

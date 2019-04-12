@@ -24,8 +24,15 @@ cd $outdir
 
 workd=$(pwd)
 
+# take first 10 taxa and create a starting alignment for phycorder to update
+ls "${master_reads}"/*$r1_tail | head -10 > start_alignment_taxa.txt
+
+# split remaining taxa depending on the number of processors available
+# dictated by --phycorder_runs
+ls "${master_reads}"/*$r1_tail | tail -n +11 | split -a 20 -l $file_split_num
+
 # split reads up into different groups
-ls "${master_reads}"/*$r1_tail | split -a 20 -l $file_split_num
+# ls "${master_reads}"/*$r1_tail | split -a 20 -l $file_split_num
 
 # potential randomization command
 #ls ${master_reads}/*$r1_tail | sort -R | split -a 20 -l $file_split_num
@@ -35,7 +42,16 @@ for j in $(ls xa*); do
   mv $j $j.txt
 done
 
-wait
+# make dir for constructing alignment from first 10 taxa
+first_tree_dir=start_alignment
+
+mkdir $first_tree_dir
+
+for i in $(cat start_alignment_taxa.txt); do
+  ln -s "${read_dir}"/$i start_alignment/
+  ln -s "${read_dir}"/${i%$r1_tail}$r2_tail start_alignment/
+  wait
+done
 
 # make new dirs for all the files that need to be processed
 # make symlinks in those dirs for the update files
@@ -50,7 +66,8 @@ for j in $(ls xa*.txt); do
 done
 
 # establish first and second tree directories for logical updating. Skipp first tree directory if in updating step
-first_tree_dir=$(ls -d */ | head -1)
+# first_tree_dir=$(ls -d */ | head -1)
+first_tree_dir=start_alignment
 
 second_tree_dir=$(ls -d */ | head -2 | tail -1)
 
@@ -90,11 +107,11 @@ time $phycorder_path/gon_phyling.sh ./first_tree_assembly.cfg
 
 mkdir updated_phycorder_required_files
 
+echo "made updated_phycorder_required_files"
+
 cp $workd/$first_tree_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas ./updated_phycorder_required_files/
 
 cp $workd/$first_tree_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out ./updated_phycorder_required_files/
-
-wait
 
 # begin looping through dirs of files to update with
 # and start running phycorder
@@ -237,6 +254,7 @@ phy_loop
 done
 # END OF PHYCORDER RUN
 
+#exit 1
 
 rm -r ./updated_phycorder_required_files/
 
@@ -279,7 +297,7 @@ done
 unlink $TEMPFILE
 
 # GON PHYLING SECTION
-
+# exit 1
 
 cd $maind
 
@@ -296,7 +314,7 @@ echo 0 > $TEMPFILE
 
 cd $workd
 
-for j in $(ls xa*.txt); do
+for j in $(ls *.txt); do
 
   COUNTER=$[$(cat $TEMPFILE) + 1]
   if [ "$COUNTER" -eq 1 ]; then
@@ -377,6 +395,8 @@ gon_phy_loop
 done
 
 unlink $TEMPFILE
+
+#exit 1
 
 mkdir $maind/combined_outputs
 

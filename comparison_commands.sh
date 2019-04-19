@@ -9,6 +9,7 @@ PHY_COMPARE=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 source $1
 
+
 # REP_TEMPFILE=/tmp/rep_temp.tmp
 # echo 0 > $REP_TEMPFILE
 #

@@ -90,7 +90,7 @@ wait
 
 cd $gon_phy_alignments
 
-if [ $bootstrapping == "OFF" ]; then
+if [ $bootstrapping == "ON" ]; then
 
   raxmlHPC-PTHREADS -f a -p 12345 -s ./combo.fas -x 12345 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
 
@@ -107,6 +107,8 @@ mkdir updated_phycorder_required_files
 cp $gon_phy_alignments/combo.fas ./updated_phycorder_required_files/
 
 cp $gon_phy_alignments/RAxML_bestTree.core_genome_run.out ./updated_phycorder_required_files/
+
+rm $gon_phy_alignments/RAxML*
 
 wait
 
@@ -372,9 +374,9 @@ for j in $(ls gon_phy*.fas); do
 #       $phycorder_path/gon_phyling.sh ./gon_phy_basic.cfg
 #
 #       wait
+      rm $gon_phy_alignments/RAxML*
 
-
-      if [ $bootstrapping == "OFF" ]; then
+      if [ $bootstrapping == "ON" ]; then
 
         raxmlHPC-PTHREADS -f a -p 12345 -s ./combo.fas -x 12345 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
 
@@ -388,6 +390,7 @@ for j in $(ls gon_phy*.fas); do
       mv $gon_phy_alignments/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.gon_phy-$COUNTER-.out
 
       mv $gon_phy_alignments/RAxML_bipartitions.core_genome_run.out $maind/gon_phy_results/RAxML_bipartitions.gon_phy_majority_rule-$COUNTER-.out
+
 
       # mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.gon_phy-$COUNTER-.out
       #

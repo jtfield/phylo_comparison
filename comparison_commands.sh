@@ -50,9 +50,9 @@ for j in $(ls xa*.txt); do
 done
 
 # establish first and second tree directories for logical updating. Skipp first tree directory if in updating step
-first_tree_dir=$(ls -d */ | head -1)
+first_tree_dir=$(ls -d xa*/ | head -1)
 
-second_tree_dir=$(ls -d */ | head -2 | tail -1)
+second_tree_dir=$(ls -d xa*/ | head -2 | tail -1)
 
 printf "$first_tree_dir"
 
@@ -90,7 +90,15 @@ wait
 
 cd $gon_phy_alignments
 
-raxmlHPC-PTHREADS -f a -p 23456 -s ./combo.fas -x 23456 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
+if [ $bootstrapping == "OFF" ]; then
+
+  raxmlHPC-PTHREADS -f a -p 12345 -s ./combo.fas -x 12345 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
+
+elif [ $bootstrapping == "OFF" ]; then
+
+  raxmlHPC-PTHREADS -m GTRGAMMA -T $THREADS -s ./combo.fas -p 12345 -n core_genome_run.out
+
+fi
 
 cd $workd
 
@@ -366,7 +374,16 @@ for j in $(ls gon_phy*.fas); do
 #       wait
 
 
-      raxmlHPC-PTHREADS -f a -p 23456 -s ./combo.fas -x 23456 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
+      if [ $bootstrapping == "OFF" ]; then
+
+        raxmlHPC-PTHREADS -f a -p 12345 -s ./combo.fas -x 12345 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
+
+      elif [ $bootstrapping == "OFF" ]; then
+
+        raxmlHPC-PTHREADS -m GTRGAMMA -T $THREADS -s ./combo.fas -p 12345 -n core_genome_run.out
+
+      fi
+      # raxmlHPC-PTHREADS -f a -p 23456 -s ./combo.fas -x 23456 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
 
       mv $gon_phy_alignments/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.gon_phy-$COUNTER-.out
 

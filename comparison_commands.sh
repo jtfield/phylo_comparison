@@ -92,13 +92,15 @@ cd $gon_phy_alignments
 
 if [ $bootstrapping == "ON" ]; then
 
-  raxmlHPC-PTHREADS -f a -p 12345 -s ./combo.fas -x 12345 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
+    raxmlHPC-PTHREADS -f a -p 12345 -s ./combo.fas -x 12345 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
 
-elif [ $bootstrapping == "OFF" ]; then
+  elif [ $bootstrapping == "OFF" ]; then
 
-  raxmlHPC-PTHREADS -m GTRGAMMA -T $THREADS -s ./combo.fas -p 12345 -n core_genome_run.out
+    raxmlHPC-PTHREADS -m GTRGAMMA -T $THREADS -s ./combo.fas -p 12345 -n core_genome_run.out
 
 fi
+
+echo "Initial tree inference complete"
 
 cd $workd
 
@@ -316,7 +318,7 @@ cd $gon_phy_alignments
 for j in $(ls gon_phy*.fas); do
 
   COUNTER=$[$(cat $TEMPFILE) + 1]
-  if [ "$COUNTER" -eq 1 ]; then
+  # if [ "$COUNTER" -eq 1 ]; then
 
 #    for i in $(cat $j); do
 
@@ -378,11 +380,11 @@ for j in $(ls gon_phy*.fas); do
 
       if [ $bootstrapping == "ON" ]; then
 
-        raxmlHPC-PTHREADS -f a -p 12345 -s ./combo.fas -x 12345 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
+        raxmlHPC-PTHREADS -f a -p 12345 -s $j -x 12345 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
 
       elif [ $bootstrapping == "OFF" ]; then
 
-        raxmlHPC-PTHREADS -m GTRGAMMA -T $THREADS -s ./combo.fas -p 12345 -n core_genome_run.out
+        raxmlHPC-PTHREADS -m GTRGAMMA -T $THREADS -s $j -p 12345 -n core_genome_run.out
 
       fi
       # raxmlHPC-PTHREADS -f a -p 23456 -s ./combo.fas -x 23456 -# 100 -m GTRGAMMA -n core_genome_run.out -T $THREADS
@@ -406,7 +408,7 @@ for j in $(ls gon_phy*.fas); do
 
       wait
 
-  fi
+  #fi
 
 done
 

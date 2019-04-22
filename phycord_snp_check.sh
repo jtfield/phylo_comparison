@@ -45,6 +45,7 @@ grep -o -P "<Hsp_gaps>.{1}" phycorder_to_TTR_blast_results.out > taxon-$tax_num-
 
 grep -o "<Hsp_gaps>" phycorder_to_TTR_blast_results.out | wc -l
 
+$PHY_SNP_COMPARE/blast_parser_fasta_matcher.py --blast_xml_file phycorder_to_TTR_blast_results.out --dir $working_dir
 
 # TEMPFILE=/tmp/$$.tmp
 # echo 0 > $TEMPFILE

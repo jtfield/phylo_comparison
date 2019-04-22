@@ -4,6 +4,7 @@ import sys
 import os
 import argparse
 import re
+import subprocess
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -40,7 +41,25 @@ def main():
                 continue
 
 
-    print(matching_seqs_dict)
+    file_list = os.listdir(args.dir)
+
+    # print(matching_seqs_dict)
+
+    matched_files_count = 0
+    for query_file, match_file in matching_seqs_dict.items():
+
+        query_comp = re.compile("(" + query_file + "chunk.fas)")
+        query = re.search(query_comp, str(file_list))
+
+        match_comp = re.compile("(" + match_file + "_chunk.fas)")
+        match = re.search(match_comp, str(file_list))
+
+        if query and match:
+            q = (query.group(1))
+            m = (match.group(1))
+            matched_files_count+=1
+            subprocess.call(['cat ', str(q) , str(q), "> matched_seqs-" + str(matched_files_count) + "-.fa" ],shell=True)
+
 
 
 

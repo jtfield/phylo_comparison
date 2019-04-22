@@ -37,7 +37,7 @@ def main():
             loci_count = 0
             for small_seq in split_seq:
                 loci_count+=1
-                loci_file = open(taxon_name + "_loci_" + str(loci_count) + ".fas", "w")
+                loci_file = open(taxon_name + "_loci_" + str(loci_count) + "chunk.fas", "w")
                 loci_file.write('>')
                 loci_file.write(taxon_name)
                 loci_file.write('_' + str(loci_count))

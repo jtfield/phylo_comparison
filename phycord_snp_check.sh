@@ -22,11 +22,12 @@ while getopts ":q:o:w:n:h" opt; do
   esac
 done
 
+mkdir $working_dir
 
 cd $working_dir
 
 # pull out all sequences belonging to a particular taxon and split them into individual files
-$PHY_SNP_COMPARE/alignment_splitter.py --align_file $query_align --taxon_num $tax_num
+$PHY_SNP_COMPARE/alignment_splitter.py -p --align_file $query_align --taxon_num $tax_num
 
 # cat all chunks together
 cat *chunk.fas > "taxon_$tax_num-complete_phycorder_seqs.fas"
@@ -35,9 +36,14 @@ cat *chunk.fas > "taxon_$tax_num-complete_phycorder_seqs.fas"
 makeblastdb -in $original_fasta -dbtype nucl -parse_seqids
 
 # blast the phycorder query sequences against the original Tree to reads genome
-blastn -db $original_fasta -query "taxon_$tax_num-complete_phycorder_seqs.fas" -max_target_seqs 2 -outfmt 5 -out phycorder_to_TTR_blast_results.out
+blastn -db $original_fasta -query "taxon_$tax_num-complete_phycorder_seqs.fas" -max_target_seqs 1 -max_hsps 1 -outfmt 5 -out phycorder_to_TTR_blast_results.out
 
+# seperate the sequences in the tree to reads genome into file
+$PHY_SNP_COMPARE/alignment_splitter.py -f --align_file $original_fasta
 
+grep -o -P "<Hsp_gaps>.{1}" phycorder_to_TTR_blast_results.out > taxon-$tax_num-gap-count.txt
+
+grep -o "<Hsp_gaps>" phycorder_to_TTR_blast_results.out | wc -l
 
 
 # TEMPFILE=/tmp/$$.tmp

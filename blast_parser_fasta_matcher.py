@@ -55,12 +55,28 @@ def main():
         match = re.search(match_comp, str(file_list))
 
         if query and match:
-            q = (query.group(1))
-            m = (match.group(1))
+            query_file_name = (query.group(1))
+            match_file_name = (match.group(1))
             matched_files_count+=1
-            subprocess.call(['cat ', str(q) , str(q), "> matched_seqs-" + str(matched_files_count) + "-.fa" ],shell=True)
 
+            file_names_list = []
+            file_names_list.append(query_file_name)
+            file_names_list.append(match_file_name)
 
+            with open(args.dir + "/unaligned_matched_seqs-" + str(matched_files_count) + "-.fa", 'w') as outfile:
+                for fname in file_names_list:
+                    with open(fname) as infile:
+                        for line in infile:
+                            outfile.write(line)
+            #subprocess.call(['cat ', str(args.dir) + "/" + str(q) , str(args.dir) + "/" + str(m), "> matched_seqs-" + str(matched_files_count) + "-.fa" ],shell=True)
+
+            # combined_files = open("matched_seqs-" + str(matched_files_count) + "-.txt", "w")
+            # combined_files.write(query_file_name)
+            # combined_files.write(" ")
+            # combined_files.write(match_file_name)
+            # combined_files.close()
+        else:
+            print("NO MATCHES")
 
 
 if __name__ == '__main__':

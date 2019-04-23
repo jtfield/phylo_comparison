@@ -47,19 +47,28 @@ grep -o "<Hsp_gaps>" phycorder_to_TTR_blast_results.out | wc -l
 
 $PHY_SNP_COMPARE/blast_parser_fasta_matcher.py --blast_xml_file phycorder_to_TTR_blast_results.out --dir $working_dir
 
+
 # TEMPFILE=/tmp/$$.tmp
 # echo 0 > $TEMPFILE
-#
-# for file in $(ls *.fas); do
+# for matched_seq_file in $(ls $working_dir/matched*.txt); do
 #
 #   COUNTER=$[$(cat $TEMPFILE) + 1]
 #
-#   cat $file $original_fasta > loci_master_seq_combo-$COUNTER-.fasta
+#   cat $(cat $matched_seq_file) > "unaligned_matched_seqs-$COUNTER-.fa"
 #
+# # TEMPFILE=/tmp/$$.tmp
+# # echo 0 > $TEMPFILE
+# #
+# # for file in $(ls *.fas); do
+# #
+# #   COUNTER=$[$(cat $TEMPFILE) + 1]
+# #
+# #   cat $file $original_fasta > loci_master_seq_combo-$COUNTER-.fasta
+# #
 #   echo "$COUNTER"
 #
 #   echo $COUNTER > $TEMPFILE
 #
 # done
-#
+
 # unlink $TEMPFILE

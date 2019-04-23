@@ -51,7 +51,7 @@ def main():
 
                     loci_file.close()
 
-
+# for splitting the original genome fasta sequence
     elif args.f == True:
         for seq in split_align[1:]:
             split_name_and_seq = seq.split('\n')

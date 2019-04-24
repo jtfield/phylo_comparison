@@ -23,33 +23,65 @@ def main():
 
     if args.p == True:
 
+        taxon_seq_list = []
+
         for seq in split_align[1:]:
             split_name_and_seq = seq.split('\n')
             taxon_name = split_name_and_seq[0]
             name_split = taxon_name.split('_')
             taxon_number = name_split[1]
             if taxon_number == args.taxon_num:
+
                 print(taxon_number)
+                n_count = 0
+                nuc_count = 0
+
                 seq = split_name_and_seq[1]
+                seperate_seq = ''
 
-                # make a complete alignment
+                n_set = set(['n', 'N'])
+                for nuc in seq:
+                    if nuc not in n_set:
+                        nuc_count+=1
+                        seperate_seq+=str(nuc)
+                        # print(nuc_count)
+                        # print(seperate_seq)
+                        # print(nuc_count)
+                        if nuc_count >= 25:
+                            n_count = 0
 
-                # Split each seq into seperate parts
-                split_seq = seq.split('n'*100)
+                    elif nuc in n_set:
+                        n_count+=1
+                        # print(n_count)
+                    #
+                        if n_count >= 50:
+                            if nuc_count >= 2:
+                                nuc_count = 0
+                                taxon_seq_list.append(seperate_seq)
+                                seperate_seq = ''
 
-                # start counting each part of the sequence and open files to get those sequences
-                loci_count = 0
-                for small_seq in split_seq:
-                    loci_count+=1
-                    loci_file = open(taxon_name + "_" + str(loci_count) + "chunk.fas", "w")
-                    loci_file.write('>')
-                    loci_file.write(taxon_name)
-                    loci_file.write('_' + str(loci_count))
-                    loci_file.write('\n')
-                    loci_file.write(small_seq)
-                    loci_file.write('\n')
 
-                    loci_file.close()
+        # print(taxon_seq_list)
+
+                #
+                # # make a complete alignment
+                #
+                # # Split each seq into seperate parts
+                # split_seq = seq.split('n'*100)
+                #
+                # # start counting each part of the sequence and open files to get those sequences
+        loci_count = 0
+        for small_seq in taxon_seq_list:
+            loci_count+=1
+            loci_file = open(taxon_name + "_" + str(loci_count) + "chunk.fas", "w")
+            loci_file.write('>')
+            loci_file.write(taxon_name)
+            loci_file.write('_' + str(loci_count))
+            loci_file.write('\n')
+            loci_file.write(small_seq)
+            loci_file.write('\n')
+
+            loci_file.close()
 
 # for splitting the original genome fasta sequence
     elif args.f == True:

@@ -21,6 +21,7 @@ def main():
     hit_name = ""
     with open(args.blast_xml_file, 'r') as xml_file:
         loci_count = 0
+        no_hits_found_this_query_count = 0
         for line in xml_file:
 
             if "<Iteration_query-def>" in line:
@@ -32,17 +33,25 @@ def main():
                 hit = line.replace("<Hit_id>","")
                 hit_name = hit.replace("</Hit_id>","")
 
+            elif "<Iteration_message>No hits found</Iteration_message>" in line:
+                no_hits_found_this_query_count+=1
+
             elif "</Iteration>" in line:
-                query_name = query_name.strip()
-                hit_name = hit_name.strip()
-                matching_seqs_dict[query_name] = hit_name
+                if no_hits_found_this_query_count == 0 :
+                    query_name = query_name.strip()
+                    hit_name = hit_name.strip()
+                    matching_seqs_dict[query_name] = hit_name
+
+                elif no_hits_found_this_query_count >= 1:
+                    no_hits_found_this_query_count = 0
+
 
             else:
                 continue
 
 
     file_list = os.listdir(args.dir)
-
+    print(args.dir)
     # print(matching_seqs_dict)
 
     matched_files_count = 0
@@ -65,7 +74,7 @@ def main():
 
             with open(args.dir + "/unaligned_matched_seqs-" + str(matched_files_count) + "-.fa", 'w') as outfile:
                 for fname in file_names_list:
-                    with open(fname) as infile:
+                    with open(args.dir + "/" + fname) as infile:
                         for line in infile:
                             outfile.write(line)
             #subprocess.call(['cat ', str(args.dir) + "/" + str(q) , str(args.dir) + "/" + str(m), "> matched_seqs-" + str(matched_files_count) + "-.fa" ],shell=True)

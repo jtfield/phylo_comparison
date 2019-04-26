@@ -623,38 +623,105 @@ EOF
 
     elif [ "$dir" == "$second_tree_dir" ]; then
 
-      # cat <<phy_loop > $dir_phycorder_run.cfg
-      cat <<phy_loop > basic.cfg
-      ## Welcome to the Phycorder config file
-      # Change the variable values to match the files and numbers you wish to use
-      # this is the path to the phycorder directory. Dont move it.
-      # PHYCORDER=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-      # the path to the previously generated alignment file
-      align="$workd/updated_phycorder_required_files/combo.fas"
-      # the path to the previously generated tree file made from the alignment file
-      tree="$workd/updated_phycorder_required_files/RAxML_bestTree.core_genome_run.out"
-      # the directory of paired end read pairs you belonging to taxa you wish to add to your phylogeny
-      read_dir="$workd/$dir"
-      # the number of taxa that can be added to the phylogeny at a single time
-      # should be less than the number of cores available
-      # should be balanced with the number of threads you will assign to the programs within phycorder
-      phycorder_runs="$phycorder_runs"
-      # the number of threads you wish to make available to each phycorder run
-      # for mapping with bowtie and inference with RAxML
-      threads="$phycorder_threads"
-      # the tail identifiers of the read pairs
-      # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
-      # then only put the portion of the file names that change to correspond to the read pairs
-      # in this example, Clade_1_01_ identify the taxons and so must not be included
-      r1_tail="$r1_tail"
-      r2_tail="$r2_tail"
-      # the output directory for your final information
-      outdir="$workd/$dir/phycorder-out"
-      #bootstrapping
-      bootstrapping=$bootstrapping
+      if [ "$tree" != "NONE" ]; then
+        cat <<phy_loop > basic.cfg
+
+        ## Welcome to the Phycorder config file
+        # Change the variable values to match the files and numbers you wish to use
+        # this is the path to the phycorder directory. Dont move it.
+
+        # PHYCORDER=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+        # the path to the previously generated alignment file
+
+        align="$workd/updated_phycorder_required_files/combo.fas"
+
+        # the path to the previously generated tree file made from the alignment file
+
+        tree="$workd/updated_phycorder_required_files/RAxML_bestTree.core_genome_run.out"
+
+        # the directory of paired end read pairs you belonging to taxa you wish to add to your phylogeny
+
+        read_dir="$workd/$dir"
+
+        # the number of taxa that can be added to the phylogeny at a single time
+        # should be less than the number of cores available
+        # should be balanced with the number of threads you will assign to the programs within phycorder
+
+        phycorder_runs="$phycorder_runs"
+
+        # the number of threads you wish to make available to each phycorder run
+        # for mapping with bowtie and inference with RAxML
+
+        threads="$phycorder_threads"
+
+        # the tail identifiers of the read pairs
+        # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
+        # then only put the portion of the file names that change to correspond to the read pairs
+        # in this example, Clade_1_01_ identify the taxons and so must not be included
+
+        r1_tail="$r1_tail"
+        r2_tail="$r2_tail"
+
+        # the output directory for your final information
+
+        outdir="$workd/$dir/phycorder-out"
+
+        #bootstrapping
+        bootstrapping=$bootstrapping
+
 phy_loop
 
-      wait
+      elif [ "$tree" == "NONE" ]; then
+        cat <<phy_loop > basic.cfg
+
+        ## Welcome to the Phycorder config file
+        # Change the variable values to match the files and numbers you wish to use
+        # this is the path to the phycorder directory. Dont move it.
+
+        # PHYCORDER=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+        # the path to the previously generated alignment file
+
+        align="$workd/updated_phycorder_required_files/combo.fas"
+
+        # the path to the previously generated tree file made from the alignment file
+
+        tree="NONE"
+
+        # the directory of paired end read pairs you belonging to taxa you wish to add to your phylogeny
+
+        read_dir="$workd/$dir"
+
+        # the number of taxa that can be added to the phylogeny at a single time
+        # should be less than the number of cores available
+        # should be balanced with the number of threads you will assign to the programs within phycorder
+
+        phycorder_runs="$phycorder_runs"
+
+        # the number of threads you wish to make available to each phycorder run
+        # for mapping with bowtie and inference with RAxML
+
+        threads="$phycorder_threads"
+
+        # the tail identifiers of the read pairs
+        # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
+        # then only put the portion of the file names that change to correspond to the read pairs
+        # in this example, Clade_1_01_ identify the taxons and so must not be included
+
+        r1_tail="$r1_tail"
+        r2_tail="$r2_tail"
+
+        # the output directory for your final information
+
+        outdir="$workd/$dir/phycorder-out"
+
+        #bootstrapping
+        bootstrapping=$bootstrapping
+
+phy_loop
+
+      fi
 
       time $phycorder_path/multi_map.sh ./basic.cfg
 
@@ -667,37 +734,105 @@ phy_loop
       wait
     else
 
-      cat <<phy_loop > basic.cfg
-      ## Welcome to the Phycorder config file
-      # Change the variable values to match the files and numbers you wish to use
-      # this is the path to the phycorder directory. Dont move it.
-      # PHYCORDER=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-      # the path to the previously generated alignment file
-      align="$workd/updated_phycorder_required_files/extended.aln"
-      # the path to the previously generated tree file made from the alignment file
-      tree="$workd/updated_phycorder_required_files/RAxML_bestTree.consensusFULL"
-      # the directory of paired end read pairs you belonging to taxa you wish to add to your phylogeny
-      read_dir="$workd/$dir"
-      # the number of taxa that can be added to the phylogeny at a single time
-      # should be less than the number of cores available
-      # should be balanced with the number of threads you will assign to the programs within phycorder
-      phycorder_runs="$phycorder_runs"
-      # the number of threads you wish to make available to each phycorder run
-      # for mapping with bowtie and inference with RAxML
-      threads="$phycorder_threads"
-      # the tail identifiers of the read pairs
-      # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
-      # then only put the portion of the file names that change to correspond to the read pairs
-      # in this example, Clade_1_01_ identify the taxons and so must not be included
-      r1_tail="$r1_tail"
-      r2_tail="$r2_tail"
-      # the output directory for your final information
-      outdir="$workd/$dir/phycorder-out"
-      #bootstrapping
-      bootstrapping=$bootstrapping
+      if [ "$tree" != "NONE" ]; then
+        cat <<phy_loop > basic.cfg
+
+        ## Welcome to the Phycorder config file
+        # Change the variable values to match the files and numbers you wish to use
+        # this is the path to the phycorder directory. Dont move it.
+
+        # PHYCORDER=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+        # the path to the previously generated alignment file
+
+        align="$workd/updated_phycorder_required_files/extended.aln"
+
+        # the path to the previously generated tree file made from the alignment file
+
+        tree="$workd/updated_phycorder_required_files/RAxML_bestTree.consensusFULL"
+
+        # the directory of paired end read pairs you belonging to taxa you wish to add to your phylogeny
+
+        read_dir="$workd/$dir"
+
+        # the number of taxa that can be added to the phylogeny at a single time
+        # should be less than the number of cores available
+        # should be balanced with the number of threads you will assign to the programs within phycorder
+
+        phycorder_runs="$phycorder_runs"
+
+        # the number of threads you wish to make available to each phycorder run
+        # for mapping with bowtie and inference with RAxML
+
+        threads="$phycorder_threads"
+
+        # the tail identifiers of the read pairs
+        # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
+        # then only put the portion of the file names that change to correspond to the read pairs
+        # in this example, Clade_1_01_ identify the taxons and so must not be included
+
+        r1_tail="$r1_tail"
+        r2_tail="$r2_tail"
+
+        # the output directory for your final information
+
+        outdir="$workd/$dir/phycorder-out"
+
+        #bootstrapping
+        bootstrapping=$bootstrapping
+
 phy_loop
 
-      wait
+      elif [ "$tree" == "NONE" ]; then
+        cat <<phy_loop > basic.cfg
+
+        ## Welcome to the Phycorder config file
+        # Change the variable values to match the files and numbers you wish to use
+        # this is the path to the phycorder directory. Dont move it.
+
+        # PHYCORDER=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+        # the path to the previously generated alignment file
+
+        align="$workd/updated_phycorder_required_files/extended.aln"
+
+        # the path to the previously generated tree file made from the alignment file
+
+        tree="NONE"
+
+        # the directory of paired end read pairs you belonging to taxa you wish to add to your phylogeny
+
+        read_dir="$workd/$dir"
+
+        # the number of taxa that can be added to the phylogeny at a single time
+        # should be less than the number of cores available
+        # should be balanced with the number of threads you will assign to the programs within phycorder
+
+        phycorder_runs="$phycorder_runs"
+
+        # the number of threads you wish to make available to each phycorder run
+        # for mapping with bowtie and inference with RAxML
+
+        threads="$phycorder_threads"
+
+        # the tail identifiers of the read pairs
+        # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
+        # then only put the portion of the file names that change to correspond to the read pairs
+        # in this example, Clade_1_01_ identify the taxons and so must not be included
+
+        r1_tail="$r1_tail"
+        r2_tail="$r2_tail"
+
+        # the output directory for your final information
+
+        outdir="$workd/$dir/phycorder-out"
+
+        #bootstrapping
+        bootstrapping=$bootstrapping
+
+phy_loop
+
+      fi
 
       time $phycorder_path/multi_map.sh ./basic.cfg
 

@@ -589,7 +589,7 @@ elif [ $gon_phy_alignments == "OFF" ]; then
   # variable_name="value_of_the_variable"
   # value of the variable can be a path to a file or directory of files
   # Path to the reference genome required for Parsnp
-  ref_genome="$ref_gnome"
+  ref_genome="$ref_genome"
   # Path to the directory of reads for assembly
   read_dir="$workd/$first_tree_dir"
   # number of threads for Spades assembly and RAxML inference

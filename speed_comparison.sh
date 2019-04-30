@@ -174,3 +174,39 @@ fi
 { time $phycorder_path/multi_map.sh ./basic.cfg 2> update.stderr ; } 2> update_time.txt
 
 # time $phycorder_path/multi_map.sh ./basic.cfg
+
+# link files for the starting tree into the update directory for the complete amount of taxa
+for i in $(cat $outdir"/"start_tree_files.txt); do
+  ln -s "${read_dir}"/$i $update_dir
+  ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $update_dir
+done
+
+# create a config file on the fly with current settings
+cat <<EOF > gon_phyling_full_assembly.cfg
+## Config file for gon_phyling pipeline
+# change the values of the variables to control the pipeline
+# the variables are structured like this:
+# variable_name="value_of_the_variable"
+# value of the variable can be a path to a file or directory of files
+
+# Path to the reference genome required for Parsnp
+ref_genome="NONE"
+
+# Path to the directory of reads for assembly
+read_dir="$outdir/$update_dir"
+
+# number of threads for Spades assembly and RAxML inference
+threads="$THREADS"
+
+# File stubs required to assemble paired end reads
+r1_tail="$r1_tail"
+r2_tail="$r2_tail"
+
+#bootstrapping
+bootstrapping="$bootstrapping"
+EOF
+
+
+{ time $phycorder_path/gon_phyling.sh ./gon_phyling_full_assembly.cfg 2> full_assembly_run.stderr ; } 2> full_assembly_time.txt
+
+printf "Speed comparison complete. Check output files for times"

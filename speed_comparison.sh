@@ -69,7 +69,7 @@ mkdir phycorder_required_files
 
 cp $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $outdir/phycorder_required_files/
 
-cp $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out/ $outdir/phycorder_required_files/
+cp $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $outdir/phycorder_required_files/
 
 if [ "$tree" != "NONE" ]; then
   cat <<phy_loop > basic.cfg
@@ -86,7 +86,7 @@ if [ "$tree" != "NONE" ]; then
 
   # the path to the previously generated tree file made from the alignment file
 
-  tree="$outdir/updated_phycorder_required_files/RAxML_bestTree.core_genome_run.out"
+  tree="$outdir/phycorder_required_files/RAxML_bestTree.core_genome_run.out"
 
   # the directory of paired end read pairs you belonging to taxa you wish to add to your phylogeny
 
@@ -171,6 +171,6 @@ phy_loop
 
 fi
 
-{ time $phycorder_path/multi_map.sh ./basic.cfg 2> sleep.stderr ; } 2> update_time.txt
+{ time $phycorder_path/multi_map.sh ./basic.cfg 2> update.stderr ; } 2> update_time.txt
 
 # time $phycorder_path/multi_map.sh ./basic.cfg

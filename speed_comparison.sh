@@ -45,6 +45,9 @@ ref_genome="NONE"
 # Path to the directory of reads for assembly
 read_dir="$outdir/$start_dir"
 
+# number of runs for gon_phyling to commence in parallel
+gon_phy_runs="$gon_phy_runs"
+
 # number of threads for Spades assembly and RAxML inference
 threads="$THREADS"
 
@@ -63,7 +66,7 @@ EOF
 
 # time $phycorder_path/gon_phyling.sh ./first_tree_assembly.cfg
 
-{ time $phycorder_path/gon_phyling.sh ./first_tree_assembly.cfg 2> start_tree_make.stderr ; } 2> start_tree_make_time.txt
+{ time $phycorder_path/gon_phyling.sh ./first_tree_assembly.cfg 2>&1 $outdir/start_tree_make.stderr ; } 2> $outdir/start_tree_make_time.txt
 
 mkdir phycorder_required_files
 
@@ -171,7 +174,7 @@ phy_loop
 
 fi
 
-{ time $phycorder_path/multi_map.sh ./basic.cfg 2> update.stderr ; } 2> update_time.txt
+{ time $phycorder_path/multi_map.sh ./basic.cfg 2>&1 $outdir/update.stderr ; } 2> $outdir/update_time.txt
 
 # time $phycorder_path/multi_map.sh ./basic.cfg
 
@@ -195,6 +198,9 @@ ref_genome="NONE"
 # Path to the directory of reads for assembly
 read_dir="$outdir/$update_dir"
 
+# number of runs for gon_phyling to commence in parallel
+gon_phy_runs="$gon_phy_runs"
+
 # number of threads for Spades assembly and RAxML inference
 threads="$THREADS"
 
@@ -207,6 +213,6 @@ bootstrapping="$bootstrapping"
 EOF
 
 
-{ time $phycorder_path/gon_phyling.sh ./gon_phyling_full_assembly.cfg 2> full_assembly_run.stderr ; } 2> full_assembly_time.txt
+{ time $phycorder_path/gon_phyling.sh ./gon_phyling_full_assembly.cfg 2>&1 $outdir/full_assembly_run.stderr ; } 2> $outdir/full_assembly_time.txt
 
 printf "Speed comparison complete. Check output files for times"

@@ -592,6 +592,8 @@ elif [ $gon_phy_alignments == "OFF" ]; then
   ref_genome="$ref_genome"
   # Path to the directory of reads for assembly
   read_dir="$workd/$first_tree_dir"
+  # number of runs for gon_phyling to commence in parallel
+  gon_phy_runs="$gon_phy_runs"
   # number of threads for Spades assembly and RAxML inference
   threads="$THREADS"
   # File stubs required to assemble paired end reads
@@ -951,6 +953,8 @@ phy_loop
         ref_genome="$ref_genome"
         # Path to the directory of reads for assembly
         read_dir="$maind/gon_phy_runs_dir"
+        # number of runs for gon_phyling to commence in parallel
+        gon_phy_runs="$gon_phy_runs"
         # number of threads for Spades assembly and RAxML inference
         threads="$THREADS"
         # File stubs required to assemble paired end reads

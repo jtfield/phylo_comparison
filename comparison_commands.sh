@@ -24,8 +24,35 @@ cd $outdir
 
 workd=$(pwd)
 
+second_tree_num=$(($start_tree_num + 1))
+
+printf "Checking randomization setting\n"
+if [ $randomize == "ON" ]; then
+
+  printf "Using randomization setting\n"
+  ls "${master_reads}"/*$r1_tail | sort -R > taxa_list.txt
+  #
+  # cat taxa_list.txt | head -"${start_tree_num}" > start_alignment_taxa.txt
+  #
+  # cat taxa_list.txt | tail -n +"$second_tree_num" | split -a 20 -l $file_split_num
+  #
+elif [ $randomize == "OFF" ]; then
+
+  printf "Skipping randomization of input taxa"
+  ls "${master_reads}"/*$r1_tail > taxa_list.txt
+
+fi
+
+cat taxa_list.txt | head -"${start_tree_num}" > start_alignment_taxa.txt
+
+cat taxa_list.txt | tail -n +"$second_tree_num" | split -a 20 -l $file_split_num
+
+first_tree_dir=start_tree_dir
+
+mkdir $first_tree_dir
+
 # split reads up into different groups
-ls "${master_reads}"/*$r1_tail | split -a 20 -l $file_split_num
+# ls "${master_reads}"/*$r1_tail | split -a 20 -l $file_split_num
 
 # potential randomization command
 #ls ${master_reads}/*$r1_tail | sort -R | split -a 20 -l $file_split_num
@@ -35,7 +62,11 @@ for j in $(ls xa*); do
   mv $j $j.txt
 done
 
-wait
+for i in $(cat start_alignment_taxa.txt); do
+  ln -s "${read_dir}"/$i $first_tree_dir/
+  ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $first_tree_dir/
+  wait
+done
 
 # make new dirs for all the files that need to be processed
 # make symlinks in those dirs for the update files
@@ -50,13 +81,21 @@ for j in $(ls xa*.txt); do
 done
 
 # establish first and second tree directories for logical updating. Skipp first tree directory if in updating step
-first_tree_dir=$(ls -d xa*/ | head -1)
 
 second_tree_dir=$(ls -d xa*/ | head -2 | tail -1)
+
+# first_tree_dir=$(ls -d xa*/ | head -1)
+#
+# second_tree_dir=$(ls -d xa*/ | head -2 | tail -1)
 
 printf "$first_tree_dir"
 
 printf "$second_tree_dir"
+
+################################################################################
+# Proceeding with using gon_phyling.sh alignment files produced by a previous run of comparison
+#################################################################################
+
 
 if [ $gon_phy_alignments != "OFF" ]; then
 
@@ -606,24 +645,33 @@ EOF
   # run gon_phyling to create the first starting tree
   time $phycorder_path/gon_phyling.sh ./first_tree_assembly.cfg
 
-  mkdir updated_phycorder_required_files
+  printf "First tree produced. Beginning rapid updating\n"
 
-  cp $workd/$first_tree_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas ./updated_phycorder_required_files/
+  mkdir $workd/updated_phycorder_required_files
 
-  cp $workd/$first_tree_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out ./updated_phycorder_required_files/
+  cp $workd/$first_tree_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $workd/updated_phycorder_required_files/
+
+  cp $workd/$first_tree_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $workd/updated_phycorder_required_files/
 
   wait
 
   # begin looping through dirs of files to update with
   # and start running phycorder
   for dir in $(ls -d */ ); do
-    # printf $dir
+    printf "Looping through directories of split files and updating alignments and trees with Phycorder\n"
+    printf $dir
     # printf $first_tree_dir
-    if [ "$dir" == "$first_tree_dir" ]; then
+    #if [ "$dir" == "$first_tree_dir" ]; then
+    if [[ $( echo "$dir" | grep "$first_tree_dir" ) && $? -eq 0 ]]; then
 
       printf "skipping first first tree file"
 
-    elif [ "$dir" == "$second_tree_dir" ]; then
+    elif [[ $( echo "$dir" | grep "updated_phycorder_required_files" ) && $? -eq 0 ]]; then
+
+      printf "Skipping folder with phycorder required files"
+
+    elif [[ $( echo "$dir" | grep "$second_tree_dir" ) && $? -eq 0 ]]; then
+    #elif [ "$dir" == "$second_tree_dir" ]; then
 
       if [ "$tree" != "NONE" ]; then
         cat <<phy_loop > basic.cfg
@@ -729,9 +777,9 @@ phy_loop
 
       wait
 
-      cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL ./updated_phycorder_required_files/
+      cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL $workd/updated_phycorder_required_files/
 
-      cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln ./updated_phycorder_required_files/
+      cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln $workd/updated_phycorder_required_files/
 
       wait
     else
@@ -840,13 +888,13 @@ phy_loop
 
       wait
 
-      rm ./updated_phycorder_required_files/RAxML_bestTree.consensusFULL
+      rm $workd/updated_phycorder_required_files/RAxML_bestTree.consensusFULL
 
-      rm ./updated_phycorder_required_files/extended.aln
+      rm $workd/updated_phycorder_required_files/extended.aln
 
-      cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL ./updated_phycorder_required_files/
+      cp $workd/$dir/phycorder-out/combine_and_infer/RAxML_bestTree.consensusFULL $workd/updated_phycorder_required_files/
 
-      cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln ./updated_phycorder_required_files/
+      cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln $workd/updated_phycorder_required_files/
 
       wait
     fi
@@ -855,7 +903,7 @@ phy_loop
   # END OF PHYCORDER RUN
 
 
-  rm -r ./updated_phycorder_required_files/
+  #rm -r ./updated_phycorder_required_files/
 
   mkdir $maind/phycorder_results
 
@@ -866,7 +914,11 @@ phy_loop
   for dir in $(ls -d */ ); do
     COUNTER=$[$(cat $TEMPFILE) + 1]
 
-    if [ "$dir" == "$first_tree_dir" ]; then
+    if [[ $( echo "$dir" | grep "updated_phycorder_required_files" ) && $? -eq 0 ]]; then
+
+      printf "Skipping updated_phycorder_required_files"
+
+    elif [[ $( echo "$dir" | grep "$first_tree_dir" ) && $? -eq 0 ]]; then
 
       printf "skipping first first tree file"
 

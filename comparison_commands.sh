@@ -82,7 +82,7 @@ done
 
 # establish first and second tree directories for logical updating. Skipp first tree directory if in updating step
 
-second_tree_dir=$(ls -d xa*/ | head -2 | tail -1)
+second_tree_dir=$(ls -d xa*/ | head -1)
 
 # first_tree_dir=$(ls -d xa*/ | head -1)
 #
@@ -961,82 +961,88 @@ phy_loop
   mkdir $gon_runs
 
   TEMPFILE=/tmp/$$.tmp
-  echo 0 > $TEMPFILE
+  echo 1 > $TEMPFILE
 
   cd $workd
+
+  for i in $(cat start_alignment_taxa.txt); do
+    ln -s "${read_dir}"/$i $maind/gon_phy_runs_dir/
+    ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $maind/gon_phy_runs_dir/
+
+  done
 
   for j in $(ls xa*.txt); do
 
     COUNTER=$[$(cat $TEMPFILE) + 1]
-    if [ "$COUNTER" -eq 1 ]; then
-
-      for i in $(cat $j); do
-
-        printf "First tree already assembled, skipping to second tree."
-
-        ln -s "${read_dir}"/$i $maind/gon_phy_runs_dir/
-        ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $maind/gon_phy_runs_dir/
-
-        wait
-
-        echo $COUNTER > $TEMPFILE
-
-      done
-
-    else
-      for i in $(cat $j); do
-        ln -s "${read_dir}"/$i $maind/gon_phy_runs_dir/
-        ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $maind/gon_phy_runs_dir/
-
-
-        wait
-
-      done
+    # if [ "$COUNTER" -eq 1 ]; then
+    #
+    #   for i in $(cat $j); do
+    #
+    #     printf "First tree already assembled, skipping to second tree."
+    #
+    #     ln -s "${read_dir}"/$i $maind/gon_phy_runs_dir/
+    #     ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $maind/gon_phy_runs_dir/
+    #
+    #     wait
+    #
+    #     echo $COUNTER > $TEMPFILE
+    #
+    #   done
+    #
+    # else
+    for i in $(cat $j); do
+      ln -s "${read_dir}"/$i $maind/gon_phy_runs_dir/
+      ln -s "${read_dir}"/${i%$r1_tail}$r2_tail $maind/gon_phy_runs_dir/
 
 
+      wait
 
-        cat <<gon_phy_loop > gon_phy_basic.cfg
-        ## Config file for gon_phyling pipeline
-        # change the values of the variables to control the pipeline
-        # the variables are structured like this:
-        # variable_name="value_of_the_variable"
-        # value of the variable can be a path to a file or directory of files
-        # Path to the reference genome required for Parsnp
-        ref_genome="$ref_genome"
-        # Path to the directory of reads for assembly
-        read_dir="$maind/gon_phy_runs_dir"
-        # number of runs for gon_phyling to commence in parallel
-        gon_phy_runs="$gon_phy_runs"
-        # number of threads for Spades assembly and RAxML inference
-        threads="$THREADS"
-        # File stubs required to assemble paired end reads
-        r1_tail="$r1_tail"
-        r2_tail="$r2_tail"
-        #bootstrapping
-        bootstrapping=$bootstrapping
+    done
+
+
+
+      cat <<gon_phy_loop > gon_phy_basic.cfg
+      ## Config file for gon_phyling pipeline
+      # change the values of the variables to control the pipeline
+      # the variables are structured like this:
+      # variable_name="value_of_the_variable"
+      # value of the variable can be a path to a file or directory of files
+      # Path to the reference genome required for Parsnp
+      ref_genome="$ref_genome"
+      # Path to the directory of reads for assembly
+      read_dir="$maind/gon_phy_runs_dir"
+      # number of runs for gon_phyling to commence in parallel
+      gon_phy_runs="$gon_phy_runs"
+      # number of threads for Spades assembly and RAxML inference
+      threads="$THREADS"
+      # File stubs required to assemble paired end reads
+      r1_tail="$r1_tail"
+      r2_tail="$r2_tail"
+      #bootstrapping
+      bootstrapping=$bootstrapping
 gon_phy_loop
 
       #   else
       #     printf "$dir"
-        $phycorder_path/gon_phyling.sh ./gon_phy_basic.cfg
+      $phycorder_path/gon_phyling.sh ./gon_phy_basic.cfg
 
-        wait
+      wait
 
-        mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.gon_phy-$COUNTER-.out
+      mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $maind/gon_phy_results/RAxML_bestTree.gon_phy-$COUNTER-.out
 
-        mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $maind/gon_phy_results/gon_phy-$COUNTER-.fas
+      mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas $maind/gon_phy_results/gon_phy-$COUNTER-.fas
 
-        mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bipartitions.core_genome_run.out $maind/gon_phy_results/RAxML_bipartitions.gon_phy_majority_rule-$COUNTER-.out
+      mv $maind/gon_phy_runs_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bipartitions.core_genome_run.out $maind/gon_phy_results/RAxML_bipartitions.gon_phy_majority_rule-$COUNTER-.out
 
-        echo "$COUNTER"
+      echo "$COUNTER"
 
-        echo $COUNTER > $TEMPFILE
+      echo $COUNTER > $TEMPFILE
 
-        rm -r $maind/gon_phy_runs_dir/trimmed*
+      rm -r $maind/gon_phy_runs_dir/trimmed*
 
-        wait
+      wait
 
-    fi
+
 
   done
 

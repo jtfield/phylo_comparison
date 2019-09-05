@@ -27,7 +27,7 @@ workd=$(pwd)
 second_tree_num=$(($start_tree_num + 1))
 
 printf "Checking randomization setting\n"
-if [ $randomize == "ON" ]; then
+if [ "$randomize" == "ON" ]; then
 
   printf "Using randomization setting\n"
   ls "${master_reads}"/*$r1_tail | sort -R > taxa_list.txt
@@ -36,9 +36,9 @@ if [ $randomize == "ON" ]; then
   #
   # cat taxa_list.txt | tail -n +"$second_tree_num" | split -a 20 -l $file_split_num
   #
-elif [ $randomize == "OFF" ]; then
+elif [ "$randomize" == "OFF" ]; then
 
-  printf "Skipping randomization of input taxa"
+  printf "Skipping randomization of input taxa\n"
   ls "${master_reads}"/*$r1_tail > taxa_list.txt
 
 fi

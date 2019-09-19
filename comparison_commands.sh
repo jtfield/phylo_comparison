@@ -640,6 +640,14 @@ elif [ $gon_phy_alignments == "OFF" ]; then
   r2_tail="$r2_tail"
   #bootstrapping
   bootstrapping="OFF"
+  # type of output
+  # this setting determines if you output a single, concatenated loci MSA fasta file,
+  # multiple single locus MSA fasta files
+  # or a single nexus file that includes the start and stop locations of each loci
+  # EXAMPLE: output_type="LOCI"
+  # EXAMPLE: output_type="LOCUS"
+  # EXAMPLE: output_type="NEXUS" ~~~~~~NOT SUPPORTED YET~~~~~~
+  output_type="$output_type"
 EOF
 
   # run gon_phyling to create the first starting tree
@@ -1022,6 +1030,14 @@ phy_loop
       r2_tail="$r2_tail"
       #bootstrapping
       bootstrapping=$bootstrapping
+      # type of output
+      # this setting determines if you output a single, concatenated loci MSA fasta file,
+      # multiple single locus MSA fasta files
+      # or a single nexus file that includes the start and stop locations of each loci
+      # EXAMPLE: output_type="LOCI"
+      # EXAMPLE: output_type="LOCUS"
+      # EXAMPLE: output_type="NEXUS" ~~~~~~NOT SUPPORTED YET~~~~~~
+      output_type="LOCUS"
 gon_phy_loop
 
       #   else

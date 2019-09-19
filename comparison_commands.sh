@@ -664,11 +664,11 @@ EOF
     #if [ "$dir" == "$first_tree_dir" ]; then
     if [[ $( echo "$dir" | grep "$first_tree_dir" ) && $? -eq 0 ]]; then
 
-      printf "skipping first first tree file"
+      printf "skipping first first tree file\n"
 
     elif [[ $( echo "$dir" | grep "updated_phycorder_required_files" ) && $? -eq 0 ]]; then
 
-      printf "Skipping folder with phycorder required files"
+      printf "Skipping folder with phycorder required files\n"
 
     elif [[ $( echo "$dir" | grep "$second_tree_dir" ) && $? -eq 0 ]]; then
     #elif [ "$dir" == "$second_tree_dir" ]; then
@@ -772,6 +772,8 @@ phy_loop
 phy_loop
 
       fi
+
+      printf "BEGINNING PHYCORDER STATE\n" 
 
       time $phycorder_path/multi_map.sh ./basic.cfg
 

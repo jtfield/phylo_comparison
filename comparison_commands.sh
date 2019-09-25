@@ -648,6 +648,8 @@ elif [ $gon_phy_alignments == "OFF" ]; then
   # EXAMPLE: output_type="LOCUS"
   # EXAMPLE: output_type="NEXUS" ~~~~~~NOT SUPPORTED YET~~~~~~
   output_type="$output_type"
+  # output location for the positional dict file if enabled
+  loci_positions="$loci_positions"
 EOF
 
   # run gon_phyling to create the first starting tree
@@ -728,6 +730,17 @@ EOF
         #bootstrapping
         bootstrapping=$bootstrapping
 
+	# alignment type, either concatenated loci file or multiple single locus files
+	# important later
+	align_type="$output_type"
+
+	# In addition, you'll currently need to run Gon_phyling with align_type="LOCUS" to run this mode
+	# you'll need to pass in the location of the output positional dictionary file describing the length
+	# of the loci in the concatenated alignment. This is important because it also contains the relative positon
+	# in the concatenated alignment
+	# give this variable the absolute path to the dict file
+	loci_positions="$loci_positions"
+
 phy_loop
 
       elif [ "$tree" == "NONE" ]; then
@@ -776,6 +789,17 @@ phy_loop
 
         #bootstrapping
         bootstrapping=$bootstrapping
+
+	# alignment type, either concatenated loci file or multiple single locus files
+        # important later
+        align_type="$output_type" 
+
+	# In addition, you'll currently need to run Gon_phyling with align_type="LOCUS" to run this mode
+        # you'll need to pass in the location of the output positional dictionary file describing the length
+        # of the loci in the concatenated alignment. This is important because it also contains the relative positon
+        # in the concatenated alignment
+        # give this variable the absolute path to the dict file
+        loci_positions="$loci_positions"
 
 phy_loop
 
@@ -841,6 +865,17 @@ phy_loop
         #bootstrapping
         bootstrapping=$bootstrapping
 
+	# alignment type, either concatenated loci file or multiple single locus files
+        # important later
+        align_type="$output_type"
+
+	# In addition, you'll currently need to run Gon_phyling with align_type="LOCUS" to run this mode
+        # you'll need to pass in the location of the output positional dictionary file describing the length
+        # of the loci in the concatenated alignment. This is important because it also contains the relative positon
+        # in the concatenated alignment
+        # give this variable the absolute path to the dict file
+        loci_positions="$loci_positions"
+
 phy_loop
 
       elif [ "$tree" == "NONE" ]; then
@@ -889,6 +924,17 @@ phy_loop
 
         #bootstrapping
         bootstrapping=$bootstrapping
+
+	# alignment type, either concatenated loci file or multiple single locus files
+        # important later
+        align_type="$output_type"
+
+	# In addition, you'll currently need to run Gon_phyling with align_type="LOCUS" to run this mode
+        # you'll need to pass in the location of the output positional dictionary file describing the length
+        # of the loci in the concatenated alignment. This is important because it also contains the relative positon
+        # in the concatenated alignment
+        # give this variable the absolute path to the dict file
+        loci_positions="$loci_positions"
 
 phy_loop
 
@@ -1037,7 +1083,9 @@ phy_loop
       # EXAMPLE: output_type="LOCI"
       # EXAMPLE: output_type="LOCUS"
       # EXAMPLE: output_type="NEXUS" ~~~~~~NOT SUPPORTED YET~~~~~~
-      output_type="LOCUS"
+      output_type="$output_type"
+      # output location for the positional dict file if enabled
+      loci_positions="$loci_positions"
 gon_phy_loop
 
       #   else

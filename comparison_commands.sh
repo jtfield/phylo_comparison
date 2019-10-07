@@ -663,6 +663,8 @@ EOF
 
   cp $workd/$first_tree_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out $workd/updated_phycorder_required_files/
 
+  cp $workd/$first_tree_dir/trimmed_reads/spades_output/genomes_for_parsnp/P*/parsnp.xmfa $workd/updated_phycorder_required_files/
+
   wait
 
   # begin looping through dirs of files to update with
@@ -694,7 +696,7 @@ EOF
 
         # the path to the previously generated alignment file
 
-        align="$workd/updated_phycorder_required_files/combo.fas"
+        align="$workd/updated_phycorder_required_files/parsnp.xmfa"
 
         # the path to the previously generated tree file made from the alignment file
 
@@ -730,16 +732,34 @@ EOF
         #bootstrapping
         bootstrapping=$bootstrapping
 
-	# alignment type, either concatenated loci file or multiple single locus files
-	# important later
-	align_type="$output_type"
-
-	# In addition, you'll currently need to run Gon_phyling with align_type="LOCUS" to run this mode
+	# In addition, you'll currently need to run Phycorder with align_type="LOCUS" to run this mode
 	# you'll need to pass in the location of the output positional dictionary file describing the length
 	# of the loci in the concatenated alignment. This is important because it also contains the relative positon
 	# in the concatenated alignment
 	# give this variable the absolute path to the dict file
 	loci_positions="$loci_positions"
+
+	# depending on how you want to use phycorder, you'll change this variable value.
+	# if you have multiple sequence alignments for multiple single locus,
+	# if you have a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+	# if you have a nexus file with concatenated MSA and loci start and stop positions
+	# EXAMPLE: align_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<
+	# EXAMPLE: align_type="SINGLE_LOCUS_FILES"
+	# EXAMPLE: align_type="CONCAT_MSA"
+	# EXAMPLE: align_type="PARSNP_XMFA"
+	#align_type="CONCAT_MSA"
+	align_type="PARSNP_XMFA"
+	#align_type="SINGLE_LOCUS_FILES"
+
+	# depending on how you want to use phycorder, you'll change this variable value.
+	# if you want multiple sequence alignments for multiple single locus,
+	# if you want  a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+	# if you want a nexus file with concatenated MSA and loci start and stop positions
+	# EXAMPLE: output_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<<<
+	# EXAMPLE: output_type="SINGLE_LOCUS_FILES"
+	# EXAMPLE: output_type="CONCAT_MSA"
+	#output_type="SINGLE_LOCUS_FILES"
+	output_type="CONCAT_MSA"
 
 phy_loop
 
@@ -754,7 +774,7 @@ phy_loop
 
         # the path to the previously generated alignment file
 
-        align="$workd/updated_phycorder_required_files/combo.fas"
+        align="$workd/updated_phycorder_required_files/parsnp.xmfa"
 
         # the path to the previously generated tree file made from the alignment file
 
@@ -790,16 +810,34 @@ phy_loop
         #bootstrapping
         bootstrapping=$bootstrapping
 
-	# alignment type, either concatenated loci file or multiple single locus files
-        # important later
-        align_type="$output_type" 
-
 	# In addition, you'll currently need to run Gon_phyling with align_type="LOCUS" to run this mode
         # you'll need to pass in the location of the output positional dictionary file describing the length
         # of the loci in the concatenated alignment. This is important because it also contains the relative positon
         # in the concatenated alignment
         # give this variable the absolute path to the dict file
         loci_positions="$loci_positions"
+
+	# depending on how you want to use phycorder, you'll change this variable value.
+	# if you have multiple sequence alignments for multiple single locus,
+	# if you have a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+	# if you have a nexus file with concatenated MSA and loci start and stop positions
+	# EXAMPLE: align_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<
+	# EXAMPLE: align_type="SINGLE_LOCUS_FILES"
+	# EXAMPLE: align_type="CONCAT_MSA"
+	# EXAMPLE: align_type="PARSNP_XMFA"
+	#align_type="CONCAT_MSA"
+	align_type="PARSNP_XMFA"
+	#align_type="SINGLE_LOCUS_FILES"
+
+	# depending on how you want to use phycorder, you'll change this variable value.
+	# if you want multiple sequence alignments for multiple single locus,
+	# if you want  a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+	# if you want a nexus file with concatenated MSA and loci start and stop positions
+	# EXAMPLE: output_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<<<
+	# EXAMPLE: output_type="SINGLE_LOCUS_FILES"
+	# EXAMPLE: output_type="CONCAT_MSA"
+	#output_type="SINGLE_LOCUS_FILES"
+	output_type="CONCAT_MSA"
 
 phy_loop
 
@@ -816,6 +854,8 @@ phy_loop
       cp $workd/$dir/phycorder-out/combine_and_infer/extended.aln $workd/updated_phycorder_required_files/
 
       wait
+##### BEGIN SECTION FOR THIRD AND BEYOND TREES######################
+
     else
 
       if [ "$tree" != "NONE" ]; then
@@ -865,16 +905,34 @@ phy_loop
         #bootstrapping
         bootstrapping=$bootstrapping
 
-	# alignment type, either concatenated loci file or multiple single locus files
-        # important later
-        align_type="$output_type"
-
 	# In addition, you'll currently need to run Gon_phyling with align_type="LOCUS" to run this mode
         # you'll need to pass in the location of the output positional dictionary file describing the length
         # of the loci in the concatenated alignment. This is important because it also contains the relative positon
         # in the concatenated alignment
         # give this variable the absolute path to the dict file
         loci_positions="$loci_positions"
+
+	# depending on how you want to use phycorder, you'll change this variable value.
+	# if you have multiple sequence alignments for multiple single locus,
+	# if you have a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+	# if you have a nexus file with concatenated MSA and loci start and stop positions
+	# EXAMPLE: align_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<
+	# EXAMPLE: align_type="SINGLE_LOCUS_FILES"
+	# EXAMPLE: align_type="CONCAT_MSA"
+	# EXAMPLE: align_type="PARSNP_XMFA"
+	align_type="CONCAT_MSA"
+	#align_type="PARSNP_XMFA"
+	#align_type="SINGLE_LOCUS_FILES"
+
+	# depending on how you want to use phycorder, you'll change this variable value.
+	# if you want multiple sequence alignments for multiple single locus,
+	# if you want  a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+	# if you want a nexus file with concatenated MSA and loci start and stop positions
+	# EXAMPLE: output_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<<<
+	# EXAMPLE: output_type="SINGLE_LOCUS_FILES"
+	# EXAMPLE: output_type="CONCAT_MSA"
+	#output_type="SINGLE_LOCUS_FILES"
+	output_type="CONCAT_MSA"
 
 phy_loop
 
@@ -925,16 +983,34 @@ phy_loop
         #bootstrapping
         bootstrapping=$bootstrapping
 
-	# alignment type, either concatenated loci file or multiple single locus files
-        # important later
-        align_type="$output_type"
-
 	# In addition, you'll currently need to run Gon_phyling with align_type="LOCUS" to run this mode
         # you'll need to pass in the location of the output positional dictionary file describing the length
         # of the loci in the concatenated alignment. This is important because it also contains the relative positon
         # in the concatenated alignment
         # give this variable the absolute path to the dict file
         loci_positions="$loci_positions"
+
+	# depending on how you want to use phycorder, you'll change this variable value.
+	# if you have multiple sequence alignments for multiple single locus,
+	# if you have a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+	# if you have a nexus file with concatenated MSA and loci start and stop positions
+	# EXAMPLE: align_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<
+	# EXAMPLE: align_type="SINGLE_LOCUS_FILES"
+	# EXAMPLE: align_type="CONCAT_MSA"
+	# EXAMPLE: align_type="PARSNP_XMFA"
+	align_type="CONCAT_MSA"
+	#align_type="PARSNP_XMFA"
+	#align_type="SINGLE_LOCUS_FILES"
+
+	# depending on how you want to use phycorder, you'll change this variable value.
+	# if you want multiple sequence alignments for multiple single locus,
+	# if you want  a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+	# if you want a nexus file with concatenated MSA and loci start and stop positions
+	# EXAMPLE: output_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<<<
+	# EXAMPLE: output_type="SINGLE_LOCUS_FILES"
+	# EXAMPLE: output_type="CONCAT_MSA"
+	#output_type="SINGLE_LOCUS_FILES"
+	output_type="CONCAT_MSA"
 
 phy_loop
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 # Phycorder and Gon_phyling basecall accuracy comparison
+PHY_COMPARE=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 
 source $1
 
@@ -16,8 +18,10 @@ ls "${master_reads}"/*$r1_tail | tail -n +11 > update_read_list.txt
 start_dir=start_tree_dir
 update_dir=update_alignment_dir
 loci_blast_indexes=loci_blast_indexes_dir
+truncated_tree=phycorder_low_loci_dir
 
 mkdir $start_dir
+mkdir $truncated_tree
 mkdir $update_dir
 mkdir $loci_blast_indexes
 
@@ -81,5 +85,26 @@ EOF
 
 fi
 
-cp $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/*.fasta $outdir/$loci_blast_indexes/
+$PHY_COMPARE/select_ten.py --msa_folder $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files --position_dict_file $outdir/positional_dict.txt --out_file $outdir/$loci_blast_indexes/loci_for_use.txt
+
+# move a set number (max of 10) of loci to a folder where blast indexes will be constructed
+# SEPERATE TOP TAXON SEQUNCE AS REPRESENTITIVE TO BE USED FOR BLAST INDEX
+for i in $(cat $outdir"/"$loci_blast_indexes"/"loci_for_use.txt); do
+
+	cp "$outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/$i" $outdir/$loci_blast_indexes/
+
+	cp "$outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/$i" $outdir/$truncated_tree/
+
+	$phycorder_path/ref_producer.py --align_file $outdir/$loci_blast_indexes/$i --out_file $outdir/$loci_blast_indexes/$i-single.fasta
+
+	makeblastdb -in $outdir/$loci_blast_indexes/$i-single.fasta -dbtype nucl -parse_seqids
+
+done
+
+# COMBINE SELECTED LOCI INTO SINGLE FASTA FILE FOR TRUNCATED PHYCORDER RUN
+$phycorder_path/locus_combiner.py --msa_folder $truncated_tree --out_file phycord_base.fasta --position_dict_file pos_file.txt --suffix .fasta
+
+
+
+
 

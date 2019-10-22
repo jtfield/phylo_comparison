@@ -157,5 +157,19 @@ fi
 
 time $phycorder_path/gon_phyling.sh $outdir/gon_phy_assembly.cfg
 
+for j in $(ls $outdir/$loci_blast_indexes/*single.fasta); do
+        for i in $(ls $outdir/$gon_phy/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/*.fasta); do
 
+                database=$(basename $j)
+                query=$(basename $i)
+                blastn -db $j -query $i -out blast_output-$database-$query.txt -outfmt 5
+                #printf "$j \n"
+                #printf "$i \n"
+                #printf "\n"
+
+
+
+        done
+        wait
+done
 

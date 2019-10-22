@@ -8,7 +8,7 @@ import json
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--msa_folder')
-    #parser.add_argument('--out_file')
+    parser.add_argument('--out_file')
     parser.add_argument('--position_dict_file')
     #parser.add_argument('--suffix')
     return parser.parse_args()
@@ -29,12 +29,14 @@ def main():
     loci_count = 0
     for pos, locus_name_and_len in pos_dict.items():
         for leng, name in locus_name_and_len.items():
-            if leng >= 2000 and loci_count < 10 and name in msa_list:
+            #print(type(leng))
+            if int(leng) >= 2000 and loci_count < 10 and name in msa_list:
                 loci_for_use.append(str(name))
+                loci_count+=1
      
     print(loci_for_use)
 
-    open_output = open("loci_for_use.txt","w")
+    open_output = open(args.out_file,"w")
     for name in loci_for_use:
         open_output.write(name)
         open_output.write("\n")

@@ -23,9 +23,9 @@ def main():
     #print(results_list)
 
     evalue = "<Hsp_evalue>(.+)</Hsp_evalue>"
-    hsp_align_leng = "<Hsp_align-len>.+</Hsp_align-len>"
-    gaps = "<Hsp_gaps>.+</Hsp_gaps>"
-    query_len = "<Iteration_query-len>.+</Iteration_query-len>"
+    hsp_align_leng = "<Hsp_align-len>(.+)</Hsp_align-len>"
+    gaps = "<Hsp_gaps>(.+)</Hsp_gaps>"
+    query_len = "<Iteration_query-len>(.+)</Iteration_query-len>"
     hit = "<Hit>"
     file_name_re = "blast_output-(cluster\d+-.fasta-single.fasta)-(cluster\d+-.fasta).txt"
 
@@ -51,11 +51,21 @@ def main():
                 if split_count == 1 and type(split_chunk) != 'NoneType':
                     #print(split_chunk)
                     evalue_findall = re.findall(compile_evalue, split_chunk)
-                    if evalue_findall:
-                        if '0' in evalue_findall:
-                            check_file_name = re.findall(compile_file_name, file_name)
-                            phycord_file = check_file_name[0][0]
-                            gon_phy_file = check_file_name[0][1]
+                    query_len_findall = re.findall(compile_query_len, split_chunk)
+                    hsp_align_leng_findall = re.findall(compile_hsp_align_leng, split_chunk)
+                    if query_len_findall:
+                        if hsp_align_leng_findall:
+                            if int(hsp_align_leng_findall[0]) >= (int(query_len_findall[0]) / 2):
+                                print(hsp_align_leng_findall)
+                                
+
+
+
+                    #if evalue_findall:
+                    #    if '0' in evalue_findall:
+                    #        check_file_name = re.findall(compile_file_name, file_name)
+                    #        phycord_file = check_file_name[0][0]
+                    #        gon_phy_file = check_file_name[0][1]
 
                             
                     

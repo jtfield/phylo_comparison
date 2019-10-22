@@ -20,12 +20,14 @@ update_dir=update_alignment_dir
 loci_blast_indexes=loci_blast_indexes_dir
 truncated_tree=phycorder_low_loci_dir
 gon_phy=gon_phyling_dir
+gon_phy_tree=gon_phyling_tree_dir
 
 mkdir $start_dir
 mkdir $truncated_tree
 mkdir $update_dir
 mkdir $loci_blast_indexes
 mkdir $gon_phy
+mkdir $gon_phy_tree
 
 # link files for the starting tree into a seperate directory
 # seperate directory for both the complete run and the single addition of a taxon run
@@ -106,7 +108,7 @@ for i in $(cat $outdir"/"$loci_blast_indexes"/"loci_for_use.txt); do
 
 	cp "$outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/$i" $outdir/$loci_blast_indexes/
 
-	cp "$outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/$i" $outdir/$truncated_tree/
+	#cp "$outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/$i" $outdir/$truncated_tree/
 
 	$phycorder_path/ref_producer.py --align_file $outdir/$loci_blast_indexes/$i --out_file $outdir/$loci_blast_indexes/$i-single.fasta
 
@@ -115,7 +117,7 @@ for i in $(cat $outdir"/"$loci_blast_indexes"/"loci_for_use.txt); do
 done
 
 # COMBINE SELECTED LOCI INTO SINGLE FASTA FILE FOR TRUNCATED PHYCORDER RUN
-$phycorder_path/locus_combiner.py --msa_folder $outdir/$truncated_tree/ --out_file $outdir/$truncated_tree/phycord_base.fasta --position_dict_file $outdir/$truncated_tree/pos_file.txt --suffix .fasta
+#$phycorder_path/locus_combiner.py --msa_folder $outdir/$truncated_tree/ --out_file $outdir/$truncated_tree/phycord_base.fasta --position_dict_file $outdir/$truncated_tree/pos_file.txt --suffix .fasta
 
 # RUN GON_PHYLING ON READS FOR ALL TAXA IN LOCUS MODE
 if [ $gon_phy_alignments == "OFF" ]; then
@@ -172,4 +174,37 @@ for j in $(ls $outdir/$loci_blast_indexes/*single.fasta); do
         done
         wait
 done
+
+
+$PHY_COMPARE/basecall_loci_matcher.py --blast_output_folder $outdir/$loci_blast_indexes --gon_out_file $outdir/gon_phyling_files.txt --phy_out_file $ourdir/phycorder_files.txt
+
+
+# MOVE FILES INTO APPROPRIATE FOLDERS
+
+for i in $(cat $outdir"/"phycorder_files.txt); do
+	cp "$outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/$i" $outdir/$truncated_tree/
+
+done
+
+$phycorder_path/locus_combiner.py --msa_folder $outdir/$truncated_tree/ --out_file $outdir/$truncated_tree/phycord_base.fasta --position_dict_file $outdir/$truncated_tree/phycord_pos_file.txt --suffix .fasta
+
+for i in $(ls $outdir/$gon_phy/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/*.fasta); do
+	cp $i $outdir/$gon_phy_tree/
+
+done
+
+$phycorder_path/locus_combiner.py --msa_folder $outdir/$gon_phy_tree/ --out_file $outdir/$gon_phy_tree/gon_phy_base.fasta --position_dict_file $outdir/$gon_phy_tree/gon_phypos_file.txt --suffix .fasta
+
+# RUN RAxML ON GON_PHYLING LOCI
+
+
+
+# RUN PHYCORDER ON STARTING TREE LOCI
+
+
+
+# BLAST ALL LOCI AGAINST TRUE FASTAS THAT PRODUCED THE READS
+
+
+
 

@@ -8,7 +8,8 @@ import json
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--blast_output_folder')
-    #parser.add_argument('--out_file')
+    parser.add_argument('--gon_out_file')
+    parser.add_argument('--phy_out_file')
     #parser.add_argument('--position_dict_file')
     #parser.add_argument('--suffix')
     return parser.parse_args()
@@ -36,8 +37,9 @@ def main():
     compile_query_len = re.compile(query_len)
     compile_file_name = re.compile(file_name_re)
 
-
-    
+    gon_phy_file_names = open(args.gon_out_file, 'w')
+    phycord_file_names = open(args.phy_out_file,'w')
+ 
     for file_name in results_list:
         file_open = open(file_name,"r")
         file_read = file_open.read()
@@ -56,8 +58,17 @@ def main():
                     if query_len_findall:
                         if hsp_align_leng_findall:
                             if int(hsp_align_leng_findall[0]) >= (int(query_len_findall[0]) / 2):
-                                print(hsp_align_leng_findall)
-                                
+                                #print(hsp_align_leng_findall)
+                                check_file_name = re.findall(compile_file_name, file_name)
+                                phycord_file = check_file_name[0][0]
+                                gon_phy_file = check_file_name[0][1]
+                                #print(phycord_file)
+                                #print(gon_phy_file)
+                                phycord_file = phycord_file.replace("-single.fasta","")
+                                phycord_file_names.write(phycord_file)
+                                phycord_file_names.write("\n")
+                                gon_phy_file_names.write(gon_phy_file)
+                                gon_phy_file_names.write("\n")
 
 
 

@@ -23,7 +23,7 @@ def main():
     results_list = os.listdir(args.blast_output_folder)
     #print(results_list)
 
-    evalue = "<Hsp_evalue>(.+)</Hsp_evalue>"
+    evalue = "<Hsp_evalue>(0)</Hsp_evalue>"
     hsp_align_leng = "<Hsp_align-len>(.+)</Hsp_align-len>"
     gaps = "<Hsp_gaps>(.+)</Hsp_gaps>"
     query_len = "<Iteration_query-len>(.+)</Iteration_query-len>"
@@ -47,29 +47,55 @@ def main():
         hit_findall = re.findall(compile_hit, file_read)
         if hit_findall:
             
+#            split_file = file_read.split("</Iteration>")
+#            for split_chunk in split_file:
+#                split_count+=1
+#                if split_count == 1 and type(split_chunk) != 'NoneType':
+#                    #print(split_chunk)
+#                    evalue_findall = re.findall(compile_evalue, split_chunk)
+#                    query_len_findall = re.findall(compile_query_len, split_chunk)
+#                    hsp_align_leng_findall = re.findall(compile_hsp_align_leng, split_chunk)
+#                    if query_len_findall:
+#                        if hsp_align_leng_findall:
+#                            if int(hsp_align_leng_findall[0]) >= (int(query_len_findall[0]) / 2):
+#                                #print(hsp_align_leng_findall)
+#                                check_file_name = re.findall(compile_file_name, file_name)
+#                                phycord_file = check_file_name[0][0]
+#                                gon_phy_file = check_file_name[0][1]
+#                                print(phycord_file)
+#                                print(gon_phy_file)
+#                                phycord_file = phycord_file.replace("-single.fasta","")
+#                                phycord_file_names.write(phycord_file)
+#                                phycord_file_names.write("\n")
+#                                gon_phy_file_names.write(gon_phy_file)
+#                                gon_phy_file_names.write("\n")
+ #                               print("BLAST MATCH FILES WRITTEN")
+
+
             split_file = file_read.split("</Iteration>")
             for split_chunk in split_file:
                 split_count+=1
                 if split_count == 1 and type(split_chunk) != 'NoneType':
                     #print(split_chunk)
                     evalue_findall = re.findall(compile_evalue, split_chunk)
-                    query_len_findall = re.findall(compile_query_len, split_chunk)
-                    hsp_align_leng_findall = re.findall(compile_hsp_align_leng, split_chunk)
-                    if query_len_findall:
-                        if hsp_align_leng_findall:
-                            if int(hsp_align_leng_findall[0]) >= (int(query_len_findall[0]) / 2):
+                    if evalue_findall:
+#                    query_len_findall = re.findall(compile_query_len, split_chunk)
+#                    hsp_align_leng_findall = re.findall(compile_hsp_align_leng, split_chunk)
+#                    if query_len_findall:
+#                        if hsp_align_leng_findall:
+#                            if int(hsp_align_leng_findall[0]) >= (int(query_len_findall[0]) / 2):
                                 #print(hsp_align_leng_findall)
-                                check_file_name = re.findall(compile_file_name, file_name)
-                                phycord_file = check_file_name[0][0]
-                                gon_phy_file = check_file_name[0][1]
-                                print(phycord_file)
-                                print(gon_phy_file)
-                                phycord_file = phycord_file.replace("-single.fasta","")
-                                phycord_file_names.write(phycord_file)
-                                phycord_file_names.write("\n")
-                                gon_phy_file_names.write(gon_phy_file)
-                                gon_phy_file_names.write("\n")
-                                print("BLAST MATCH FILES WRITTEN")
+                        check_file_name = re.findall(compile_file_name, file_name)
+                        phycord_file = check_file_name[0][0]
+                        gon_phy_file = check_file_name[0][1]
+                        print(phycord_file)
+                        print(gon_phy_file)
+                        phycord_file = phycord_file.replace("-single.fasta","")
+                        phycord_file_names.write(phycord_file)
+                        phycord_file_names.write("\n")
+                        gon_phy_file_names.write(gon_phy_file)
+                        gon_phy_file_names.write("\n")
+                        print("BLAST MATCH FILES WRITTEN")
 
 
 

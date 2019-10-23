@@ -196,12 +196,92 @@ done
 $phycorder_path/locus_combiner.py --msa_folder $outdir/$gon_phy_tree/ --out_file $outdir/$gon_phy_tree/gon_phy_base.fasta --position_dict_file $outdir/$gon_phy_tree/gon_phypos_file.txt --suffix .fasta
 
 # RUN RAxML ON GON_PHYLING LOCI
+cd $outdir/$gon_phy_tree
 
+time raxmlHPC-PTHREADS -m GTRGAMMA -T $THREADS -s $outdir/$gon_phy_tree/gon_phy_base.fasta -p 12345 -n core_genome_run.out
 
-
+cd $outdir
 # RUN PHYCORDER ON STARTING TREE LOCI
 
+# MAKE CONFIG FILE FOR PHYCORDER
+cat <<phy_loop > basic.cfg
 
+        ## Welcome to the Phycorder config file
+        # Change the variable values to match the files and numbers you wish to use
+        # this is the path to the phycorder directory. Dont move it.
+
+        # PHYCORDER=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+        # the path to the previously generated alignment file
+
+        align="$outdir/$truncated_tree/phycord_base.fasta"
+
+        # the path to the previously generated tree file made from the alignment file
+
+        tree="NONE"
+
+        # the directory of paired end read pairs you belonging to taxa you wish to add to your phylogeny
+
+        read_dir="$outdir/$update_dir"
+
+        # the number of taxa that can be added to the phylogeny at a single time
+        # should be less than the number of cores available
+        # should be balanced with the number of threads you will assign to the programs within phycorder
+
+        phycorder_runs="$phycorder_runs"
+
+        # the number of threads you wish to make available to each phycorder run
+        # for mapping with bowtie and inference with RAxML
+
+        threads="$phycorder_threads"
+
+        # the tail identifiers of the read pairs
+        # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
+        # then only put the portion of the file names that change to correspond to the read pairs
+        # in this example, Clade_1_01_ identify the taxons and so must not be included
+
+        r1_tail="$r1_tail"
+        r2_tail="$r2_tail"
+
+        # the output directory for your final information
+
+        outdir="$outdir/phycorder-out"
+
+        #bootstrapping
+        bootstrapping=$bootstrapping
+
+        # In addition, you'll currently need to run Phycorder with align_type="LOCUS" to run this mode
+        # you'll need to pass in the location of the output positional dictionary file describing the length
+        # of the loci in the concatenated alignment. This is important because it also contains the relative positon
+        # in the concatenated alignment
+        # give this variable the absolute path to the dict file
+        loci_positions="$outdir/$truncated_tree/phycord_pos_file.txt"
+
+        # depending on how you want to use phycorder, you'll change this variable value.
+        # if you have multiple sequence alignments for multiple single locus,
+        # if you have a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+        # if you have a nexus file with concatenated MSA and loci start and stop positions
+        # EXAMPLE: align_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<
+        # EXAMPLE: align_type="SINGLE_LOCUS_FILES"
+        # EXAMPLE: align_type="CONCAT_MSA"
+        # EXAMPLE: align_type="PARSNP_XMFA"
+        align_type="CONCAT_MSA"
+        #align_type="PARSNP_XMFA"
+        #align_type="SINGLE_LOCUS_FILES"
+
+	# depending on how you want to use phycorder, you'll change this variable value.
+        # if you want multiple sequence alignments for multiple single locus,
+        # if you want  a fasta file with concatenated MSA and a seperate file containing loci start and stop positions
+        # if you want a nexus file with concatenated MSA and loci start and stop positions
+        # EXAMPLE: output_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<<<
+        # EXAMPLE: output_type="SINGLE_LOCUS_FILES"
+        # EXAMPLE: output_type="CONCAT_MSA"
+        #output_type="SINGLE_LOCUS_FILES"
+        output_type="CONCAT_MSA"
+
+phy_loop
+
+$phycorder_path/multi_map.sh $outdir/basic.cfg
 
 # BLAST ALL LOCI AGAINST TRUE FASTAS THAT PRODUCED THE READS
 

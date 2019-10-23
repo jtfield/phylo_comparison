@@ -38,10 +38,10 @@ def main():
     compile_file_name = re.compile(file_name_re)
 
     gon_phy_file_names = open(args.gon_out_file, 'w')
-    phycord_file_names = open(args.phy_out_file,'w')
+    phycord_file_names = open(args.phy_out_file, 'w')
  
     for file_name in results_list:
-        file_open = open(file_name,"r")
+        file_open = open(args.blast_output_folder + "/" + file_name,"r")
         file_read = file_open.read()
         split_count = 0
         hit_findall = re.findall(compile_hit, file_read)
@@ -62,13 +62,14 @@ def main():
                                 check_file_name = re.findall(compile_file_name, file_name)
                                 phycord_file = check_file_name[0][0]
                                 gon_phy_file = check_file_name[0][1]
-                                #print(phycord_file)
-                                #print(gon_phy_file)
+                                print(phycord_file)
+                                print(gon_phy_file)
                                 phycord_file = phycord_file.replace("-single.fasta","")
                                 phycord_file_names.write(phycord_file)
                                 phycord_file_names.write("\n")
                                 gon_phy_file_names.write(gon_phy_file)
                                 gon_phy_file_names.write("\n")
+                                print("BLAST MATCH FILES WRITTEN")
 
 
 

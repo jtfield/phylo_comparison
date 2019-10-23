@@ -21,6 +21,7 @@ loci_blast_indexes=loci_blast_indexes_dir
 truncated_tree=phycorder_low_loci_dir
 gon_phy=gon_phyling_dir
 gon_phy_tree=gon_phyling_tree_dir
+blast_output=blast_output_dir
 
 mkdir $start_dir
 mkdir $truncated_tree
@@ -28,6 +29,7 @@ mkdir $update_dir
 mkdir $loci_blast_indexes
 mkdir $gon_phy
 mkdir $gon_phy_tree
+mkdir $blast_output
 
 # link files for the starting tree into a seperate directory
 # seperate directory for both the complete run and the single addition of a taxon run
@@ -100,7 +102,7 @@ EOF
 
 fi
 
-$PHY_COMPARE/select_ten.py --msa_folder $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files --position_dict_file $outdir/positional_dict.txt --out_file $outdir/$loci_blast_indexes/loci_for_use.txt
+$PHY_COMPARE/select_ten.py --msa_folder $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files --position_dict_file $loci_positions --out_file $outdir/$loci_blast_indexes/loci_for_use.txt
 
 # move a set number (max of 10) of loci to a folder where blast indexes will be constructed
 # SEPERATE TOP TAXON SEQUNCE AS REPRESENTITIVE TO BE USED FOR BLAST INDEX
@@ -164,7 +166,7 @@ for j in $(ls $outdir/$loci_blast_indexes/*single.fasta); do
 
                 database=$(basename $j)
                 query=$(basename $i)
-                blastn -db $j -query $i -out blast_output-$database-$query.txt -outfmt 5
+                blastn -db $j -query $i -out $blast_output/blast_output-$database-$query.txt -outfmt 5
                 #printf "$j \n"
                 #printf "$i \n"
                 #printf "\n"
@@ -176,14 +178,14 @@ for j in $(ls $outdir/$loci_blast_indexes/*single.fasta); do
 done
 
 
-$PHY_COMPARE/basecall_loci_matcher.py --blast_output_folder $outdir/$loci_blast_indexes --gon_out_file $outdir/gon_phyling_files.txt --phy_out_file $ourdir/phycorder_files.txt
+$PHY_COMPARE/basecall_loci_matcher.py --blast_output_folder $outdir/$blast_output --gon_out_file $outdir/gon_phyling_files.txt --phy_out_file $outdir/phycorder_files.txt
 
 
 # MOVE FILES INTO APPROPRIATE FOLDERS
 
 for i in $(cat $outdir"/"phycorder_files.txt); do
 	cp "$outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/$i" $outdir/$truncated_tree/
-
+	printf "CLUSTER FOR PHYCORDER $i"
 done
 
 $phycorder_path/locus_combiner.py --msa_folder $outdir/$truncated_tree/ --out_file $outdir/$truncated_tree/phycord_base.fasta --position_dict_file $outdir/$truncated_tree/phycord_pos_file.txt --suffix .fasta

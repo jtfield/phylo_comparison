@@ -10,6 +10,7 @@ def parse_args():
     parser.add_argument('--msa_folder')
     parser.add_argument('--out_file')
     parser.add_argument('--position_dict_file')
+    parser.add_argument('--num_loci')
     #parser.add_argument('--suffix')
     return parser.parse_args()
 
@@ -30,7 +31,7 @@ def main():
     for pos, locus_name_and_len in pos_dict.items():
         for leng, name in locus_name_and_len.items():
             #print(type(leng))
-            if int(leng) >= 2000 and loci_count < 10 and name in msa_list:
+            if int(leng) >= 2000 and loci_count < args.num_loci and name in msa_list:
                 loci_for_use.append(str(name))
                 loci_count+=1
      

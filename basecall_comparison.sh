@@ -22,6 +22,9 @@ truncated_tree=phycorder_low_loci_dir
 gon_phy=gon_phyling_dir
 gon_phy_tree=gon_phyling_tree_dir
 blast_output=blast_output_dir
+gon_phy_basecall=gon_phy_basecall
+phycord_basecall=phycord_basecall
+
 
 mkdir $start_dir
 mkdir $truncated_tree
@@ -30,6 +33,9 @@ mkdir $loci_blast_indexes
 mkdir $gon_phy
 mkdir $gon_phy_tree
 mkdir $blast_output
+mkdir $gon_phy_basecall
+mkdir $phycord_basecall
+
 
 # link files for the starting tree into a seperate directory
 # seperate directory for both the complete run and the single addition of a taxon run
@@ -102,7 +108,7 @@ EOF
 
 fi
 
-$PHY_COMPARE/select_ten.py --msa_folder $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files --position_dict_file $loci_positions --out_file $outdir/$loci_blast_indexes/loci_for_use.txt
+$PHY_COMPARE/select_ten.py --msa_folder $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files --position_dict_file $loci_positions --out_file $outdir/$loci_blast_indexes/loci_for_use.txt --num_loci 10
 
 # move a set number (max of 10) of loci to a folder where blast indexes will be constructed
 # SEPERATE TOP TAXON SEQUNCE AS REPRESENTITIVE TO BE USED FOR BLAST INDEX
@@ -112,7 +118,7 @@ for i in $(cat $outdir"/"$loci_blast_indexes"/"loci_for_use.txt); do
 
 	#cp "$outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/$i" $outdir/$truncated_tree/
 
-	$phycorder_path/ref_producer.py --align_file $outdir/$loci_blast_indexes/$i --out_file $outdir/$loci_blast_indexes/$i-single.fasta
+	$phycorder_path/ref_producer.py -s --align_file $outdir/$loci_blast_indexes/$i --out_file $outdir/$loci_blast_indexes/$i-single.fasta
 
 	makeblastdb -in $outdir/$loci_blast_indexes/$i-single.fasta -dbtype nucl -parse_seqids
 
@@ -278,8 +284,8 @@ cat <<phy_loop > basic.cfg
         # EXAMPLE: output_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<<<
         # EXAMPLE: output_type="SINGLE_LOCUS_FILES"
         # EXAMPLE: output_type="CONCAT_MSA"
-        #output_type="SINGLE_LOCUS_FILES"
-        output_type="CONCAT_MSA"
+        output_type="SINGLE_LOCUS_FILES"
+        #output_type="CONCAT_MSA"
 
 phy_loop
 

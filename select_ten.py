@@ -28,12 +28,23 @@ def main():
 
     loci_for_use = []
     loci_count = 0
+    print(args.num_loci)
+    print("ABOVE IS SELECT_TEN_LOCI_CUTOFF")
     for pos, locus_name_and_len in pos_dict.items():
         for leng, name in locus_name_and_len.items():
             #print(type(leng))
-            if int(leng) >= 2000 and loci_count < args.num_loci and name in msa_list:
-                loci_for_use.append(str(name))
-                loci_count+=1
+            print(leng)
+            print(type(args.num_loci))
+            print(type(leng))
+            print(name)
+            print(loci_count)
+            print("##########################################################")
+            if int(leng) >= 2000:
+                if loci_count < int(args.num_loci):
+                    if name in msa_list:
+                        print("~~~~~~~~~~~~~~~~~~~~~~~~LOCI SELECTED~~~~~~~~~~~~~~~~~~")
+                        loci_for_use.append(str(name))
+                        loci_count+=1
      
     print(loci_for_use)
 

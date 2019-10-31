@@ -10,10 +10,10 @@ mkdir -p $outdir
 cd $outdir
 
 # split read names for the phycorder starting tree into a file
-ls "${master_reads}"/*$r1_tail | head -10 > start_tree_files.txt
+ls "${master_reads}"/*$r1_tail | head -2 > start_tree_files.txt
 
 # split reads for the rest of the updating using phycorder into a seperate file
-ls "${master_reads}"/*$r1_tail | tail -n +11 > update_read_list.txt
+ls "${master_reads}"/*$r1_tail | tail -n +3 > update_read_list.txt
 
 start_dir=start_tree_dir
 update_dir=update_alignment_dir
@@ -108,7 +108,9 @@ EOF
 
 fi
 
-$PHY_COMPARE/select_ten.py --msa_folder $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files --position_dict_file $loci_positions --out_file $outdir/$loci_blast_indexes/loci_for_use.txt --num_loci 10
+printf "USING THIS NUMBER OF LOCI == $num_loci"
+
+$PHY_COMPARE/select_ten.py --msa_folder $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files --position_dict_file $loci_positions --out_file $outdir/$loci_blast_indexes/loci_for_use.txt --num_loci $num_loci
 
 # move a set number (max of 10) of loci to a folder where blast indexes will be constructed
 # SEPERATE TOP TAXON SEQUNCE AS REPRESENTITIVE TO BE USED FOR BLAST INDEX
@@ -196,8 +198,9 @@ done
 
 $phycorder_path/locus_combiner.py --msa_folder $outdir/$truncated_tree/ --out_file $outdir/$truncated_tree/phycord_base.fasta --position_dict_file $outdir/$truncated_tree/phycord_pos_file.txt --suffix .fasta
 
-for i in $(ls $outdir/$gon_phy/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/*.fasta); do
-	cp $i $outdir/$gon_phy_tree/
+#for i in $(ls $outdir/$gon_phy/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/*.fasta); do
+for i in $(cat $outdir"/"gon_phyling_files.txt); do
+	 cp $outdir/$gon_phy/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/$i /$outdir/$gon_phy_tree/
 
 done
 

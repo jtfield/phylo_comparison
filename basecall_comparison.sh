@@ -196,7 +196,13 @@ for i in $(cat $outdir"/"phycorder_files.txt); do
 	printf "CLUSTER FOR PHYCORDER $i"
 done
 
-$phycorder_path/locus_combiner.py --msa_folder $outdir/$truncated_tree/ --out_file $outdir/$truncated_tree/phycord_base.fasta --position_dict_file $outdir/$truncated_tree/phycord_pos_file.txt --suffix .fasta
+#$phycorder_path/locus_combiner.py --msa_folder $outdir/$truncated_tree/ --out_file $outdir/$truncated_tree/phycord_base.fasta --position_dict_file $outdir/$truncated_tree/phycord_pos_file.txt --suffix .fasta
+
+echo "phycorder_path/new_locus_combiner.py --msa_folder $outdir/$truncated_tree/ --suffix .fasta --out_file $outdir/$truncated_tree/phycord_base.fasta --len_filter 1000 --position_csv_file $outdir/$truncated_tree/phycord_pos_file.csv"
+
+
+$phycorder_path/new_locus_combiner.py --msa_folder $outdir/$truncated_tree/ --suffix .fasta --out_file $outdir/$truncated_tree/phycord_base.fasta --len_filter 1000 --position_csv_file $outdir/$truncated_tree/phycord_pos_file.csv
+
 
 #for i in $(ls $outdir/$gon_phy/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files/*.fasta); do
 for i in $(cat $outdir"/"gon_phyling_files.txt); do
@@ -204,7 +210,13 @@ for i in $(cat $outdir"/"gon_phyling_files.txt); do
 
 done
 
-$phycorder_path/locus_combiner.py --msa_folder $outdir/$gon_phy_tree/ --out_file $outdir/$gon_phy_tree/gon_phy_base.fasta --position_dict_file $outdir/$gon_phy_tree/gon_phypos_file.txt --suffix .fasta
+#$phycorder_path/locus_combiner.py --msa_folder $outdir/$gon_phy_tree/ --out_file $outdir/$gon_phy_tree/gon_phy_base.fasta --position_dict_file $outdir/$gon_phy_tree/gon_phypos_file.txt --suffix .fasta
+
+echo "$phycorder_path/new_locus_combiner.py --msa_folder $outdir/$gon_phy_tree/ --suffix .fasta --out_file $outdir/$gon_phy_tree/gon_phy_base.fasta --len_filter 1000 --position_csv_file $outdir/$gon_phy_tree/gon_phypos_file.csv"
+
+$phycorder_path/new_locus_combiner.py --msa_folder $outdir/$gon_phy_tree/ --suffix .fasta --out_file $outdir/$gon_phy_tree/gon_phy_base.fasta --len_filter 1000 --position_csv_file $outdir/$gon_phy_tree/gon_phypos_file.csv
+
+
 
 # RUN RAxML ON GON_PHYLING LOCI
 cd $outdir/$gon_phy_tree
@@ -215,7 +227,7 @@ cd $outdir
 # RUN PHYCORDER ON STARTING TREE LOCI
 
 # MAKE CONFIG FILE FOR PHYCORDER
-cat <<phy_loop > basic.cfg
+#cat <<phy_loop > basic.cfg
 
         ## Welcome to the Phycorder config file
         # Change the variable values to match the files and numbers you wish to use
@@ -225,48 +237,48 @@ cat <<phy_loop > basic.cfg
 
         # the path to the previously generated alignment file
 
-        align="$outdir/$truncated_tree/phycord_base.fasta"
+#        align="$outdir/$truncated_tree/phycord_base.fasta"
 
         # the path to the previously generated tree file made from the alignment file
 
-        tree="NONE"
+#        tree="NONE"
 
         # the directory of paired end read pairs you belonging to taxa you wish to add to your phylogeny
 
-        read_dir="$outdir/$update_dir"
+#        read_dir="$outdir/$update_dir"
 
         # the number of taxa that can be added to the phylogeny at a single time
         # should be less than the number of cores available
         # should be balanced with the number of threads you will assign to the programs within phycorder
 
-        phycorder_runs="$phycorder_runs"
+#        phycorder_runs="$phycorder_runs"
 
         # the number of threads you wish to make available to each phycorder run
         # for mapping with bowtie and inference with RAxML
 
-        threads="$phycorder_threads"
+#        threads="$phycorder_threads"
 
         # the tail identifiers of the read pairs
         # if the full read name is "Clade_1_01_R1_001.fastq" and Clade_1_01_R2_001.fastq"
         # then only put the portion of the file names that change to correspond to the read pairs
         # in this example, Clade_1_01_ identify the taxons and so must not be included
 
-        r1_tail="$r1_tail"
-        r2_tail="$r2_tail"
+#        r1_tail="$r1_tail"
+#        r2_tail="$r2_tail"
 
         # the output directory for your final information
 
-        outdir="$outdir/phycorder-out"
+#        outdir="$outdir/phycorder-out"
 
         #bootstrapping
-        bootstrapping=$bootstrapping
+#        bootstrapping=$bootstrapping
 
         # In addition, you'll currently need to run Phycorder with align_type="LOCUS" to run this mode
         # you'll need to pass in the location of the output positional dictionary file describing the length
         # of the loci in the concatenated alignment. This is important because it also contains the relative positon
         # in the concatenated alignment
         # give this variable the absolute path to the dict file
-        loci_positions="$outdir/$truncated_tree/phycord_pos_file.txt"
+#        loci_positions="$outdir/$truncated_tree/phycord_pos_file.txt"
 
         # depending on how you want to use phycorder, you'll change this variable value.
         # if you have multiple sequence alignments for multiple single locus,
@@ -276,7 +288,7 @@ cat <<phy_loop > basic.cfg
         # EXAMPLE: align_type="SINGLE_LOCUS_FILES"
         # EXAMPLE: align_type="CONCAT_MSA"
         # EXAMPLE: align_type="PARSNP_XMFA"
-        align_type="CONCAT_MSA"
+#        align_type="CONCAT_MSA"
         #align_type="PARSNP_XMFA"
         #align_type="SINGLE_LOCUS_FILES"
 
@@ -287,12 +299,22 @@ cat <<phy_loop > basic.cfg
         # EXAMPLE: output_type="NEXUS" NOT SUPPORTED YET<<<<<<<<<<<<<<<<<<<<
         # EXAMPLE: output_type="SINGLE_LOCUS_FILES"
         # EXAMPLE: output_type="CONCAT_MSA"
-        output_type="SINGLE_LOCUS_FILES"
+#        output_type="SINGLE_LOCUS_FILES"
         #output_type="CONCAT_MSA"
 
-phy_loop
+#phy_loop
 
-$phycorder_path/multi_map.sh $outdir/basic.cfg
+#$phycorder_path/multi_map.sh $outdir/basic.cfg
+
+
+# commandline phycorder
+
+printf $phycorder_path/multi_map.sh -a "$outdir/$truncated_tree/phycord_base.fasta" -d "$outdir/$update_dir" -m CONCAT_MSA -g SINGLE_LOCUS_FILES -1 "$r1_tail" -2 "$r2_tail" -p $phycorder_runs -c $phycorder_threads -o "$outdir/phycorder-out" -f "$outdir/$truncated_tree/phycord_pos_file.txt"
+
+
+
+$phycorder_path/multi_map.sh -a "$outdir/$truncated_tree/phycord_base.fasta" -d "$outdir/$update_dir" -m CONCAT_MSA -g SINGLE_LOCUS_FILES -1 "$r1_tail" -2 "$r2_tail" -p $phycorder_runs -c $phycorder_threads -o "$outdir/phycorder-out" -f "$outdir/$truncated_tree/phycord_pos_file.txt"
+
 
 # BLAST ALL LOCI AGAINST TRUE FASTAS THAT PRODUCED THE READS
 

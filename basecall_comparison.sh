@@ -316,7 +316,27 @@ printf $phycorder_path/multi_map.sh -a "$outdir/$truncated_tree/phycord_base.fas
 $phycorder_path/multi_map.sh -a "$outdir/$truncated_tree/phycord_base.fasta" -d "$outdir/$update_dir" -m CONCAT_MSA -g SINGLE_LOCUS_FILES -1 "$r1_tail" -2 "$r2_tail" -p $phycorder_runs -c $phycorder_threads -o "$outdir/phycorder-out" -f "$outdir/$truncated_tree/phycord_pos_file.csv"
 
 
-# BLAST ALL LOCI AGAINST TRUE FASTAS THAT PRODUCED THE READS
+# MOVE ALL OUTPUT LOCUS FILES TO THE APPROPRIATE METHOD BASECALL FOLDERS
+ln -s $outdir/phycorder-out/combine_and_infer/updated_single_loci/*.fasta $outdir/phycord_basecall
+
+ln -s $outdir/gon_phyling_tree_dir/cluster*.fasta $outdir/gon_phy_basecall
+
+# SEPARATE OUT EACH TAXON SEQUENCE FOR EACH LOCUS TO ITS OWN FILE
+
+for i in $(ls -l $outdir/phycord_basecall); do
+
+	$PHY_COMPARE/sequence_separate.py --concatenated_fasta $i --out_file_dir $outdir/phycord_basecall
+
+done
+
+for i in $(ls -l $outdir/gon_phy_basecall); do
+
+        $PHY_COMPARE/sequence_separate.py --concatenated_fasta $i --out_file_dir $outdir/gon_phy_basecall
+
+done
+
+# BLAST ALL SEPARATED TAXON LOCI AGAINST THE GENOMES THAT PRODUCED THEM
+
 
 
 

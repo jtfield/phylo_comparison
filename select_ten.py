@@ -20,6 +20,8 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    print("SELECTING LOCI RANDOMLY")
     num_loc = int(args.num_loci)
 
     assert(type(num_loc) == int)
@@ -61,7 +63,7 @@ def main():
                 loci_to_use_names.append(row['locus_file_name'])
 
     print(loci_to_use_names)
-
+    print("LOCI SELECTION COMPLETE!")
 
 
     open_output = open(args.out_file,"w")

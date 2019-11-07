@@ -110,7 +110,7 @@ fi
 
 printf "USING THIS NUMBER OF LOCI == $num_loci"
 
-$PHY_COMPARE/select_ten.py --msa_folder $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files --position_dict_file $loci_positions --out_file $outdir/$loci_blast_indexes/loci_for_use.txt --num_loci $num_loci
+$PHY_COMPARE/select_ten.py --msa_folder $outdir/$start_dir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/locus_msa_files --position_csv_file $loci_positions --out_file $outdir/$loci_blast_indexes/loci_for_use.txt --num_loci $num_loci
 
 # move a set number (max of 10) of loci to a folder where blast indexes will be constructed
 # SEPERATE TOP TAXON SEQUNCE AS REPRESENTITIVE TO BE USED FOR BLAST INDEX
@@ -309,11 +309,11 @@ cd $outdir
 
 # commandline phycorder
 
-printf $phycorder_path/multi_map.sh -a "$outdir/$truncated_tree/phycord_base.fasta" -d "$outdir/$update_dir" -m CONCAT_MSA -g SINGLE_LOCUS_FILES -1 "$r1_tail" -2 "$r2_tail" -p $phycorder_runs -c $phycorder_threads -o "$outdir/phycorder-out" -f "$outdir/$truncated_tree/phycord_pos_file.txt"
+printf $phycorder_path/multi_map.sh -a "$outdir/$truncated_tree/phycord_base.fasta" -d "$outdir/$update_dir" -m CONCAT_MSA -g SINGLE_LOCUS_FILES -1 "$r1_tail" -2 "$r2_tail" -p $phycorder_runs -c $phycorder_threads -o "$outdir/phycorder-out" -f "$outdir/$truncated_tree/phycord_pos_file.csv"
 
 
 
-$phycorder_path/multi_map.sh -a "$outdir/$truncated_tree/phycord_base.fasta" -d "$outdir/$update_dir" -m CONCAT_MSA -g SINGLE_LOCUS_FILES -1 "$r1_tail" -2 "$r2_tail" -p $phycorder_runs -c $phycorder_threads -o "$outdir/phycorder-out" -f "$outdir/$truncated_tree/phycord_pos_file.txt"
+$phycorder_path/multi_map.sh -a "$outdir/$truncated_tree/phycord_base.fasta" -d "$outdir/$update_dir" -m CONCAT_MSA -g SINGLE_LOCUS_FILES -1 "$r1_tail" -2 "$r2_tail" -p $phycorder_runs -c $phycorder_threads -o "$outdir/phycorder-out" -f "$outdir/$truncated_tree/phycord_pos_file.csv"
 
 
 # BLAST ALL LOCI AGAINST TRUE FASTAS THAT PRODUCED THE READS

@@ -34,10 +34,17 @@ def main():
     compile_tax_reg = re.compile(tax_reg)
     compile_cluster_reg = re.compile(cluster_reg)
 
+    #print(seq_set_2_list)
     # test that file names have been formatted properly
-    seq_1_check = re.search(compile_tax_reg, seq_set_1_list[0])
-    seq_2_check = re.search(compile_tax_reg, seq_set_2_list[0])
-    seq_ref_check = re.search(compile_tax_reg, ref_seq_dir_list[0])
+    seq_1_join = ''.join(seq_set_1_list)
+    seq_2_join = ''.join(seq_set_2_list)
+    ref_join = ''.join(ref_seq_dir_list)
+    
+
+
+    seq_1_check = re.search(compile_tax_reg, seq_1_join)
+    seq_2_check = re.search(compile_tax_reg, seq_2_join)
+    seq_ref_check = re.search(compile_tax_reg, ref_join)
     assert(type(seq_1_check.group()) == str)
     assert(type(seq_2_check.group()) == str)
     assert(type(seq_ref_check.group()) == str)

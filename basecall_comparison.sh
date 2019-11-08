@@ -348,6 +348,33 @@ for i in $(ls $reference_dir); do
 
 done
 
+# CALL PROGRAM TO MATCH SEQUENCE FILE SETS FROM BOTH METHODS TO APPROPRIATE REFERENCE FILES
+# OUTPUT FILES WITH THE SEQUENCE QUERY FILE NAME AND THE REFERENCE FILE NAME TO RESPECTIVE FOLDERS
+
+$PHY_COMPARE/basecall_match_blast.py --ref_seq_dir $outdir/final_blast_idxs --seq_set_1_dir $outdir/gon_phy_basecall --seq_set_2_dir $outdir/phycord_basecall --ref_suffix .fasta
+
+# MAKE FOLDERS FOR BLAST RESULTS OF BOTH METHODS
+
+mkdir $outdir/final_phycord_blast_output
+mkdir $outdir/final_gon_phy_blast_output
+
+# RUN BLAST AND OUTPUT TO RESPECTIVE FOLDERS
+for i in $(ls $outdir/gon_phy_basecall/*.txt); do
+	base=$(basename $i)
+	query=$(head -1 $i)
+	ref=$(tail -1 $i)
+	blastn -db $ref -query $query -out $outdir/final_gon_phy_blast_output/$base-blast-out.txt -outfmt 5
 
 
+done
 
+# RUN BLAST AND OUTPUT TO RESPECTIVE FOLDERS
+for i in $(ls $outdir/phycord_basecall/*.txt); do
+        base=$(basename $i)
+        query=$(head -1 $i)
+        ref=$(tail -1 $i)
+        blastn -db $ref -query $query -out $outdir/final_phycord_blast_output/$base-blast-out.txt -outfmt 5
+
+done
+
+printf "BLASTING OF METHOD CONSTRUCTED SEQUENCES AGAINST SEQUENCES THEY WERE SIMULATED FROM IS COMPLETE"

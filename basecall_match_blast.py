@@ -29,9 +29,10 @@ def main():
     assert(len(ref_seq_dir_list) > 0)
 
     tax_reg = '(taxon_\d+)'
+    cluster_reg = '(cluster\d+-)'
 
     compile_tax_reg = re.compile(tax_reg)
-
+    compile_cluster_reg = re.compile(cluster_reg)
 
     # test that file names have been formatted properly
     seq_1_check = re.search(compile_tax_reg, seq_set_1_list[0])
@@ -49,8 +50,12 @@ def main():
             file_match_list = []
             taxon_count+=1
             seq_1_search = re.search(compile_tax_reg, file_name)
+            cluster_check = re.search(compile_cluster_reg, file_name)
+            cluster_name = cluster_check.group()
             if seq_1_search:
                 #print(seq_1_search.group())
+                #cluster_check = re.search(compile_cluster_reg, file_name)
+                #cluster_name = cluster_check.group()
                 current_taxon = seq_1_search.group() + '_'
                 #print(current_taxon)
                 #print(type(current_taxon))
@@ -67,7 +72,7 @@ def main():
             assert(len(file_match_list) == 2)
 
             # write matched file names to files so they can be blasted against eachother
-            output = open(args.seq_set_1_dir + '/' + current_taxon + '_' + 'matched_files_.txt', 'w')
+            output = open(args.seq_set_1_dir + '/' + cluster_name + current_taxon + '_' + 'matched_files_.txt', 'w')
             output.write(file_match_list[0])
             output.write('\n')
             output.write(file_match_list[1])
@@ -80,6 +85,8 @@ def main():
             file_match_list = []
             taxon_count+=1
             seq_2_search = re.search(compile_tax_reg, file_name)
+            cluster_check = re.search(compile_cluster_reg, file_name)
+            cluster_name = cluster_check.group()
             if seq_2_search:
                 #print(seq_1_search.group())
                 current_taxon = seq_2_search.group() + '_'
@@ -98,7 +105,7 @@ def main():
             assert(len(file_match_list) == 2)
 
             # write matched file names to files so they can be blasted against eachother
-            output = open(args.seq_set_2_dir + '/' + current_taxon + '_' + 'matched_files_.txt', 'w')
+            output = open(args.seq_set_2_dir + '/' + cluster_name + current_taxon + '_' + 'matched_files_.txt', 'w')
             output.write(file_match_list[0])
             output.write('\n')
             output.write(file_match_list[1])

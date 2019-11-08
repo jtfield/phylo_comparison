@@ -337,6 +337,16 @@ done
 
 # BLAST ALL SEPARATED TAXON LOCI AGAINST THE GENOMES THAT PRODUCED THEM
 
+printf "FILES READY FOR BLAST INDEX CREATION"
+
+mkdir final_blast_idxs
+
+for i in $(ls $reference_dir); do
+
+	ln -s $reference_dir/$i $outdir/final_blast_idxs/
+	makeblastdb -in $outdir/final_blast_idxs/$i -dbtype nucl -parse_seqids
+
+done
 
 
 

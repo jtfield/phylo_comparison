@@ -41,9 +41,13 @@ def main():
     assert(type(seq_2_check.group()) == str)
     assert(type(seq_ref_check.group()) == str)
 
+
+    taxon_count = 0
     # Begin matching sequence files to reference files
     for file_name in seq_set_1_list:
         if file_name.endswith('.fas'):
+            file_match_list = []
+            taxon_count+=1
             seq_1_search = re.search(compile_tax_reg, file_name)
             if seq_1_search:
                 #print(seq_1_search.group())
@@ -56,7 +60,21 @@ def main():
                         ref_match = re.search(compile_current_taxon, ref_name)
                         if ref_match:
                             #print(ref_name)
-                            continue
+                            file_match_list.append(args.seq_set_1_dir + '/' + file_name)
+                            file_match_list.append(args.ref_seq_dir + '/' + ref_name)
+            
+            # make sure you only have 2 file names in the list before writing to file
+            assert(len(file_match_list) == 2)
+
+            # write matched file names to files so they can be blasted against eachother
+            output = open(args.seq_set_1_dir + '/' + current_taxon + '_' + 'matched_files_.txt', 'w')
+            output.write(file_match_list[0])
+            output.write('\n')
+            output.write(file_match_list[1])
+            output.close()
+            print('finished file matching')
+
+
 
 
 if __name__ == '__main__':

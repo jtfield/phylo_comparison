@@ -364,7 +364,7 @@ for i in $(ls $outdir/gon_phy_basecall/*.txt); do
 	query=$(head -1 $i)
 	ref=$(tail -1 $i)
 	#blastn -db $ref -query $query -out $outdir/final_gon_phy_blast_output/$base-blast-out.txt -outfmt 5
-	blastn -db $ref -query $query -out $outdir/final_gon_phy_blast_output/$base-blast-out.txt -outfmt "7 evalue qstart qend sstart send length pident nident mismatch gapopen gaps"  
+	blastn -db $ref -query $query -out $outdir/final_gon_phy_blast_output/$base-blast-out.txt -outfmt "7 evalue qstart qend sstart send length pident nident mismatch gapopen gaps sseqid qseqid"  
 
 done
 
@@ -374,7 +374,7 @@ for i in $(ls $outdir/phycord_basecall/*.txt); do
         query=$(head -1 $i)
         ref=$(tail -1 $i)
         #blastn -db $ref -query $query -out $outdir/final_phycord_blast_output/$base-blast-out.txt -outfmt 5
-	blastn -db $ref -query $query -out $outdir/final_phycord_blast_output/$base-blast-out.txt -outfmt "7 evalue qstart qend sstart send length pident nident mismatch gapopen gaps"
+	blastn -db $ref -query $query -out $outdir/final_phycord_blast_output/$base-blast-out.txt -outfmt "7 evalue qstart qend sstart send length pident nident mismatch gapopen gaps sseqid qseqid"
 
 
 done

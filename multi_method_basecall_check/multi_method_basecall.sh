@@ -75,7 +75,7 @@ $snippy_path/snippy-multi $outdir/$update_dir/snippy_run.tab --ref $outdir/$upda
 
 chmod +x $outdir/runme.sh
 
-#$outdir/runme.sh
+$outdir/runme.sh
 
 
 

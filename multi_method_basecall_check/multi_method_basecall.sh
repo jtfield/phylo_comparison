@@ -53,4 +53,29 @@ rm "$gon_phy_pwd/$ref_name"*
 
 ls $gon_phy_pwd
 
+mv $gon_phy_pwd/trimmed_reads $outdir/trimmed_reads
+
+#BEGIN ROUNDS OF RAPUP AND SNIPPY
+$rapup_path/multi_map.sh -a $outdir/$update_dir/alignment_ref.fas -d $gon_phy_pwd -1 $r1_tail -2 $r2_tail -o $outdir/rapup_run -g LOCUS -f rapup_loci_positions.csv
+
+touch $update_dir/snippy_run.tab
+
+#SET UP FOR SNIPPY MULTI-TAXON RUN
+for i in $(ls $gon_phy_pwd/*$r1_tail);
+do
+	isolate_name=$(basename $i $r1_tail)
+	printf "$isolate_name"
+	printf "\n$i\n"
+	printf "\n${i%$r1_tail}$r2_tail\n"
+	echo "$isolate_name	$i	${i%$r1_tail}$r2_tail" >> $update_dir/snippy_run.tab
+
+done
+
+$snippy_path/snippy-multi $outdir/$update_dir/snippy_run.tab --ref $outdir/$update_dir/alignment_ref.fas --cpus 4 > $outdir/runme.sh
+
+chmod +x $outdir/runme.sh
+
+#$outdir/runme.sh
+
+
 

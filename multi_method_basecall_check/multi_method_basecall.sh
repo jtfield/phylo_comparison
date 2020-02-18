@@ -101,7 +101,10 @@ mkdir $outdir/$gon_phy_basecall/blast_results
 
 #SPLIT EACH LOCUS INTO A SEPARATE ALIGNMENT FILE
 
-#TODO: return name of reference for the snippy output
+#TODO: thuroughly check replacement of name of reference for the snippy output
+
+#REPLACE THE term REFERENCE with the actual reference name in the snippy output alignment
+sed -i -e 's/Reference/'$ref_name'/g' $outdir/core.full.aln
 
 $rapup_path/locus_position_identifier.py --out_file_dir $outdir/$rapup_basecall/sep_loci --position_csv_file $loci_positions --concatenated_fasta $outdir/rapup_run/combine_and_infer/extended.aln
 
@@ -118,8 +121,34 @@ do
 	for i in $(grep ">" $j | sed -e 's/>//g');
 	do
 		printf "\n$j\n$i\n"
-		msa_file=$(basename $j)
-		$rapup_path/ref_producer.py -s --align_file $j --out_file $outdir/$gon_phy_basecall/sep_loci/individual_tax/single_tax_$msa_file_$i --ref_select $i
+		msa_file=$(basename $j | sed -e 's/.fasta//g')
+		printf "\n$msa_file\n"
+		$rapup_path/ref_producer.py -s --align_file $j --out_file $outdir/$gon_phy_basecall/sep_loci/individual_tax/single_tax_gon_phy-$msa_file-$i --ref_select $i
 	done
 done
+
+for j in $(ls $outdir/$rapup_basecall/sep_loci/*.fasta);
+do
+        for i in $(grep ">" $j | sed -e 's/>//g');
+        do
+                printf "\n$j\n$i\n"
+                msa_file=$(basename $j | sed -e 's/.fasta//g')
+		printf "\n$msa_file\n"
+                $rapup_path/ref_producer.py -s --align_file $j --out_file $outdir/$rapup_basecall/sep_loci/individual_tax/single_tax_rapup-$msa_file-$i --ref_select $i
+        done
+done
+
+#Create single taxa locus files for snippy output
+for j in $(ls $outdir/$snippy_basecall/sep_loci/*.fasta);
+do
+        for i in $(grep ">" $j | sed -e 's/>//g');
+        do
+                printf "\n$j\n$i\n"
+                msa_file=$(basename $j | sed -e 's/.fasta//g')
+		printf "\n$msa_file\n"
+                $rapup_path/ref_producer.py -s --align_file $j --out_file $outdir/$snippy_basecall/sep_loci/individual_tax/single_tax_snippy-$msa_file-$i --ref_select $i
+        done
+done
+
+
 

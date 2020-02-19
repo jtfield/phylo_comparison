@@ -155,12 +155,15 @@ printf "\n BEGINNING BLAST PROCESS\n"
 for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
 do
 	file_name=$(basename $j)
-	printf "\n$file_name\n"
+	#printf "\n$file_name\n"
 	for i in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax);
 	do
 		#echo ${i:28:14}
 		seq=${i:28:14}
-		printf "\nseq = $seq\n"
+		if [ "$seq" == "$file_name" ];
+		then
+			printf "\nFOUND A MATCH BETWEEN THE NEW SEQUENCE AND BLAST INDEX\n"
+		fi
 	done
 done
 

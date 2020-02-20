@@ -163,6 +163,9 @@ do
 		if [ "$seq" == "$file_name" ];
 		then
 			printf "\nFOUND A MATCH BETWEEN THE NEW SEQUENCE AND BLAST INDEX\n"
+			blastn -db $j.fasta -query $outdir/$snippy_basecall/sep_loci/individual_tax/$i -out $outdir/$snippy_basecall/blast_results/blast_output_$file_name-$seq.out -outfmt 5
+			#printf "\n$j\n"
+			#printf "\n$i\n"
 		fi
 	done
 done

@@ -120,9 +120,9 @@ for j in $(ls $outdir/$gon_phy_basecall/sep_loci/*.fasta);
 do
 	for i in $(grep ">" $j | sed -e 's/>//g');
 	do
-		printf "\n$j\n$i\n"
+		#printf "\n$j\n$i\n"
 		msa_file=$(basename $j | sed -e 's/.fasta//g')
-		printf "\n$msa_file\n"
+		#printf "\n$msa_file\n"
 		$rapup_path/ref_producer.py -s --align_file $j --out_file $outdir/$gon_phy_basecall/sep_loci/individual_tax/single_tax_gon_phy-$msa_file-$i --ref_select $i
 	done
 done
@@ -131,9 +131,9 @@ for j in $(ls $outdir/$rapup_basecall/sep_loci/*.fasta);
 do
         for i in $(grep ">" $j | sed -e 's/>//g');
         do
-                printf "\n$j\n$i\n"
+                #printf "\n$j\n$i\n"
                 msa_file=$(basename $j | sed -e 's/.fasta//g')
-		printf "\n$msa_file\n"
+		#printf "\n$msa_file\n"
                 $rapup_path/ref_producer.py -s --align_file $j --out_file $outdir/$rapup_basecall/sep_loci/individual_tax/single_tax_rapup-$msa_file-$i --ref_select $i
         done
 done
@@ -143,31 +143,83 @@ for j in $(ls $outdir/$snippy_basecall/sep_loci/*.fasta);
 do
         for i in $(grep ">" $j | sed -e 's/>//g');
         do
-                printf "\n$j\n$i\n"
+                #printf "\n$j\n$i\n"
                 msa_file=$(basename $j | sed -e 's/.fasta//g')
-		printf "\n$msa_file\n"
+		#printf "\n$msa_file\n"
                 $rapup_path/ref_producer.py -s --align_file $j --out_file $outdir/$snippy_basecall/sep_loci/individual_tax/single_tax_snippy-$msa_file-$i --ref_select $i
         done
 done
 
 printf "\n BEGINNING BLAST PROCESS\n"
+
+
 #FIND THE CORRECT SEQUENCES TO BLAST AGAINST THE TRUE GENOME SEQUENCES
+#TODO: the semi-hardcoding of file name based on structure isnt good coding and needs to be changed
+
+## SNIPPY FILES BLAST
 for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
 do
 	file_name=$(basename $j)
 	#printf "\n$file_name\n"
 	for i in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax);
 	do
+		cluster=${i:19:8}
+		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
+		#printf "\n$cluster_grep\n"
 		#echo ${i:28:14}
 		seq=${i:28:14}
 		if [ "$seq" == "$file_name" ];
 		then
-			printf "\nFOUND A MATCH BETWEEN THE NEW SEQUENCE AND BLAST INDEX\n"
-			blastn -db $j.fasta -query $outdir/$snippy_basecall/sep_loci/individual_tax/$i -out $outdir/$snippy_basecall/blast_results/blast_output_$file_name-$seq.out -outfmt 5
+			printf "\nFOUND A MATCH BETWEEN A SNIPPY SEQUENCE AND BLAST INDEX\n"
+			blastn -db $j.fasta -query $outdir/$snippy_basecall/sep_loci/individual_tax/$i -out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq.out -outfmt 5
 			#printf "\n$j\n"
 			#printf "\n$i\n"
 		fi
 	done
 done
 
+## RAPUP FILES BLAST
+for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
+do
+        file_name=$(basename $j)
+        #printf "\n$file_name\n"
+        for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax);
+        do
+		cluster=${i:19:8}
+		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
+                #printf "\n$cluster_grep\n"i
+                #echo ${i:27:14}
+                seq=${i:27:14}
+                if [ "$seq" == "$file_name" ];
+                then
+                        printf "\nFOUND A MATCH BETWEEN A RAPUP SEQUENCE AND BLAST INDEX\n"
+                        blastn -db $j.fasta -query $outdir/$rapup_basecall/sep_loci/individual_tax/$i -out $outdir/$rapup_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq.out -outfmt 5
+                        #printf "\n$j\n"
+                        #printf "\n$i\n"
+                fi
+        done
+done
 
+## gon_phy FILES BLAST
+for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
+do
+        file_name=$(basename $j)
+        #printf "\n$file_name\n"
+        for i in $(ls $outdir/$gon_phy_basecall/sep_loci/individual_tax);
+        do
+		cluster=${i:19:8}
+		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
+                #printf "\n$cluster_grep\n"
+                #echo ${i:29:14}
+                seq=${i:29:14}
+                if [ "$seq" == "$file_name" ];
+                then
+                        printf "\nFOUND A MATCH BETWEEN A GON_PHY SEQUENCE AND BLAST INDEX\n"
+                        blastn -db $j.fasta -query $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i -out $outdir/$gon_phy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq.out -outfmt 5
+                        #printf "\n$j\n"
+                        #printf "\n$i\n"
+                fi
+        done
+done
+
+# 

@@ -90,6 +90,7 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
             #print(correctly_called_bases)
             elif hit_end_search:
                 hit_and_hsp_count = 0
+        output_dict["miscalled_bases"].append(miscalled_bases)
         output_dict["miscall_positions"].append(miscalled_base_positions)
     return output_dict
     #print(cluster_name_list)

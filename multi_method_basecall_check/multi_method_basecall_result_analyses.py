@@ -2,6 +2,7 @@
 import argparse
 import os
 import re
+from collections import defaultdict
 import numpy as np
 import pandas as pd
 import matplotlib as plt
@@ -51,25 +52,31 @@ def main():
 
     # LIST CLUSTERS/LOCI IN THIS ANALYSIS
     cluster_names = 'cluster\d+'
+    cluster_len = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
     cluster_compile = re.compile(cluster_names)
-    cluster_name_list = []
-    #for file_name in rapup_blast_results:
-    #    cluster_name_search = re.findall(cluster_compile, file_name)
-    #    if cluster_name_search:
-    #        if cluster_name_search[0] not in cluster_name_list:
-    #            cluster_name_list.append(cluster_name_search[0])
-    #print(cluster_name_list)
+    len_compile = re.compile(cluster_len)
+    cluster_name = {"loci_names" : []}
+    miscalls = {"miscalled_bases" : []}
+    taxon_dict = {"taxon_names" : []}
+    cluster_len = {"loci_len" : []}
+    miscall_base_positions = {"miscall_positions" : []}
 
     # BEGIN READING BLAST FILES AND RECORDING OUTPUT FOR EACH SEQUENCE
     for file_name in rapup_blast_results:
+        current_locus = ''
+        tax_specific_miscalled_base_position = {}
+        miscalled_base_positions = []
         hit_and_hsp_count = 0
-
+        miscalled_bases = 0
+        correctly_called_bases = 0
         cluster_name_search = re.findall(cluster_compile, file_name)
         if cluster_name_search:
-            if cluster_name_search[0] not in cluster_name_list:
-                cluster_name_list.append(cluster_name_search[0])
+            cluster_name["loci_names"].append(cluster_name_search[0])
+            current_locus = cluster_name_search[0]
+        
         read_results = open(rapup_results + "/" + file_name, "r")
-            
+        results_string = read_results.read()
+
         seq_len_match = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
         taxon_name = "<BlastOutput_query-def>(.+)</BlastOutput_query-def>"
         hsp_num_1 = "<Hit_num>(1)</Hit_num>"
@@ -81,29 +88,49 @@ def main():
         len_compile = re.compile(seq_len_match)
         midline_compile = re.compile(hsp_midline)
         hit_end_compile = re.compile(hit_end)
-        #print(len_compile) 
+        #print(len_compile)
+
+        name_search = re.findall(name_compile, results_string)
+        if name_search:
+            #print(name_search)
+            taxon_dict["taxon_names"].append(name_search[0])
+        #print(taxon_dict)
+
+        len_search = re.findall(len_compile, results_string)
+        if len_search:
+            #print(len_search)
+            cluster_len["loci_len"].append(len_search[0])
         
         for line in read_results:
-            name_search = re.findall(name_compile, line)
-            len_search = re.findall(len_compile, line)
+            #name_search = re.findall(name_compile, line)
+            #len_search = re.findall(len_compile, line)
             first_hit_search = re.findall(hsp_compile, line)
             midline_search = re.findall(midline_compile, line)
             hit_end_search = re.findall(hit_end_compile, line)
 
-            if name_search:
-                print(name_search)
-            elif len_search:
-                print(len_search)
-            elif first_hit_search:
-                print(first_hit_search)
+            if first_hit_search:
+                #print(first_hit_search)
                 hit_and_hsp_count = 1
             if midline_search and hit_and_hsp_count == 1:
-                print(midline_search)
+                #print(midline_search)
+                for num, midline in enumerate(midline_search[0]):
+                    if midline == ' ':
+                        miscalled_bases+=1
+                        #miscall_base_positions["miscall_base_positons"].append(num)
+                        miscalled_base_positions.append(num)
+                    elif midline == '|':
+                        correctly_called_bases+=1
+            #print(miscalled_bases)
+            #print(correctly_called_bases)
             elif hit_end_search:
                 hit_and_hsp_count = 0
-
-    print(cluster_name_list)
-
+        miscall_base_positions["miscall_positions"].append(miscalled_base_positions)
+    #print(cluster_name_list)
+    print(cluster_name)
+    print(miscalls)
+    print(taxon_dict)
+    print(cluster_len)
+    print(miscall_base_positions)
 
 if __name__ == '__main__':
     main()

@@ -53,32 +53,56 @@ def main():
     cluster_names = 'cluster\d+'
     cluster_compile = re.compile(cluster_names)
     cluster_name_list = []
+    #for file_name in rapup_blast_results:
+    #    cluster_name_search = re.findall(cluster_compile, file_name)
+    #    if cluster_name_search:
+    #        if cluster_name_search[0] not in cluster_name_list:
+    #            cluster_name_list.append(cluster_name_search[0])
+    #print(cluster_name_list)
+
+    # BEGIN READING BLAST FILES AND RECORDING OUTPUT FOR EACH SEQUENCE
     for file_name in rapup_blast_results:
+        hit_and_hsp_count = 0
+
         cluster_name_search = re.findall(cluster_compile, file_name)
         if cluster_name_search:
             if cluster_name_search[0] not in cluster_name_list:
                 cluster_name_list.append(cluster_name_search[0])
-    print(cluster_name_list)
-
-    # BEGIN READING BLAST FILES AND RECORDING OUTPUT FOR EACH SEQUENCE
-    for file_name in rapup_blast_results:
         read_results = open(rapup_results + "/" + file_name, "r")
             
         seq_len_match = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
         taxon_name = "<BlastOutput_query-def>(.+)</BlastOutput_query-def>"
+        hsp_num_1 = "<Hit_num>(1)</Hit_num>"
+        hsp_midline = "<Hsp_midline>(.+)</Hsp_midline>"
+        hit_end = "</Hsp>"
+
+        hsp_compile = re.compile(hsp_num_1)
         name_compile = re.compile(taxon_name)
         len_compile = re.compile(seq_len_match)
+        midline_compile = re.compile(hsp_midline)
+        hit_end_compile = re.compile(hit_end)
         #print(len_compile) 
         
         for line in read_results:
             name_search = re.findall(name_compile, line)
             len_search = re.findall(len_compile, line)
-            
+            first_hit_search = re.findall(hsp_compile, line)
+            midline_search = re.findall(midline_compile, line)
+            hit_end_search = re.findall(hit_end_compile, line)
+
             if name_search:
                 print(name_search)
             elif len_search:
                 print(len_search)
+            elif first_hit_search:
+                print(first_hit_search)
+                hit_and_hsp_count = 1
+            if midline_search and hit_and_hsp_count == 1:
+                print(midline_search)
+            elif hit_end_search:
+                hit_and_hsp_count = 0
 
+    print(cluster_name_list)
 
 
 if __name__ == '__main__':

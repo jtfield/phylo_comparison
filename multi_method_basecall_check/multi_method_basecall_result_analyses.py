@@ -5,6 +5,7 @@ import re
 from collections import defaultdict
 import numpy as np
 import pandas as pd
+from random import *
 import matplotlib as plt
 import seaborn as sns
 import dendropy
@@ -100,6 +101,29 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
     #print(cluster_len)
     #print(miscall_base_positions)
 
+# THIS FUNCTION IS FOR DEV PURPOSES ONLY. I USED THIS BECAUSE THE TEST DATASET DOESNT INCLUDE ENOUGH BASES TO BE MISCALLED
+# AND I NEEDED SOME MISCALLS TO TEST FIGURE MAKING
+def add_fake_miscall_data_for_test(miscall_dict):
+    random_num_list = [12,15,3,20,17,1,19,30,45,17,34,6]
+    print(miscall_dict["miscalled_bases"])
+    
+    for num, miscall_num in enumerate(miscall_dict["miscalled_bases"]):
+        miscall_dict["miscalled_bases"][num] = random_num_list[num]
+    #print(miscall_dict["miscalled_bases"])
+
+    print( miscall_dict['loci_len'])
+    for num, miscall_num in enumerate(miscall_dict["miscalled_bases"]):
+        #print(miscall_dict["miscall_positions"][num])
+        miscall_base_count = 0
+        for i in range(miscall_num):
+            ran_num = randint(1, int(miscall_dict['loci_len'][num]))
+            print(ran_num)
+            miscall_dict['miscall_positions'][num].append(ran_num)
+            miscall_base_count+=1
+    return(miscall_dict)
+
+    
+
 def main():
     args = parse_args()
     
@@ -135,7 +159,10 @@ def main():
     read_rapup_tree = dendropy.Tree.get(path = rapup_tree, schema='newick')
     
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_master_dict) 
-    print(rapup_basecall_check)
+    #print(rapup_basecall_check)
+
+    add_miscalls = add_fake_miscall_data_for_test(rapup_basecall_check) 
+    print(add_miscalls)
 
     # begin adding analyzing information and sorting it based on which method and which reference was used (if applicable)
     # dendropy find the closest related taxa to the reference sequence

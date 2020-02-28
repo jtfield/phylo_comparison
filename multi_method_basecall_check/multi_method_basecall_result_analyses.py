@@ -6,7 +6,8 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 from random import *
-import matplotlib as plt
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import seaborn as sns
 import dendropy
 
@@ -66,7 +67,7 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
         len_search = re.findall(len_compile, results_string)
         if len_search:
             #print(len_search)
-            output_dict["loci_len"].append(len_search[0])
+            output_dict["loci_len"].append(int(len_search[0]))
         
         for line in read_results:
             #name_search = re.findall(name_compile, line)
@@ -105,24 +106,65 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
 # AND I NEEDED SOME MISCALLS TO TEST FIGURE MAKING
 def add_fake_miscall_data_for_test(miscall_dict):
     random_num_list = [12,15,3,20,17,1,19,30,45,17,34,6]
-    print(miscall_dict["miscalled_bases"])
+    #print(miscall_dict["miscalled_bases"])
     
     for num, miscall_num in enumerate(miscall_dict["miscalled_bases"]):
         miscall_dict["miscalled_bases"][num] = random_num_list[num]
     #print(miscall_dict["miscalled_bases"])
 
-    print( miscall_dict['loci_len'])
+    #print( miscall_dict['loci_len'])
     for num, miscall_num in enumerate(miscall_dict["miscalled_bases"]):
         #print(miscall_dict["miscall_positions"][num])
         miscall_base_count = 0
         for i in range(miscall_num):
             ran_num = randint(1, int(miscall_dict['loci_len'][num]))
-            print(ran_num)
+            #print(ran_num)
             miscall_dict['miscall_positions'][num].append(ran_num)
             miscall_base_count+=1
     return(miscall_dict)
 
-    
+
+def fig_gen(data_dict):
+
+    df = pd.DataFrame(data_dict, columns= ['loci_names', 'taxon_names','loci_len','miscalled_bases', 'miscall_positions'])
+    #print(df)
+    row_count = 0
+    for index, row in df.iterrows():
+        row_count+=1
+        print(row)
+        
+        # set up the figure
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_xlim(0,10)
+        ax.set_ylim(0,10)
+
+        # draw lines
+        xmin = 1
+        xmax = 9
+        y = 5
+        height = 1
+
+        plt.hlines(y, xmin, xmax)
+        plt.vlines(xmin, y - height / 2., y + height / 2.)
+        plt.vlines(xmax, y - height / 2., y + height / 2.)
+        
+        plt.text(xmin - 0.1, y, '1', horizontalalignment='right')
+        plt.text(xmax + 0.1, y, str(row['loci_len']), horizontalalignment='left')
+
+        plt.savefig('foo.png')
+
+        # CREATE A NEW DATAFRAME ON THE FLY TO HANDLE THE VARIABLE NUMBER OF MISCALLED BASE POSITIONS
+        for num in row['miscall_positions']:
+            print(num)
+
+        #row.plot(x='loci_len',y='miscalled_bases',color='red')
+    #df.plot(kind='scatter',x='loci_len',y='miscalled_bases',color='red')
+    #plt.show()
+    #plt.savefig('foo.png')
+    #plt.savefig('foo_' + row_count '_.png')
+
+    return(df)
 
 def main():
     args = parse_args()
@@ -163,6 +205,9 @@ def main():
 
     add_miscalls = add_fake_miscall_data_for_test(rapup_basecall_check) 
     print(add_miscalls)
+
+    generate_figure = fig_gen(add_miscalls)
+    
 
     # begin adding analyzing information and sorting it based on which method and which reference was used (if applicable)
     # dendropy find the closest related taxa to the reference sequence

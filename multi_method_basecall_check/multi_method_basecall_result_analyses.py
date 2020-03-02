@@ -201,7 +201,7 @@ def main():
     read_rapup_tree = dendropy.Tree.get(path = rapup_tree, schema='newick')
     
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_master_dict) 
-    #print(rapup_basecall_check)
+    print(rapup_basecall_check)
     
     snippy_basecall_check = basecall_method_checker(snippy_results, snippy_blast_results, snippy_master_dict)
     print(snippy_basecall_check)

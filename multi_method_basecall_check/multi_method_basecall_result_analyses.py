@@ -202,11 +202,17 @@ def main():
     
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_master_dict) 
     #print(rapup_basecall_check)
+    
+    snippy_basecall_check = basecall_method_checker(snippy_results, snippy_blast_results, snippy_master_dict)
+    print(snippy_basecall_check)
+    
+    gon_phy_basecall_check = basecall_method_checker(gon_phy_results, gon_phy_blast_results, gon_phy_master_dict)
+    print(gon_phy_basecall_check)
 
     add_miscalls = add_fake_miscall_data_for_test(rapup_basecall_check) 
-    print(add_miscalls)
+    #print(add_miscalls)
 
-    generate_figure = fig_gen(add_miscalls)
+    #generate_figure = fig_gen(add_miscalls)
     
 
     # begin adding analyzing information and sorting it based on which method and which reference was used (if applicable)

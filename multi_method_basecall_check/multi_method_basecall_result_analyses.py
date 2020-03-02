@@ -129,34 +129,63 @@ def fig_gen(data_dict):
     df = pd.DataFrame(data_dict, columns= ['loci_names', 'taxon_names','loci_len','miscalled_bases', 'miscall_positions'])
     #print(df)
     row_count = 0
-    for index, row in df.iterrows():
-        row_count+=1
-        print(row)
-        
-        # set up the figure
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.set_xlim(0,10)
-        ax.set_ylim(0,10)
+
+    # set up the figure
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_xlim(0,10)
+    ax.set_ylim(0,10)
 
         # draw lines
-        xmin = 1
-        xmax = 9
-        y = 5
-        height = 1
+    xmin = 1
+    xmax = 9
+    y = 5
+    height = 1
 
-        plt.hlines(y, xmin, xmax)
-        plt.vlines(xmin, y - height / 2., y + height / 2.)
-        plt.vlines(xmax, y - height / 2., y + height / 2.)
+    plt.hlines(y, xmin, xmax)
+    plt.vlines(xmin, y - height / 2., y + height / 2.)
+    plt.vlines(xmax, y - height / 2., y + height / 2.)
+
+# ITERATE OVER MISCALL LOCATION DATA AND ADD POINTS
+    for index, row in df.iterrows():
+        row_count+=1
+#        print(row)
+#        
+#        # set up the figure
+#        fig = plt.figure()
+#        ax = fig.add_subplot(111)
+#        ax.set_xlim(0,10)
+#        ax.set_ylim(0,10)
+#
+#        # draw lines
+#        xmin = 1
+#        xmax = 9
+#        y = 5
+#        height = 1
+#
+#        plt.hlines(y, xmin, xmax)
+#        plt.vlines(xmin, y - height / 2., y + height / 2.)
+#        plt.vlines(xmax, y - height / 2., y + height / 2.)
+        #ADD POINTS TO LINE
+        #px = 4
+        #plt.plot(px,y, 'ro', ms = 15, mfc = 'r')
         
-        plt.text(xmin - 0.1, y, '1', horizontalalignment='right')
-        plt.text(xmax + 0.1, y, str(row['loci_len']), horizontalalignment='left')
+        px = row_count
+        plt.plot(px,y, 'ro', ms = 5, mfc = 'r')
+#        plt.text(xmin - 0.1, y, '1', horizontalalignment='right')
+#        plt.text(xmax + 0.1, y, str(row['loci_len']), horizontalalignment='left')
+#
+#        plt.savefig('foo.png')
 
-        plt.savefig('foo.png')
+    plt.text(xmin - 0.1, y, '1', horizontalalignment='right')
+    plt.text(xmax + 0.1, y, str(row['loci_len']), horizontalalignment='left')
+
+    plt.savefig('foo.png')
+
 
         # CREATE A NEW DATAFRAME ON THE FLY TO HANDLE THE VARIABLE NUMBER OF MISCALLED BASE POSITIONS
-        for num in row['miscall_positions']:
-            print(num)
+#        for num in row['miscall_positions']:
+#            print(num)
 
         #row.plot(x='loci_len',y='miscalled_bases',color='red')
     #df.plot(kind='scatter',x='loci_len',y='miscalled_bases',color='red')
@@ -212,7 +241,7 @@ def main():
     add_miscalls = add_fake_miscall_data_for_test(rapup_basecall_check) 
     #print(add_miscalls)
 
-    #generate_figure = fig_gen(add_miscalls)
+    generate_figure = fig_gen(add_miscalls)
     
 
     # begin adding analyzing information and sorting it based on which method and which reference was used (if applicable)

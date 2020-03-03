@@ -128,17 +128,31 @@ def fig_gen(data_dict):
 
     df = pd.DataFrame(data_dict, columns= ['loci_names', 'taxon_names','loci_len','miscalled_bases', 'miscall_positions'])
     #print(df)
-    row_count = 0
+    total_sequence_len = 0
+    current_seq_start_pos = 0
+    current_seq_end_pos = 0
+    unique_df = df.drop_duplicates('loci_names', keep='first')
+    #print(unique_df[['loci_len']])
 
+    unique_loci = {}
+    for num, value in enumerate(data_dict['loci_names']):
+        if value not in unique_loci:
+            total_sequence_len+=data_dict['loci_len'][num]
+            unique_loci[value] = num
+    
+    print(unique_loci)
+    print(total_sequence_len)
+    row_count = 0
+    
     # set up the figure
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.set_xlim(0,10)
+    ax.set_xlim(0 ,total_sequence_len + (2 * (total_sequence_len * .10)))
     ax.set_ylim(0,10)
 
         # draw lines
-    xmin = 1
-    xmax = 9
+    xmin = (total_sequence_len * .10)
+    xmax = total_sequence_len + xmin
     y = 5
     height = 1
 
@@ -147,8 +161,24 @@ def fig_gen(data_dict):
     plt.vlines(xmax, y - height / 2., y + height / 2.)
 
 # ITERATE OVER MISCALL LOCATION DATA AND ADD POINTS
-    for index, row in df.iterrows():
-        row_count+=1
+    used_positions = {}
+    for miscall_list in data_dict['miscall_positions']:
+
+        for miscall_pos in miscall_list:
+            px = miscall_pos + xmin
+            #print(px)
+            if px not in used_positions:
+                used_positions[px] = y
+                #print(used_positions[px])
+                plt.plot(px,y, 'ro', ms = 5, mfc = 'r')
+            elif px in used_positions:
+                
+                y = used_positions[px] + (used_positions[px] * .15)
+                used_positions[px] = y
+                plt.plot(px,y, 'ro', ms = 5, mfc = 'r')
+    print(used_positions)
+#    for index, row in df.iterrows():
+#        row_count+=1
 #        print(row)
 #        
 #        # set up the figure
@@ -166,19 +196,23 @@ def fig_gen(data_dict):
 #        plt.hlines(y, xmin, xmax)
 #        plt.vlines(xmin, y - height / 2., y + height / 2.)
 #        plt.vlines(xmax, y - height / 2., y + height / 2.)
+
         #ADD POINTS TO LINE
         #px = 4
         #plt.plot(px,y, 'ro', ms = 15, mfc = 'r')
         
-        px = row_count
-        plt.plot(px,y, 'ro', ms = 5, mfc = 'r')
+#        px = row_count
+#        plt.plot(px,y, 'ro', ms = 5, mfc = 'r')
+
+
+
 #        plt.text(xmin - 0.1, y, '1', horizontalalignment='right')
 #        plt.text(xmax + 0.1, y, str(row['loci_len']), horizontalalignment='left')
 #
 #        plt.savefig('foo.png')
 
     plt.text(xmin - 0.1, y, '1', horizontalalignment='right')
-    plt.text(xmax + 0.1, y, str(row['loci_len']), horizontalalignment='left')
+    plt.text(xmax + 0.1, y, str(total_sequence_len), horizontalalignment='left')
 
     plt.savefig('foo.png')
 

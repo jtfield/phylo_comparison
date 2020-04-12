@@ -6,6 +6,7 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 from random import *
+import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
@@ -23,6 +24,7 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
     cluster_len = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
     cluster_compile = re.compile(cluster_names)
     len_compile = re.compile(cluster_len)
+    
     cluster_name = {"loci_names" : []}
     miscalls = {"miscalled_bases" : []}
     taxon_dict = {"taxon_names" : []}
@@ -37,11 +39,15 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
         hit_and_hsp_count = 0
         miscalled_bases = 0
         correctly_called_bases = 0
+
+        # get the name of the cluster in the current file name
+        # add the cluster name to the list of cluster names
         cluster_name_search = re.findall(cluster_compile, file_name)
         if cluster_name_search:
-            output_dict["loci_names"].append(cluster_name_search[0])
-            current_locus = cluster_name_search[0]
-        
+            if cluster_name_search[0] not in output_dict["loci_names"]:
+                output_dict["loci_names"].append(cluster_name_search[0])
+                current_locus = cluster_name_search[0]
+         
         read_results = open(folder_path + "/" + file_name, "r")
         results_string = read_results.read()
 
@@ -56,7 +62,7 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
         len_compile = re.compile(seq_len_match)
         midline_compile = re.compile(hsp_midline)
         hit_end_compile = re.compile(hit_end)
-        #print(len_compile)
+        print(midline_compile)
 
         name_search = re.findall(name_compile, results_string)
         if name_search:
@@ -79,15 +85,17 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
             if first_hit_search:
                 #print(first_hit_search)
                 hit_and_hsp_count = 1
-            if midline_search and hit_and_hsp_count == 1:
-                #print(midline_search)
-                for num, midline in enumerate(midline_search[0]):
-                    if midline == ' ':
-                        miscalled_bases+=1
-                        #miscall_base_positions["miscall_base_positons"].append(num)
-                        miscalled_base_positions.append(num)
-                    elif midline == '|':
-                        correctly_called_bases+=1
+            if midline_search:
+                print(midline_search)
+                if hit_and_hsp_count == 1:
+                    #print(midline_search)
+                    for num, midline in enumerate(midline_search[0]):
+                        if midline == ' ':
+                            miscalled_bases+=1
+                            #miscall_base_positions["miscall_base_positons"].append(num)
+                            miscalled_base_positions.append(num)
+                        elif midline == '|':
+                            correctly_called_bases+=1
             #print(miscalled_bases)
             #print(correctly_called_bases)
             elif hit_end_search:
@@ -139,44 +147,52 @@ def fig_gen(data_dict):
         if value not in unique_loci:
             total_sequence_len+=data_dict['loci_len'][num]
             unique_loci[value] = num
-    
-    print(unique_loci)
-    print(total_sequence_len)
+
+    all_miscall_positions = []
+    for num, value in enumerate(data_dict['miscall_positions']):
+        for pos in value:
+            all_miscall_positions.append(pos)
+#    print(all_miscall_positions)
+
+    num_bins = 200
+    plt.hist(all_miscall_positions, num_bins, facecolor='blue', alpha=1)
+    #print(unique_loci)
+    #print(total_sequence_len)
     row_count = 0
     
     # set up the figure
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.set_xlim(0 ,total_sequence_len + (2 * (total_sequence_len * .10)))
-    ax.set_ylim(0,10)
+#    fig = plt.figure()
+#    ax = fig.add_subplot(111)
+#    ax.set_xlim(0 ,total_sequence_len + (2 * (total_sequence_len * .10)))
+#    ax.set_ylim(0,10)
 
         # draw lines
     xmin = (total_sequence_len * .10)
-    xmax = total_sequence_len + xmin
-    y = 5
-    height = 1
+#    xmax = total_sequence_len + xmin
+#    y = 5
+#    height = 1
 
-    plt.hlines(y, xmin, xmax)
-    plt.vlines(xmin, y - height / 2., y + height / 2.)
-    plt.vlines(xmax, y - height / 2., y + height / 2.)
+#    plt.hlines(y, xmin, xmax)
+#    plt.vlines(xmin, y - height / 2., y + height / 2.)
+#    plt.vlines(xmax, y - height / 2., y + height / 2.)
 
 # ITERATE OVER MISCALL LOCATION DATA AND ADD POINTS
-    used_positions = {}
-    for miscall_list in data_dict['miscall_positions']:
-
-        for miscall_pos in miscall_list:
-            px = miscall_pos + xmin
-            #print(px)
-            if px not in used_positions:
-                used_positions[px] = y
-                #print(used_positions[px])
-                plt.plot(px,y, 'ro', ms = 5, mfc = 'r')
-            elif px in used_positions:
+#    used_positions = {}
+#    for miscall_list in data_dict['miscall_positions']:
+#
+#        for miscall_pos in miscall_list:
+#            px = miscall_pos + xmin
+#            #print(px)
+#            if px not in used_positions:
+#                used_positions[px] = y
+#                #print(used_positions[px])
+#                plt.plot(px,y, 'ro', ms = 5, mfc = 'r')
+#            elif px in used_positions:
                 
-                y = used_positions[px] + (used_positions[px] * .15)
-                used_positions[px] = y
-                plt.plot(px,y, 'ro', ms = 5, mfc = 'r')
-    print(used_positions)
+#                y = used_positions[px] + (used_positions[px] * .15)
+#                used_positions[px] = y
+#                plt.plot(px,y, 'ro', ms = 5, mfc = 'r')
+    #print(used_positions)
 #    for index, row in df.iterrows():
 #        row_count+=1
 #        print(row)
@@ -211,8 +227,8 @@ def fig_gen(data_dict):
 #
 #        plt.savefig('foo.png')
 
-    plt.text(xmin - 0.1, y, '1', horizontalalignment='right')
-    plt.text(xmax + 0.1, y, str(total_sequence_len), horizontalalignment='left')
+#    plt.text(xmin - 0.1, y, '1', horizontalalignment='right')
+#    plt.text(xmax + 0.1, y, str(total_sequence_len), horizontalalignment='left')
 
     plt.savefig('foo.png')
 

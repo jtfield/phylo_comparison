@@ -50,10 +50,11 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
          
         read_results = open(folder_path + "/" + file_name, "r")
         results_string = read_results.read()
+        split_file = results_string.split('\n')
 
         seq_len_match = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
         taxon_name = "<BlastOutput_query-def>(.+)</BlastOutput_query-def>"
-        hsp_num_1 = "<Hit_num>(1)</Hit_num>"
+        hsp_num_1 = "<Hit_num>1</Hit_num>"
         hsp_midline = "<Hsp_midline>(.+)</Hsp_midline>"
         hit_end = "</Hsp>"
 
@@ -62,7 +63,8 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
         len_compile = re.compile(seq_len_match)
         midline_compile = re.compile(hsp_midline)
         hit_end_compile = re.compile(hit_end)
-        print(midline_compile)
+        #print(midline_compile)
+        #print(hsp_compile)
 
         name_search = re.findall(name_compile, results_string)
         if name_search:
@@ -75,7 +77,8 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
             #print(len_search)
             output_dict["loci_len"].append(int(len_search[0]))
         
-        for line in read_results:
+        for line in split_file:
+            #print(line)
             #name_search = re.findall(name_compile, line)
             #len_search = re.findall(len_compile, line)
             first_hit_search = re.findall(hsp_compile, line)
@@ -86,7 +89,7 @@ def basecall_method_checker(folder_path, input_folder, output_dict):
                 #print(first_hit_search)
                 hit_and_hsp_count = 1
             if midline_search:
-                print(midline_search)
+                #print(midline_search)
                 if hit_and_hsp_count == 1:
                     #print(midline_search)
                     for num, midline in enumerate(midline_search[0]):
@@ -278,20 +281,22 @@ def main():
     
     #print(rapup_blast_results)
     read_rapup_tree = dendropy.Tree.get(path = rapup_tree, schema='newick')
-    
+    print("rapup results") 
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_master_dict) 
     print(rapup_basecall_check)
     
+    print("snippy results")
     snippy_basecall_check = basecall_method_checker(snippy_results, snippy_blast_results, snippy_master_dict)
     print(snippy_basecall_check)
     
+    print("gon_phy results")
     gon_phy_basecall_check = basecall_method_checker(gon_phy_results, gon_phy_blast_results, gon_phy_master_dict)
     print(gon_phy_basecall_check)
 
-    add_miscalls = add_fake_miscall_data_for_test(rapup_basecall_check) 
+    #add_miscalls = add_fake_miscall_data_for_test(rapup_basecall_check) 
     #print(add_miscalls)
 
-    generate_figure = fig_gen(add_miscalls)
+    #generate_figure = fig_gen(add_miscalls)
     
 
     # begin adding analyzing information and sorting it based on which method and which reference was used (if applicable)

@@ -175,7 +175,7 @@ do
 		if [ ! -z "$seq_grep" ];
 		then
 			printf "\nFOUND A MATCH BETWEEN A SNIPPY SEQUENCE AND BLAST INDEX\n"
-			blastn -db $j.fasta -query $outdir/$snippy_basecall/sep_loci/individual_tax/$i -out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -outfmt 5
+			blastn -db $j.fasta -query $outdir/$snippy_basecall/sep_loci/individual_tax/$i -out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
 			#printf "\n$j\n"
 			#printf "\n$i\n"
 		fi
@@ -199,7 +199,7 @@ do
 		if [ ! -z "$seq_grep" ];
                 then
                         printf "\nFOUND A MATCH BETWEEN A RAPUP SEQUENCE AND BLAST INDEX\n"
-                        blastn -db $j.fasta -query $outdir/$rapup_basecall/sep_loci/individual_tax/$i -out $outdir/$rapup_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -outfmt 5
+                        blastn -db $j.fasta -query $outdir/$rapup_basecall/sep_loci/individual_tax/$i -out $outdir/$rapup_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
                         #printf "\n$j\n"
                         #printf "\n$i\n"
                 fi
@@ -223,7 +223,7 @@ do
 		if [ ! -z "$seq_grep" ];
                 then
                         printf "\nFOUND A MATCH BETWEEN A GON_PHY SEQUENCE AND BLAST INDEX\n"
-                        blastn -db $j.fasta -query $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i -out $outdir/$gon_phy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -outfmt 5
+                        blastn -db $j.fasta -query $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i -out $outdir/$gon_phy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
                         #printf "\n$j\n"
                         #printf "\n$i\n"
                 fi

@@ -94,6 +94,26 @@ $outdir/runme.sh
 raxmlHPC-PTHREADS -s $outdir/core.full.aln -m GTRGAMMA -p 12345 -n consensusFULL
 
 
+#trying to clean up snippy...
+if [ $intermediate_files == "CLEAN" ]; then
+        printf "\nCleaning up intermediate output files.\n"
+        for i in $(cat $outdir/taxa_list.txt); do
+		base_file=$(basename $i $r1_tail)
+		printf "\n$base_file\n"
+		rm -r $base_file
+                #cd $i
+                #for j in $(ls -1); do
+                #        rm ./$j
+                #done    
+                #cd ..
+                #rmdir $i
+        done
+elif [ $intermediate_files == "KEEP" ]; then
+        printf "\nKeeping intermediate output files\n"
+fi
+
+
+
 #BEGIN SEPARATION OF LOCI IF NECESSARY AND ALIGNMENT OF CONSTRUCTED LOCI TO THE ORIGINAL GENOMES THAT PRODUCED THE READS
 
 # CONSTRUCT BLAST INDEXES

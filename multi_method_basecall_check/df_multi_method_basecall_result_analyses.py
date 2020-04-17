@@ -6,6 +6,7 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 from random import *
+import matplotlib
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -112,10 +113,60 @@ def basecall_method_checker(folder_path, input_folder, df):
    
 
 
-def fig_gen(df):
+def fig_gen(df_1, method_1, df_2, method_2, df_3, method_3):
+
+    #hist = df.hist(bins=10)
+    df_1['sums'] = df_1.sum(axis=1)
+    df_2['sums'] = df_2.sum(axis=1)
+    df_3['sums'] = df_3.sum(axis=1)
+    sums_1 = df_1['sums']
+    sums_2 = df_2['sums']
+    sums_3 = df_3['sums']
+
+    
+    #plt.plot(df['sums'])
+    #num_bins = 15
+    #n, bins, patches = plt.hist(df['sums'], num_bins, facecolor='blue', alpha=0.5)
+    #plt.show()
+    #file_name = method + "_miscalled_bases.png"
+    #plt.savefig(file_name)
 
 
-    return(df)
+    #stacked plots
+    #fig, (ax1, ax2, ax3) = plt.subplots(1, 2)
+    #fig.suptitle('Horizontally stacked subplots')
+    #n, bins, patches = plt.hist(df['sums'], num_bins, facecolor='blue', alpha=0.5)
+    #ax1.plot(df_1['sums'])
+    #ax2.plot(df_2['sums'])
+    #ax3.plot(df_3['sums'])
+
+
+
+    fig, axs = plt.subplots(3, sharex=True, sharey=True)
+    fig.suptitle('Program Miscalled Bases')
+    axs[0].plot(df_1['sums'])
+    axs[0].set_title('RapUp')
+    
+    axs[1].plot(df_2['sums'])
+    axs[1].set_title('Snippy')
+    
+    axs[2].plot(df_3['sums'])
+    axs[2].set_title('Gon_phy')
+    plt.xticks([])
+#    plt.show()
+
+
+    #OVERLAYED DOT PLOT
+
+#    plt.plot(sums_1, 'bo')
+#    plt.plot(sums_2,'go')
+#    plt.plot(sums_3, 'co')
+#    plt.xticks([])
+    plt.show()
+
+
+
+    return "done"
 
 
 
@@ -164,18 +215,30 @@ def main():
     
     print("rapup results") 
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_df) 
-    print(rapup_basecall_check)
+    #print(rapup_basecall_check)
     #print(rapup_basecall_check["miscalled_bases"])
     
     print("snippy results")
     snippy_basecall_check = basecall_method_checker(snippy_results, snippy_blast_results, snippy_df)
-    print(snippy_basecall_check)
+    #print(snippy_basecall_check)
     #print(snippy_basecall_check["miscalled_bases"])
 
     print("gon_phy results")
     gon_phy_basecall_check = basecall_method_checker(gon_phy_results, gon_phy_blast_results, gon_phy_df)
-    print(gon_phy_basecall_check)
+    #print(gon_phy_basecall_check)
     #print(gon_phy_basecall_check["miscalled_bases"])
+
+    #rapup_fig = fig_gen(rapup_basecall_check, "rapup")
+    #print(rapup_fig)
+
+    #snippy_fig = fig_gen(snippy_basecall_check, "snippy")
+
+    #gon_phy_fig = fig_gen(gon_phy_basecall_check, "gon_phy")
+
+    combo_fig = fig_gen(rapup_basecall_check, "rapup", snippy_basecall_check, "snippy", gon_phy_basecall_check, "gon_phy")
+
+
+
 
 
 if __name__ == '__main__':

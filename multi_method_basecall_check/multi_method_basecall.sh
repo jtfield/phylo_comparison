@@ -87,6 +87,13 @@ chmod +x $outdir/runme.sh
 
 $outdir/runme.sh
 
+# WARNING WARNING WARNING: THIS RAXML COMMAND IS WONKY AS FUCK
+#raxmlHPC-PTHREADS -m GTRGAMMA -T $threads -s $outdir/core.full.aln -p 12345 -n consensusFULL
+
+#This one works for some ungodly reason. wtf and why cant i call -T for threads?
+raxmlHPC-PTHREADS -s $outdir/core.full.aln -m GTRGAMMA -p 12345 -n consensusFULL
+
+
 #BEGIN SEPARATION OF LOCI IF NECESSARY AND ALIGNMENT OF CONSTRUCTED LOCI TO THE ORIGINAL GENOMES THAT PRODUCED THE READS
 
 # CONSTRUCT BLAST INDEXES

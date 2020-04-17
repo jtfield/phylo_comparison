@@ -135,6 +135,10 @@ def add_fake_miscall_data_for_test(miscall_dict):
     return(miscall_dict)
 
 
+# combine raw results data into a single dataframe for further processing
+def df_gen():
+    print("waffle")
+
 def fig_gen(data_dict):
 
     df = pd.DataFrame(data_dict, columns= ['loci_names', 'taxon_names','loci_len','miscalled_bases', 'miscall_positions'])
@@ -283,18 +287,18 @@ def main():
     read_rapup_tree = dendropy.Tree.get(path = rapup_tree, schema='newick')
     print("rapup results") 
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_master_dict) 
-    #print(rapup_basecall_check)
-    print(rapup_basecall_check["miscalled_bases"])
+    print(rapup_basecall_check)
+    #print(rapup_basecall_check["miscalled_bases"])
     
     print("snippy results")
     snippy_basecall_check = basecall_method_checker(snippy_results, snippy_blast_results, snippy_master_dict)
-    #print(snippy_basecall_check)
-    print(snippy_basecall_check["miscalled_bases"])
+    print(snippy_basecall_check)
+    #print(snippy_basecall_check["miscalled_bases"])
 
     print("gon_phy results")
     gon_phy_basecall_check = basecall_method_checker(gon_phy_results, gon_phy_blast_results, gon_phy_master_dict)
-    #print(gon_phy_basecall_check)
-    print(gon_phy_basecall_check["miscalled_bases"])
+    print(gon_phy_basecall_check)
+    #print(gon_phy_basecall_check["miscalled_bases"])
 
     #add_miscalls = add_fake_miscall_data_for_test(rapup_basecall_check) 
     #print(add_miscalls)

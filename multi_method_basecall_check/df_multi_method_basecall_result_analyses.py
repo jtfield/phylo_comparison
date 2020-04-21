@@ -21,6 +21,20 @@ def parse_args():
     parser.add_argument('--output_folder')
     return parser.parse_args()
 
+def get_taxa_names(tree_file):
+    name_list = []
+    name_grabber = '(\w+?):'
+    compile_name_grabber = re.compile(name_grabber)
+    
+    grab_names = re.findall(compile_name_grabber, tree_file)
+
+    if grab_names:
+        for name in grab_names:
+            name_list.append(name)
+
+    return name_list
+
+
 def make_df(folder_path, input_folder):
     cluster_names = 'cluster\d+'
     cluster_len = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
@@ -218,6 +232,15 @@ def main():
 
     name_grabber = '(\w+?):'
     compile_name_grabber = re.compile(name_grabber)
+
+    snippy_ref_name = ''
+    with open(path_to_output_folder + '/core.ref.fa') as f:
+        first_line = f.readline().strip()
+        snippy_ref_name = first_line.strip('>')
+    print(snippy_ref_name)
+
+    ref = 'Reference'
+    ref_compile = re.compile(ref)
     
 
     read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
@@ -225,11 +248,27 @@ def main():
     read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
     read_true_tree = dendropy.Tree.get(data = true_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
     
-    str_tree = str(read_true_tree)
-    true_tree_names = re.findall(compile_name_grabber, str_tree)
-    if true_tree_names:
-        print(true_tree_names)
+    str_true_tree = str(read_true_tree)
+    str_rapup_tree = str(read_rapup_tree)
+    str_snippy_tree = str(read_snippy_tree)
+    str_gon_phy_tree = str(read_gon_phy_tree)
 
+    str_snippy_tree = str_snippy_tree.replace(ref, snippy_ref_name)
+
+    true_names = get_taxa_names(str_true_tree)
+    rapup_names = get_taxa_names(str_rapup_tree)
+    snippy_names = get_taxa_names(str_snippy_tree)
+    gon_phy_names = get_taxa_names(str_gon_phy_tree)
+
+    #print(rapup_names)
+    #print(snippy_names)
+
+    for name in rapup_names:
+        #print(name)
+        assert name in snippy_names
+    
+    print(str_snippy_tree)
+    fixed_snippy_tree = dendropy.Tree.get(data = str_snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
 
     #BASECALL COMPARISON
     print("rapup results")
@@ -240,7 +279,7 @@ def main():
     #print(rapup_basecall_check["miscalled_bases"])
     
     print("snippy results")
-    snippy_phylo_compare = treecompare.symmetric_difference(read_true_tree, read_snippy_tree)
+    snippy_phylo_compare = treecompare.symmetric_difference(read_true_tree, fixed_snippy_tree)
     print(snippy_phylo_compare)
     snippy_basecall_check = basecall_method_checker(snippy_results, snippy_blast_results, snippy_df)
     #print(snippy_basecall_check)

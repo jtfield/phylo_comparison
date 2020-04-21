@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
 import dendropy
+from dendropy.calculate import treecompare
+
 
 
 def parse_args():
@@ -197,10 +199,11 @@ def main():
     snippy_blast_results = os.listdir(snippy_results)
     gon_phy_blast_results = os.listdir(gon_phy_results)
 
-    gon_phy_tree = path_to_output_folder + '/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out'
-    rapup_tree = path_to_output_folder + '/rapup_run/combine_and_infer/RAxML_bestTree.consensusFULL'
-    snippy_tree = path_to_output_folder + '' # RUN SNIPPY ALIGNMENT THROUGH RAXML
-   
+    gon_phy_tree = open(path_to_output_folder + '/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out', 'r').read()
+    rapup_tree = open(path_to_output_folder + '/rapup_run/combine_and_infer/RAxML_bestTree.consensusFULL','r').read()
+    snippy_tree = open(path_to_output_folder + '/RAxML_bestTree.snippy_tree','r').read()
+    true_tree = open(path_to_output_folder + '/true_tree.tre','r').read()
+
     rapup_df = make_df(rapup_results, rapup_blast_results)
     #print(rapup_df)
 
@@ -210,20 +213,42 @@ def main():
     gon_phy_df = make_df(gon_phy_results, gon_phy_blast_results)
     #print(gon_phy_df)
 
-    #print(rapup_blast_results)
-    read_rapup_tree = dendropy.Tree.get(path = rapup_tree, schema='newick')
+    #TREE COMPARISON
+    tns = dendropy.TaxonNamespace()
+
+    name_grabber = '[\(|,](.+?):'
+    compile_name_grabber = re.compile(name_grabber)
     
-    print("rapup results") 
+
+    read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
+    read_snippy_tree = dendropy.Tree.get(data = snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
+    read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
+    read_true_tree = dendropy.Tree.get(data = true_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
+    
+    str_tree = str(read_true_tree)
+    true_tree_names = re.findall(compile_name_grabber, str_tree)
+    if true_tree_names:
+        print(true_tree_names)
+
+
+    #BASECALL COMPARISON
+    print("rapup results")
+    rapup_phylo_compare = treecompare.symmetric_difference(read_true_tree, read_rapup_tree)
+    print(rapup_phylo_compare)
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_df) 
     #print(rapup_basecall_check)
     #print(rapup_basecall_check["miscalled_bases"])
     
     print("snippy results")
+    snippy_phylo_compare = treecompare.symmetric_difference(read_true_tree, read_snippy_tree)
+    print(snippy_phylo_compare)
     snippy_basecall_check = basecall_method_checker(snippy_results, snippy_blast_results, snippy_df)
     #print(snippy_basecall_check)
     #print(snippy_basecall_check["miscalled_bases"])
 
     print("gon_phy results")
+    gon_phy_phylo_compare = treecompare.symmetric_difference(read_true_tree, read_gon_phy_tree)
+    print(gon_phy_phylo_compare)
     gon_phy_basecall_check = basecall_method_checker(gon_phy_results, gon_phy_blast_results, gon_phy_df)
     #print(gon_phy_basecall_check)
     #print(gon_phy_basecall_check["miscalled_bases"])

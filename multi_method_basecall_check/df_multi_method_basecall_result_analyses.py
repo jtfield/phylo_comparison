@@ -254,6 +254,7 @@ def main():
     str_gon_phy_tree = str(read_gon_phy_tree)
 
     str_snippy_tree = str_snippy_tree.replace(ref, snippy_ref_name)
+    str_gon_phy_tree = str_gon_phy_tree.replace('.ref', '')
 
     true_names = get_taxa_names(str_true_tree)
     rapup_names = get_taxa_names(str_rapup_tree)
@@ -262,13 +263,25 @@ def main():
 
     #print(rapup_names)
     #print(snippy_names)
+    #print(gon_phy_names)
 
+    names_not_in_true_tree = []
     for name in rapup_names:
         #print(name)
         assert name in snippy_names
+        assert name in gon_phy_names
+        if name not in true_names:
+            names_not_in_true_tree.append(name)
     
-    print(str_snippy_tree)
+    #print(names_not_in_true_tree)
+    if len(names_not_in_true_tree) > 0:
+        read_true_tree.prune_taxa_with_labels(names_not_shared_list)
+
+    #print(str_snippy_tree)
     fixed_snippy_tree = dendropy.Tree.get(data = str_snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
+
+    fixed_gon_phy_tree = dendropy.Tree.get(data = str_gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
+
 
     #BASECALL COMPARISON
     print("rapup results")
@@ -286,7 +299,7 @@ def main():
     #print(snippy_basecall_check["miscalled_bases"])
 
     print("gon_phy results")
-    gon_phy_phylo_compare = treecompare.symmetric_difference(read_true_tree, read_gon_phy_tree)
+    gon_phy_phylo_compare = treecompare.symmetric_difference(read_true_tree, fixed_gon_phy_tree)
     print(gon_phy_phylo_compare)
     gon_phy_basecall_check = basecall_method_checker(gon_phy_results, gon_phy_blast_results, gon_phy_df)
     #print(gon_phy_basecall_check)

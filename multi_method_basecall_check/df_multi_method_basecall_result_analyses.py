@@ -282,6 +282,9 @@ def main():
 
     fixed_gon_phy_tree = dendropy.Tree.get(data = str_gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
 
+    assert len(read_true_tree.leaf_nodes()) == len(read_rapup_tree.leaf_nodes())
+    read_true_tree.write(path= path_to_output_folder + "/true_tree_subset.tre", schema="newick")
+
 
     #BASECALL COMPARISON
     print("rapup results")

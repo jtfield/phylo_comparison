@@ -216,7 +216,7 @@ def main():
     #TREE COMPARISON
     tns = dendropy.TaxonNamespace()
 
-    name_grabber = '[\(|,](.+?):'
+    name_grabber = '(\w+?):'
     compile_name_grabber = re.compile(name_grabber)
     
 

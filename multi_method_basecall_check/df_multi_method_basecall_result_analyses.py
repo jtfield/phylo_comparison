@@ -97,31 +97,59 @@ def basecall_method_checker(folder_path, input_folder, df):
         hsp_num_1 = "<Hit_num>1</Hit_num>"
         hsp_midline = "<Hsp_midline>(.+)</Hsp_midline>"
         hit_end = "</Hsp>"
-         
+        total_hit = "<Hit><Hit_num>1</Hit_num>(.+?)</Hit>"
+
         hsp_compile = re.compile(hsp_num_1)
         name_compile = re.compile(taxon_name)
         len_compile = re.compile(seq_len_match)
         midline_compile = re.compile(hsp_midline)
         hit_end_compile = re.compile(hit_end)
+        total_hit_compile = re.compile(total_hit)
         
-        tax_name_search = re.findall(name_compile, results_string)
-        #first_hit_search = re.findall(hsp_compile, line)
-        midline_search = re.findall(midline_compile, results_string)
-        hit_end_search = re.findall(hit_end_compile, results_string)
+        split_results_string = results_string.split()
+        #print(split_results_string)
+        joined_results_string = ''.join(split_results_string)
+        #print(joined_results_string)
+
+#        tax_name_search = re.findall(name_compile, results_string)
+#        #first_hit_search = re.findall(hsp_compile, line)
+#        midline_search = re.findall(midline_compile, results_string)
+#        hit_end_search = re.findall(hit_end_compile, results_string)
+        total_hit_first = re.findall(total_hit_compile, joined_results_string)
         
         correctly_called_bases = 0
         miscalled_bases = 0
-        if cluster_name_search:
-            if tax_name_search: 
-                if midline_search:
-                    #print(midline_search)
-                    for num, midline in enumerate(midline_search[0]):
-                        if midline == ' ':
-                            miscalled_bases+=1
-                            #miscall_base_positions["miscall_base_positons"].append(num)
-                            #miscalled_base_positions.append(num)
-                        elif midline == '|':
-                            correctly_called_bases+=1
+        if total_hit_first:
+            print(total_hit_first[0])
+            first_hit = total_hit_first[0]
+            tax_name_search = re.findall(name_compile, first_hit)
+            midline_search = re.findall(midline_compile, first_hit)
+            hit_end_search = re.findall(hit_end_compile, first_hit)
+            if cluster_name_search:
+                if tax_name_search:
+                    if midline_search:
+                        #print(midline_search)
+                        for num, midline in enumerate(midline_search[0]):
+                            if midline == ' ':
+                                miscalled_bases+=1
+                                #miscall_base_positions["miscall_base_positons"].append(num)
+                                #miscalled_base_positions.append(num)
+                            elif midline == '|':
+                                correctly_called_bases+=1
+
+#        correctly_called_bases = 0
+#        miscalled_bases = 0
+#        if cluster_name_search:
+#            if tax_name_search: 
+#                if midline_search:
+#                    #print(midline_search)
+#                    for num, midline in enumerate(midline_search[0]):
+#                        if midline == ' ':
+#                            miscalled_bases+=1
+#                            #miscall_base_positions["miscall_base_positons"].append(num)
+#                            #miscalled_base_positions.append(num)
+#                        elif midline == '|':
+#                            correctly_called_bases+=1
 
         df.loc[tax_name_search[0], cluster_name_search[0]] = miscalled_bases
     
@@ -237,7 +265,7 @@ def main():
     with open(path_to_output_folder + '/core.ref.fa') as f:
         first_line = f.readline().strip()
         snippy_ref_name = first_line.strip('>')
-    print(snippy_ref_name)
+    #print(snippy_ref_name)
 
     ref = 'Reference'
     ref_compile = re.compile(ref)
@@ -255,32 +283,52 @@ def main():
 
     str_snippy_tree = str_snippy_tree.replace(ref, snippy_ref_name)
     str_gon_phy_tree = str_gon_phy_tree.replace('.ref', '')
+    str_rapup_tree = str_rapup_tree.replace('.ref', '')
+    str_snippy_tree = str_snippy_tree.replace('.ref', '')
 
     true_names = get_taxa_names(str_true_tree)
     rapup_names = get_taxa_names(str_rapup_tree)
     snippy_names = get_taxa_names(str_snippy_tree)
     gon_phy_names = get_taxa_names(str_gon_phy_tree)
-
+   
+    #print(true_names)
     #print(rapup_names)
-    #print(snippy_names)
-    #print(gon_phy_names)
 
-    names_not_in_true_tree = []
-    for name in rapup_names:
+    #print(str_rapup_tree)
+    #print(str_gon_phy_tree)
+    #print(str_snippy_tree)
+
+    #print(len(rapup_names))
+    #print(len(snippy_names))
+    #print(len(gon_phy_names))
+
+    #join_true_names = ''.join(true_names)
+    #print(join_true_names)
+    names_not_shared_list = []
+    #for name in rapup_names:
+    for name in true_names:
+        #compile_name = re.compile(name)
+        #find_name = re.findall(name, join_true_names)
         #print(name)
-        assert name in snippy_names
-        assert name in gon_phy_names
-        if name not in true_names:
-            names_not_in_true_tree.append(name)
+        #assert name in snippy_names
+        #assert name in gon_phy_names
+        #if name not in true_names:
+        if name not in rapup_names:
+        #if not find_name:
+            names_not_shared_list.append(name)
     
     #print(names_not_in_true_tree)
-    if len(names_not_in_true_tree) > 0:
+    if len(names_not_shared_list) > 0:
         read_true_tree.prune_taxa_with_labels(names_not_shared_list)
 
     #print(str_snippy_tree)
     fixed_snippy_tree = dendropy.Tree.get(data = str_snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
 
     fixed_gon_phy_tree = dendropy.Tree.get(data = str_gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
+
+    #print(read_true_tree.leaf_nodes())
+    #print(read_rapup_tree.leaf_nodes())
+    #print(names_not_in_true_tree)
 
     assert len(read_true_tree.leaf_nodes()) == len(read_rapup_tree.leaf_nodes())
     read_true_tree.write(path= path_to_output_folder + "/true_tree_subset.tre", schema="newick")

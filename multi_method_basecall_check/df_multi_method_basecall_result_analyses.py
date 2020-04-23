@@ -97,6 +97,7 @@ def basecall_method_checker(folder_path, input_folder, df):
         hsp_num_1 = "<Hit_num>1</Hit_num>"
         hsp_midline = "<Hsp_midline>(.+)</Hsp_midline>"
         hit_end = "</Hsp>"
+        first_hit_with_header = "<BlastOutput_query-ID>(.+?)</Hit>"
         total_hit = "<Hit><Hit_num>1</Hit_num>(.+?)</Hit>"
 
         hsp_compile = re.compile(hsp_num_1)
@@ -105,8 +106,9 @@ def basecall_method_checker(folder_path, input_folder, df):
         midline_compile = re.compile(hsp_midline)
         hit_end_compile = re.compile(hit_end)
         total_hit_compile = re.compile(total_hit)
-        
-        split_results_string = results_string.split()
+        first_hit_with_header_compile = re.compile(first_hit_with_header)
+
+        split_results_string = results_string.split('\n')
         #print(split_results_string)
         joined_results_string = ''.join(split_results_string)
         #print(joined_results_string)
@@ -116,19 +118,26 @@ def basecall_method_checker(folder_path, input_folder, df):
 #        midline_search = re.findall(midline_compile, results_string)
 #        hit_end_search = re.findall(hit_end_compile, results_string)
         total_hit_first = re.findall(total_hit_compile, joined_results_string)
-        
+        find_first_hit_with_header = re.findall(first_hit_with_header_compile, joined_results_string)
+
         correctly_called_bases = 0
         miscalled_bases = 0
-        if total_hit_first:
-            print(total_hit_first[0])
-            first_hit = total_hit_first[0]
+        #if total_hit_first:
+        if find_first_hit_with_header:
+        
+            print(find_first_hit_with_header)
+            #print(total_hit_first[0])
+            first_hit = find_first_hit_with_header[0]
             tax_name_search = re.findall(name_compile, first_hit)
             midline_search = re.findall(midline_compile, first_hit)
             hit_end_search = re.findall(hit_end_compile, first_hit)
             if cluster_name_search:
+                #print(cluster_name_search)
                 if tax_name_search:
+                    #print(tax_name_search)
+                    #print(cluster_name_search)
                     if midline_search:
-                        #print(midline_search)
+                        #print(midline_search[0])
                         for num, midline in enumerate(midline_search[0]):
                             if midline == ' ':
                                 miscalled_bases+=1
@@ -152,7 +161,7 @@ def basecall_method_checker(folder_path, input_folder, df):
 #                            correctly_called_bases+=1
 
         df.loc[tax_name_search[0], cluster_name_search[0]] = miscalled_bases
-    
+    print(df) 
     return df
    
 
@@ -247,7 +256,7 @@ def main():
     true_tree = open(path_to_output_folder + '/true_tree.tre','r').read()
 
     rapup_df = make_df(rapup_results, rapup_blast_results)
-    #print(rapup_df)
+    print(rapup_df)
 
     snippy_df = make_df(snippy_results, snippy_blast_results)
     #print(snippy_df)

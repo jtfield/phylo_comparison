@@ -68,40 +68,71 @@ def main():
     indentical_bases_by_position = 0
     identical_bases = 0
     split_short = split_seq(shorter)
-    for num in range(0, len(longer)):
-        #longer_segment = longer[num:len(shorter)]
-        longer_segment = longer[num:num + len(shorter)]
-        if len(longer_segment) >= len(shorter):
-        
-            split_long = split_seq(longer_segment)
-            #print(len(split_long))
-            #print(len(longer))
-            
-            # make sure that the split subsequence of the longer sequence is not shorter than the shorter sequence (ugh)
-            assert len(split_long) >= len(shorter)
-           
-            #zip both lists together by elements
-            combined_positions = list(map(list, zip(split_long, split_short)))
-            #print(combined_positions)
-            check_identity = check_alignment(combined_positions)
-            #print(check_identity)
+#    for num in range(0, len(longer)):
+#        #longer_segment = longer[num:len(shorter)]
+#        longer_segment = longer[num:num + len(shorter)]
+#        if len(longer_segment) >= len(shorter):
+#        
+#            split_long = split_seq(longer_segment)
+#            #print(len(split_long))
+#            #print(len(longer))
+#            
+#            # make sure that the split subsequence of the longer sequence is not shorter than the shorter sequence (ugh)
+#            assert len(split_long) >= len(shorter)
+#           
+#            #zip both lists together by elements
+#            combined_positions = list(map(list, zip(split_long, split_short)))
+#            #print(combined_positions)
+#            check_identity = check_alignment(combined_positions)
+#            #print(check_identity)
+#
+#            if check_identity > identical_bases:
+#                identical_bases = check_identity
+#                identical_bases_by_position = num
 
-            if check_identity > identical_bases:
-                identical_bases = check_identity
-                identical_bases_by_position = num
+    best_seq = ''
+    added_gaps_on_front = 0
+    #add_gaps_short = ((added_gaps_on_front * '-') + shorter)
+    #extended_short_length = len(shorter) + added_gaps_on_front
+    while added_gaps_on_front + len(shorter) < int(len(longer)):
+        add_gaps_short = ((added_gaps_on_front * '-') + shorter)
+        split_short = split_seq(add_gaps_short)
+        split_long = split_seq(longer)
+        added_gaps_on_front+=1
+        #print(len(add_gaps_short))
+        #print(add_gaps_short)
+        #print(extended_short_length)
+        
+
+        combined_positions = list(map(list, zip(split_long, split_short)))
+        check_identity = check_alignment(combined_positions)
+        if check_identity > identical_bases:
+            identical_bases = check_identity
+            identical_bases_by_position = added_gaps_on_front
+            best_seq = split_short
+        
+
+
+
+
+
+
+
+
+
 
     print(identical_bases)
     print(identical_bases_by_position)
 
-    output_file = open('test_output_align.fasta','w')
-    output_file.write(longer_label)
-    output_file.write('\n')
-    output_file.write(longer)
-    output_file.write('\n')
-    output_file.write(shorter_label)
-    output_file.write('\n')
-    output_file.write((identical_bases_by_position * '-') + shorter)
-    output_file.close()
+    #output_file = open('test_output_align.fasta','w')
+    #output_file.write(longer_label)
+    #output_file.write('\n')
+    #output_file.write(longer)
+    #output_file.write('\n')
+    #output_file.write(shorter_label)
+    #output_file.write('\n')
+    #output_file.write((identical_bases_by_position * '-') + shorter)
+    #output_file.close()
 
 if __name__ == '__main__':
     main()

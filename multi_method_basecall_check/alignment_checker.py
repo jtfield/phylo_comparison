@@ -19,18 +19,26 @@ def split_seq(string):
 
 def check_alignment(list_of_paired_nucs):
     identical_nucs = 0
+    non_identical_nucs = 0
+    nuc_set = []
     for pair in list_of_paired_nucs:
         
         assert len(pair) == 2
         if pair[0].upper() == pair[1].upper():
             identical_nucs+=1
+        elif pair[0].upper() != pair[1].upper():
+            non_identical_nucs+=1
+    nuc_set.append(identical_nucs)
+    nuc_set.append(non_identical_nucs)
 
-    return identical_nucs
+    #return identical_nucs
+    return nuc_set
 
 def perform_alignment_check(short, long_seq):
     output = []
     identical_bases_by_position = 0
     identical_bases = 0
+    non_identical_bases = 0
     best_seq = ''
     added_gaps_on_front = 0
     #add_gaps_short = ((added_gaps_on_front * '-') + shorter)
@@ -49,15 +57,17 @@ def perform_alignment_check(short, long_seq):
 
         combined_positions = list(map(list, zip(split_long, split_short)))
         check_identity = check_alignment(combined_positions)
-        if check_identity > identical_bases:
+        if check_identity[0] > identical_bases:
             print(check_identity)
-            identical_bases = check_identity
+            identical_bases = check_identity[0]
+            non_identical_bases = check_identity[1]
             identical_bases_by_position = added_gaps_on_front
             best_seq = split_short
 
     output.append(identical_bases_by_position)
     output.append(identical_bases)
     output.append(best_seq)
+    output.append(non_identical_bases)
 
     return output
 
@@ -173,6 +183,9 @@ def main():
     #fixed_short = ''.join(split_short)
 
     fixed_short = ''.join(best_seq[2])
+
+    print("miscalled bases for this alignment")
+    print(best_seq[3])
 
     output_file = open('test_output_align.fasta','w')
     output_file.write(longer_label)

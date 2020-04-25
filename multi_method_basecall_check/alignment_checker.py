@@ -20,7 +20,7 @@ def check_alignment(list_of_paired_nucs):
     for pair in list_of_paired_nucs:
         
         assert len(pair) == 2
-        if pair[0] == pair[1]:
+        if pair[0].upper() == pair[1].upper():
             identical_nucs+=1
 
     return identical_nucs
@@ -53,7 +53,7 @@ def main():
         shorter = align_2_split[1]
         shorter_label = align_2_split[0]
 
-    elif len_aling_2 == max(combine_list):
+    elif len_align_2 == max(combine_list):
         longer = align_2_split[1]
         longer_label = align_2_split[0]
         shorter = align_1_split[1]
@@ -62,12 +62,15 @@ def main():
     # make sure the right files are assigned to the longer and shorter variables
     assert len(longer) > len(shorter)
     
+    shorter = shorter.replace('\n','')
+    longer = longer.replace('\n','')
+
     print(len(longer))
     print(len(shorter))
 
-    indentical_bases_by_position = 0
+    identical_bases_by_position = 0
     identical_bases = 0
-    split_short = split_seq(shorter)
+    #split_short = split_seq(shorter)
 #    for num in range(0, len(longer)):
 #        #longer_segment = longer[num:len(shorter)]
 #        longer_segment = longer[num:num + len(shorter)]
@@ -94,19 +97,22 @@ def main():
     added_gaps_on_front = 0
     #add_gaps_short = ((added_gaps_on_front * '-') + shorter)
     #extended_short_length = len(shorter) + added_gaps_on_front
+    #fixed_shorter
     while added_gaps_on_front + len(shorter) < int(len(longer)):
-        add_gaps_short = ((added_gaps_on_front * '-') + shorter)
-        split_short = split_seq(add_gaps_short)
-        split_long = split_seq(longer)
+    #while added_gaps_on_front + len(shorter) < 500:
+        #add_gaps_short = ((added_gaps_on_front * '-') + shorter)
+        split_short = split_seq(shorter)
+        split_long = split_seq(longer[added_gaps_on_front : added_gaps_on_front + len(shorter)])
         added_gaps_on_front+=1
-        #print(len(add_gaps_short))
-        #print(add_gaps_short)
-        #print(extended_short_length)
-        
+        print(split_long)
+        print(split_short)
+        print("waffle")
+
 
         combined_positions = list(map(list, zip(split_long, split_short)))
         check_identity = check_alignment(combined_positions)
         if check_identity > identical_bases:
+            print(check_identity)
             identical_bases = check_identity
             identical_bases_by_position = added_gaps_on_front
             best_seq = split_short
@@ -114,25 +120,21 @@ def main():
 
 
 
-
-
-
-
-
-
-
+    identical_bases_by_position = identical_bases_by_position - 1
     print(identical_bases)
     print(identical_bases_by_position)
+    #fixed_short = ''.join(split_short)
 
-    #output_file = open('test_output_align.fasta','w')
-    #output_file.write(longer_label)
-    #output_file.write('\n')
-    #output_file.write(longer)
-    #output_file.write('\n')
-    #output_file.write(shorter_label)
-    #output_file.write('\n')
-    #output_file.write((identical_bases_by_position * '-') + shorter)
-    #output_file.close()
+    output_file = open('test_output_align.fasta','w')
+    output_file.write(longer_label)
+    output_file.write('\n')
+    output_file.write(longer)
+    output_file.write('\n')
+    output_file.write(shorter_label)
+    output_file.write('\n')
+    output_file.write((identical_bases_by_position * '-') + shorter)
+    #output_file.write((27 * '-') + shorter)
+    output_file.close()
 
 if __name__ == '__main__':
     main()

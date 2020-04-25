@@ -104,8 +104,8 @@ def main():
         split_short = split_seq(shorter)
         split_long = split_seq(longer[added_gaps_on_front : added_gaps_on_front + len(shorter)])
         added_gaps_on_front+=1
-        print(split_long)
-        print(split_short)
+        #print(split_long)
+        #print(split_short)
         print("waffle")
 
 

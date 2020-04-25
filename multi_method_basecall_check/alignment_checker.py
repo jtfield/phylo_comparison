@@ -2,6 +2,8 @@
 import argparse
 import os
 import re
+from Bio.Seq import Seq
+from Bio.Alphabet import generic_dna
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -67,6 +69,17 @@ def main():
 
     print(len(longer))
     print(len(shorter))
+
+    main_short = Seq(shorter, generic_dna)
+    short_comp = main_short.complement()
+    short_reverse = main_short[::-1]
+    short_rev_comp = main_short.reverse_complement()
+    
+    print(main_short)
+    print(short_comp)
+    print(short_reverse)
+    print(short_rev_comp)
+
 
     identical_bases_by_position = 0
     identical_bases = 0

@@ -91,7 +91,7 @@ $outdir/runme.sh
 #raxmlHPC-PTHREADS -m GTRGAMMA -T $threads -s $outdir/core.full.aln -p 12345 -n consensusFULL
 
 #This one works for some ungodly reason. wtf and why cant i call -T for threads?
-raxmlHPC-PTHREADS -s $outdir/core.full.aln -m GTRGAMMA -p 12345 -n consensusFULL
+raxmlHPC-PTHREADS -s $outdir/core.full.aln -m GTRGAMMA -p 12345 -n snippy_tree
 
 
 #trying to clean up snippy...
@@ -202,7 +202,7 @@ do
 		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
 		#printf "\n$cluster_grep\n"
 		#echo ${i:28:14}
-		seq_grep=$( echo $i | grep -o "$file_name")
+		seq_grep=$( echo $i | grep -o "$file_name$")
 		#printf "\n $seq_grep \n"
 		#printf '\nFILE TO BE MATCHED == '$i'\n'
 		#seq=${i:28:14}
@@ -210,7 +210,9 @@ do
 		if [ ! -z "$seq_grep" ];
 		then
 			printf "\nFOUND A MATCH BETWEEN A SNIPPY SEQUENCE AND BLAST INDEX\n"
-			blastn -db $j.fasta -query $outdir/$snippy_basecall/sep_loci/individual_tax/$i -out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
+			$program_path/alignment_checker.py --align_1 $j.fasta --align_2 $outdir/$snippy_basecall/sep_loci/individual_tax/$i --output_align $outdir/$snippy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta --output_miscalls $outdir/$snippy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out
+
+			#blastn -db $j.fasta -query $outdir/$snippy_basecall/sep_loci/individual_tax/$i -out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
 			#printf "\n$j\n"
 			#printf "\n$i\n"
 		fi
@@ -226,7 +228,7 @@ do
         do
 		#cluster=${i:19:8}
 		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
-		seq_grep=$( echo $i | grep -o "$file_name")
+		seq_grep=$( echo $i | grep -o "$file_name$")
                 #printf "\n$cluster_grep\n"i
                 #echo ${i:27:14}
                 #seq=${i:27:14}
@@ -234,7 +236,9 @@ do
 		if [ ! -z "$seq_grep" ];
                 then
                         printf "\nFOUND A MATCH BETWEEN A RAPUP SEQUENCE AND BLAST INDEX\n"
-                        blastn -db $j.fasta -query $outdir/$rapup_basecall/sep_loci/individual_tax/$i -out $outdir/$rapup_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
+                        $program_path/alignment_checker.py --align_1 $j.fasta --align_2 $outdir/$rapup_basecall/sep_loci/individual_tax/$i --output_align $outdir/$rapup_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta --output_miscalls $outdir/$rapup_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out
+			
+			#blastn -db $j.fasta -query $outdir/$rapup_basecall/sep_loci/individual_tax/$i -out $outdir/$rapup_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
                         #printf "\n$j\n"
                         #printf "\n$i\n"
                 fi
@@ -250,7 +254,7 @@ do
         do
 		#cluster=${i:19:8}
 		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
-                seq_grep=$( echo $i | grep -o "$file_name")
+                seq_grep=$( echo $i | grep -o "$file_name$")
 		#printf "\n$cluster_grep\n"
                 #echo ${i:29:14}
                 #seq=${i:29:14}
@@ -258,11 +262,16 @@ do
 		if [ ! -z "$seq_grep" ];
                 then
                         printf "\nFOUND A MATCH BETWEEN A GON_PHY SEQUENCE AND BLAST INDEX\n"
-                        blastn -db $j.fasta -query $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i -out $outdir/$gon_phy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
+                        $program_path/alignment_checker.py --align_1 $j.fasta --align_2 $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i --output_align $outdir/$gon_phy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta --output_miscalls $outdir/$gon_phy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out
+			
+			#blastn -db $j.fasta -query $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i -out $outdir/$gon_phy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
                         #printf "\n$j\n"
                         #printf "\n$i\n"
                 fi
         done
 done
 
-# 
+# COPY TRUE TREE TO OUTPUT FOLDER
+cp $true_tree $outdir/true_tree.tre
+
+printf "\n$program_path\n"

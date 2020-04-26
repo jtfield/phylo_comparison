@@ -9,6 +9,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--align_1')
     parser.add_argument('--align_2')
+    parser.add_argument('--output_align')
+    parser.add_argument('--output_miscalls')
     return parser.parse_args()
 
 
@@ -187,7 +189,13 @@ def main():
     print("miscalled bases for this alignment")
     print(best_seq[3])
 
-    output_file = open('test_output_align.fasta','w')
+    miscalls_file = open(args.output_miscalls, 'w')
+    miscalls_file.write(shorter_label)
+    miscalls_file.write('\n')
+    miscalls_file.write(str(best_seq[3]))
+
+    #output_file = open('test_output_align.fasta','w')
+    output_file = open(args.output_align, 'w')
     output_file.write(longer_label)
     output_file.write('\n')
     output_file.write(longer)

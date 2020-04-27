@@ -227,6 +227,10 @@ do
 			mafft combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
 			mafft combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
 
+
+			#Perform basecall comparison on all method sequences with the sequence that produced the reads
+			$program_path/align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub basecall_results-$cluster_grep-$seq_grep-.txt
+
 			#echo "$program_path/alignment_checker.py --align_1 $j.fasta --align_2 $outdir/$snippy_basecall/sep_loci/individual_tax/$i --output_align $outdir/$snippy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta --output_miscalls $outdir/$snippy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out" >> $outdir/$snippy_basecall/snippy_alignment_runs.txt
 			
 			#echo "$program_path/alignment_checker.py+--align_1+$j.fasta+--align_2+$outdir/$snippy_basecall/sep_loci/individual_tax/$i+--output_align+$outdir/$snippy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta+--output_miscalls+$outdir/$snippy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out" >> $outdir/$snippy_basecall/snippy_alignment_runs.txt

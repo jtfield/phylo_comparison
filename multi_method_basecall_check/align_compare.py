@@ -12,7 +12,7 @@ def parse_args():
     parser.add_argument('--align_2')
     parser.add_argument('--align_3')
     parser.add_argument('--align_4')
-    #parser.add_argument('--output_align_stub', nargs='?', type=str, default="NONE")
+    parser.add_argument('--output_stub', nargs='?', type=str, default="NONE")
     #parser.add_argument('--output_miscalls', nargs='?', type=str, default="NONE")
     #parser.add_argument('--orientation', nargs='?', type=str, default="NONE")
     return parser.parse_args()
@@ -82,6 +82,22 @@ def trim_gaps(short_seq):
     
     return output
     
+def check_alignment(list_of_paired_nucs):
+    identical_nucs = 0
+    non_identical_nucs = 0
+    nuc_set = []
+    for pair in list_of_paired_nucs:
+
+        assert len(pair) == 2
+        if pair[0].upper() == pair[1].upper():
+            identical_nucs+=1
+        elif pair[0].upper() != pair[1].upper():
+            non_identical_nucs+=1
+    nuc_set.append(identical_nucs)
+    nuc_set.append(non_identical_nucs)
+
+    #return identical_nucs
+    return nuc_set
 
 def comparison(list_of_list_of_seqs):
 
@@ -131,8 +147,15 @@ def comparison(list_of_list_of_seqs):
 
     trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
     
+    split_trimmed_short = list(trimmed_shorter)
+    split_trimmed_long = list(trimmed_longer)
 
+    combined_positions = list(map(list, zip(split_trimmed_long, split_trimmed_short)))
+    analyze_alignment = check_alignment(combined_positions)
+
+    print(analyze_alignment)
     
+    return analyze_alignment
 
 def main():
     args = parse_args()
@@ -142,15 +165,58 @@ def main():
 
 
     align_1 = open(args.align_1,'r').read()
-    #align_2 = open(args.align_2,'r').read()
-    #align_3 = open(args.align_3,'r').read()
-    #align_3 = open(args.align_4,'r').read()
+    align_2 = open(args.align_2,'r').read()
+    align_3 = open(args.align_3,'r').read()
+    align_4 = open(args.align_4,'r').read()
 
     parse_align_1 = alignment_fixer(align_1)
     #print(parse_align_1)
+    parse_align_2 = alignment_fixer(align_2)
+    parse_align_3 = alignment_fixer(align_3)
+    parse_align_4 = alignment_fixer(align_4)
 
-    compare_seqs = comparison(parse_align_1) 
-    print(compare_seqs)
+    compare_seqs_1 = comparison(parse_align_1)
+    compare_seqs_2 = comparison(parse_align_2)
+    compare_seqs_3 = comparison(parse_align_3)
+    compare_seqs_4 = comparison(parse_align_4)
+    print("align 1", compare_seqs_1)
+    print("align 2", compare_seqs_2)
+    print("align 3", compare_seqs_3)
+    print("align 4", compare_seqs_4)
+
+    compare_identical_nucs = [compare_seqs_1[0], compare_seqs_2[0], compare_seqs_3[0], compare_seqs_4[0]]
+    best_align = max(compare_identical_nucs)
+
+    output_file = open(args.output_stub, 'w')
+    
+    if best_align == compare_seqs_1[0]:
+        output_file.write(args.align_1)
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[0]))
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[1]))
+
+    elif best_align == compare_seqs_2[0]:
+        output_file.write(args.align_2)
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_2[0]))
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_2[1]))
+
+    elif best_align == compare_seqs_3[0]:
+        output_file.write(args.align_3)
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_3[0]))
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_3[1]))
+
+    elif best_align == compare_seqs_4[0]:
+        output_file.write(args.align_4)
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_4[0]))
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_4[1]))
+
 
     #align_1_split = align_1.split('\n', 1)
     #align_2_split = align_2.split('\n', 1)

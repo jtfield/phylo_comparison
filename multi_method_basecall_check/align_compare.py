@@ -45,6 +45,95 @@ def alignment_fixer(read_file):
 
     return output
 
+def nuc_counter(sequence):
+    nuc_count = 0
+    for nuc in sequence[1]:
+        if nuc != '-':
+            nuc_count+=1
+    
+    return nuc_count
+
+def trim_gaps(short_seq):
+    output = []
+    leading_gaps = 0
+    trailing_gaps = 0
+    
+    leading_gap_match = "^(-*)\w"
+    trailing_gap_match = "\w(-*)$"
+    compile_leading_match = re.compile(leading_gap_match)
+    compile_trailing_match = re.compile(trailing_gap_match)
+    find_leading = re.findall(compile_leading_match, short_seq)
+    find_trailing = re.findall(compile_trailing_match, short_seq)
+
+    if compile_leading_match:
+        #print("found leading")
+        #print(find_leading)
+        leading_gaps = len(find_leading[0])
+        print(leading_gaps)
+    
+    if compile_trailing_match:
+        #print("found trailing")
+        #print(find_trailing)
+        trailing_gaps = len(find_trailing[0])
+        print(leading_gaps)
+
+    output.append(leading_gaps)
+    output.append(trailing_gaps)
+    
+    return output
+    
+
+def comparison(list_of_list_of_seqs):
+
+    seq_1 = None
+    seq_2 = None
+    seq_count = 0
+    for list_of_seqs in list_of_list_of_seqs:
+        seq_count+=1
+        if seq_count == 1:
+            seq_1 = list_of_seqs
+        elif seq_count == 2:
+            seq_2 = list_of_seqs
+
+    #print(seq_1)
+    #print(seq_2)
+
+    count_nucs_1 = nuc_counter(seq_1)
+    count_nucs_2 = nuc_counter(seq_2)
+    
+    #print(count_nucs_1)
+    #print(count_nucs_2)
+    
+    nuc_lens = [count_nucs_1, count_nucs_2]
+    small_seq = min(nuc_lens)
+
+    shorter = None
+    longer = None
+    if small_seq == count_nucs_1:
+        shorter = seq_1
+        longer = seq_2
+
+    elif small_seq == count_nucs_2:
+        shorter = seq_2
+        longer = seq_1
+
+    #print(shorter)
+    #print(longer)
+    
+    shorter_seq = shorter[1]
+    longer_seq = longer[1]
+    
+    get_gaps = trim_gaps(shorter_seq) 
+    #print(get_gaps)
+
+    trimmed_shorter = shorter_seq[get_gaps[0]:-get_gaps[1]]
+    #print(trimmed_shorter)
+
+    trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
+    
+
+    
+
 def main():
     args = parse_args()
 
@@ -58,7 +147,10 @@ def main():
     #align_3 = open(args.align_4,'r').read()
 
     parse_align_1 = alignment_fixer(align_1)
-    print(parse_align_1)
+    #print(parse_align_1)
+
+    compare_seqs = comparison(parse_align_1) 
+    print(compare_seqs)
 
     #align_1_split = align_1.split('\n', 1)
     #align_2_split = align_2.split('\n', 1)

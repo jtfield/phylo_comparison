@@ -110,7 +110,8 @@ def basecall_method_checker(folder_path, input_folder, df):
     
     #print(df)
     df = df.astype(int)
-    #df['sums'] = df.sum(axis=1)
+    df['sums'] = df.sum(axis=1)
+    df['mean'] = df.mean(axis=1)
     return df
    
 
@@ -412,15 +413,21 @@ def main():
     #BASECALL COMPARISON
     print("rapup results")
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_df) 
-    print(rapup_basecall_check)
-    
+    #print(rapup_basecall_check)
+    rapup_avg_miscalled = rapup_basecall_check['mean'].mean()
+    print(rapup_avg_miscalled)
+
     print("snippy results")
     snippy_basecall_check = basecall_method_checker(snippy_results, snippy_blast_results, snippy_df)
-    print(snippy_basecall_check)
+    #print(snippy_basecall_check)
+    snippy_avg_miscalled = snippy_basecall_check['mean'].mean()
+    print(snippy_avg_miscalled)
 
     print("gon_phy results")
     gon_phy_basecall_check = basecall_method_checker(gon_phy_results, gon_phy_blast_results, gon_phy_df)
-    print(gon_phy_basecall_check)
+    #print(gon_phy_basecall_check)
+    gon_phy_avg_miscalled = gon_phy_basecall_check['mean'].mean()
+    print(gon_phy_avg_miscalled)
 
     #rapup_fig = fig_gen(rapup_basecall_check, "rapup")
     #print(rapup_fig)

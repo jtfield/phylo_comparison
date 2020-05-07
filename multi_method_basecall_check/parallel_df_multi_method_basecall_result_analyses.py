@@ -115,6 +115,11 @@ def basecall_method_checker(folder_path, input_folder, df):
     return df
    
 
+def calculate_error(num_taxa_in_tree, rf):
+    twice_taxa = num_taxa_in_tree * 2
+    error = rf / twice_taxa
+    return error
+
 
 def fig_gen(df_1, method_1, df_2, method_2, df_3, method_3):
 
@@ -323,14 +328,20 @@ def main():
     print("rapup RF results")
     rapup_phylo_compare = treecompare.symmetric_difference(fixed_true_tree, fixed_rapup_tree)
     print(rapup_phylo_compare)
+    rapup_error = calculate_error(len(rapup_names), rapup_phylo_compare)
+    print(rapup_error)
 
     print("snippy RF results")
     snippy_phylo_compare = treecompare.symmetric_difference(fixed_true_tree, fixed_snippy_tree)
     print(snippy_phylo_compare)
+    snippy_error = calculate_error(len(snippy_names), snippy_phylo_compare)
+    print(snippy_error)
 
     print("gon_phy RF results")
     gon_phy_phylo_compare = treecompare.symmetric_difference(fixed_true_tree, fixed_gon_phy_tree)
     print(gon_phy_phylo_compare)
+    gon_phy_error = calculate_error(len(gon_phy_names), gon_phy_phylo_compare)
+    print(gon_phy_error)
 
 ####################################################################################################
 

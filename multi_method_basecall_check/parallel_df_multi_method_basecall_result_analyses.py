@@ -212,9 +212,12 @@ def main():
     snippy_blast_results = os.listdir(snippy_results)
     gon_phy_blast_results = os.listdir(gon_phy_results)
 
-    gon_phy_tree = open(path_to_output_folder + '/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out', 'r').read()
-    rapup_tree = open(path_to_output_folder + '/rapup_run/combine_and_infer/RAxML_bestTree.consensusFULL','r').read()
-    snippy_tree = open(path_to_output_folder + '/RAxML_bestTree.snippy_tree','r').read()
+    #gon_phy_tree = open(path_to_output_folder + '/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out', 'r').read()
+    gon_phy_tree = open(path_to_output_folder + '/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/fixed_gon_phy_MR.tre', 'r').read()
+    #rapup_tree = open(path_to_output_folder + '/rapup_run/combine_and_infer/RAxML_bestTree.consensusFULL','r').read()
+    rapup_tree = open(path_to_output_folder + '/rapup_run/combine_and_infer/fixed_rapup_MR.tre','r').read()
+    #snippy_tree = open(path_to_output_folder + '/RAxML_bestTree.snippy_tree','r').read()
+    snippy_tree = open(path_to_output_folder + '/fixed_snippy_MR.tre','r').read()
     true_tree = open(path_to_output_folder + '/true_tree.tre','r').read()
 
     rapup_df = make_df(rapup_results, rapup_blast_results)
@@ -354,84 +357,9 @@ def main():
     print(gon_phy_error)
 
 ####################################################################################################
-
-    #name_grabber = '(\w+?):'
-    #compile_name_grabber = re.compile(name_grabber)
-
-    #snippy_ref_name = ''
-    #with open(path_to_output_folder + '/core.ref.fa') as f:
-    #    first_line = f.readline().strip()
-    #    snippy_ref_name = first_line.strip('>')
-    #print(snippy_ref_name)
-
-    #ref = 'Reference'
-    #ref_compile = re.compile(ref)
     
-
-    #read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
-    #read_snippy_tree = dendropy.Tree.get(data = snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
-    #read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
-    #read_true_tree = dendropy.Tree.get(data = true_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
-    
-    #str_true_tree = str(read_true_tree)
-    #str_rapup_tree = str(read_rapup_tree)
-    #str_snippy_tree = str(read_snippy_tree)
-    #str_gon_phy_tree = str(read_gon_phy_tree)
-
-    #str_snippy_tree = str_snippy_tree.replace(ref, snippy_ref_name)
-    #str_gon_phy_tree = str_gon_phy_tree.replace('.ref', '')
-    #str_rapup_tree = str_rapup_tree.replace('.ref', '')
-    #str_snippy_tree = str_snippy_tree.replace('.ref', '')
-
-    #true_names = get_taxa_names(str_true_tree)
-    #rapup_names = get_taxa_names(str_rapup_tree)
-    #snippy_names = get_taxa_names(str_snippy_tree)
-    #gon_phy_names = get_taxa_names(str_gon_phy_tree)
-   
-    #print(true_names)
-    #print(rapup_names)
-
-    #print(str_rapup_tree)
-    #print(str_gon_phy_tree)
-    #print(str_snippy_tree)
-
-    #print(len(rapup_names))
-    #print(len(snippy_names))
-    #print(len(gon_phy_names))
-
-    #join_true_names = ''.join(true_names)
-    #print(join_true_names)
-    #names_not_shared_list = []
-    #for name in rapup_names:
-    #for name in true_names:
-        #compile_name = re.compile(name)
-        #find_name = re.findall(name, join_true_names)
-        #print(name)
-        #assert name in snippy_names
-        #assert name in gon_phy_names
-        #if name not in true_names:
-    #    if name not in rapup_names:
-        #if not find_name:
-    #        names_not_shared_list.append(name)
-    
-    #print(names_not_in_true_tree)
-    #if len(names_not_shared_list) > 0:
-    #    read_true_tree.prune_taxa_with_labels(names_not_shared_list)
-
-    #print(str_snippy_tree)
-    #fixed_snippy_tree = dendropy.Tree.get(data = str_snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
-
-    #fixed_gon_phy_tree = dendropy.Tree.get(data = str_gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
-
-    #print(read_true_tree.leaf_nodes())
-    #print(read_rapup_tree.leaf_nodes())
-    #print(names_not_in_true_tree)
-
-    #assert len(read_true_tree.leaf_nodes()) == len(read_rapup_tree.leaf_nodes())
-    #read_true_tree.write(path= path_to_output_folder + "/true_tree_subset.tre", schema="newick")
-
-
     #BASECALL COMPARISON
+
     print("rapup results")
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_df) 
     #print(rapup_basecall_check)
@@ -439,6 +367,10 @@ def main():
     print(rapup_avg_miscalled)
     rapup_std = rapup_basecall_check.loc[:,"sums"].std()
     print(rapup_std)
+    rapup_total_miscalls = rapup_basecall_check.loc[:,"sums"].sum()
+    print(rapup_total_miscalls)
+    #print(rapup_basecall_check['sums'])
+    rapup_basecall_check = rapup_basecall_check.rename(columns={'sums' : 'rapup_sums'})
 
     print("snippy results")
     snippy_basecall_check = basecall_method_checker(snippy_results, snippy_blast_results, snippy_df)
@@ -447,7 +379,11 @@ def main():
     print(snippy_avg_miscalled)
     snippy_std = snippy_basecall_check.loc[:,"sums"].std()
     print(snippy_std)
-
+    snippy_total_miscalls = snippy_basecall_check.loc[:,"sums"].sum()
+    print(snippy_total_miscalls)
+    #print(snippy_basecall_check['sums'])
+    snippy_basecall_check = snippy_basecall_check.rename(columns={'sums' : 'snippy_sums'})
+    
     print("gon_phy results")
     gon_phy_basecall_check = basecall_method_checker(gon_phy_results, gon_phy_blast_results, gon_phy_df)
     #print(gon_phy_basecall_check)
@@ -455,6 +391,18 @@ def main():
     print(gon_phy_avg_miscalled)
     gon_phy_std = gon_phy_basecall_check.loc[:,"sums"].std()
     print(gon_phy_std)
+    gon_phy_total_miscalls = gon_phy_basecall_check.loc[:,"sums"].sum()
+    print(gon_phy_total_miscalls)
+    #print(gon_phy_basecall_check['sums'])
+    gon_phy_basecall_check = gon_phy_basecall_check.rename(columns={'sums' : 'gon_phy_sums'})
+    
+    
+    #print(gon_phy_basecall_check['gon_phy_sums'])    
+    combine_sums_df = pd.concat([rapup_basecall_check['rapup_sums'], snippy_basecall_check['snippy_sums'], gon_phy_basecall_check['gon_phy_sums']] , axis=1, ignore_index=False, sort=True)
+
+    combine_index = combine_sums_df['taxa'] = combine_sums_df.index
+    
+    
 
     #rapup_fig = fig_gen(rapup_basecall_check, "rapup")
     #print(rapup_fig)

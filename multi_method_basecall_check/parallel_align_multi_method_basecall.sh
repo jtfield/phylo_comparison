@@ -93,6 +93,16 @@ $outdir/runme.sh
 #This one works for some ungodly reason. wtf and why cant i call -T for threads?
 raxmlHPC-PTHREADS -s $outdir/core.full.aln -m GTRGAMMA -p 12345 -n snippy_tree
 
+# bootstrap
+raxmlHPC-PTHREADS -s core.full.aln -n snippy_tree_bootstrap -m GTRGAMMA -p 12345 -T 4 -N 100 -b 12345
+
+# construct consensus MR tree
+raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.snippy_tree_bootstrap -n snippy_MR_CONS
+
+# fix raxml's weird consensus tree format so topology is at least accessable
+cat RAxML_MajorityRuleConsensusTree.snippy_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_snippy_MR.tre
+
+sed -i -e "s/;/:0.0;/g" fixed_snippy_MR.tre
 
 #trying to clean up snippy...
 if [ $intermediate_files == "CLEAN" ]; then
@@ -404,5 +414,23 @@ cd $outdir
 #cd -
 # COPY TRUE TREE TO OUTPUT FOLDER
 cp $true_tree $outdir/true_tree.tre
+
+
+# BOOTSTRAP RAPUP AND GONPHYLING FOR CONSENSUS TREE PRODUCTION
+cd $gon_phy_pwd/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/ 
+
+raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.core_genome_run.out -n gon_phy_MR_CONS
+
+cat RAxML_MajorityRuleConsensusTree.gon_phy_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_gon_phy_MR.tre
+
+sed -i -e "s/;/:0.0;/g" fixed_gon_phy_MR.tre
+
+cd $outdir/rapup_run/combine_and_infer/
+
+raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.consensusFULL_bootstrap -n rapup_MR_CONS
+
+cat RAxML_MajorityRuleConsensusTree.rapup_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_rapup_MR.tre
+
+sed -i -e "s/;/:0.0;/g" fixed_rapup_MR.tre
 
 printf "\n$program_path\n"

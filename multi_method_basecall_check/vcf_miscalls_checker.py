@@ -23,14 +23,17 @@ def get_header(file_name):
     return header
 
 def find_taxon(main_vcf_header, simulated_vcf_file):
+    taxon_name = ''
     for name in main_vcf_header:
-        print(name)
+        #print(name)
         name_compile = re.compile('(' + name.strip() + ')')
         name_match = re.search(name_compile, simulated_vcf_file)
         if name_match:
-            print("FOUND")
-            print(name_match)
+            #print("FOUND")
+            #print(name_match)
+            taxon_name = name
 
+    return taxon_name
 
 def main():
     args = parse_args()
@@ -74,10 +77,17 @@ def main():
     df = pd.DataFrame(combined_lines_frame, columns=get_head)
     #print(df)
     
-    print(args.vcf_dir)
+    #print(args.vcf_dir)
     find_correct_name = find_taxon(get_head, args.vcf_dir)
+    print(find_correct_name)
 
+    vcf_path = args.vcf_dir + "/snps.vcf"
+    get_single_tax_head = get_header(vcf_path)
+    
+    print(get_single_tax_head)
 
+    single_tax_df = pd.read_csv(vcf_path, comment = '#', sep='\t', names=get_single_tax_head)
+    #print(single_tax_df)
 
 
 if __name__ == '__main__':

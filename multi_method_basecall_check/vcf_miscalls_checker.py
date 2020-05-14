@@ -9,7 +9,7 @@ from collections import defaultdict
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--main_vcf')
-    parser.add_argument('--vcf_2')
+    parser.add_argument('--vcf_dir')
     return parser.parse_args()
 
 def get_header(file_name):
@@ -22,12 +22,21 @@ def get_header(file_name):
     header = header[0]
     return header
 
+def find_taxon(main_vcf_header, simulated_vcf_file):
+    for name in main_vcf_header:
+        print(name)
+        name_compile = re.compile('(' + name.strip() + ')')
+        name_match = re.search(name_compile, simulated_vcf_file)
+        if name_match:
+            print("FOUND")
+            print(name_match)
+
 
 def main():
     args = parse_args()
 
     get_head = get_header(args.main_vcf)
-    print(get_head)
+    #print(get_head)
 
     #head_df = pd.Dataframe
     lines_frame = []
@@ -44,10 +53,10 @@ def main():
                 #print(len(line))
                 #print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
                 lines_frame.append(line)
-    print(lines_frame)
+    #print(lines_frame)
 
     combined_lines_frame = []
-    print(len(lines_frame))
+    #print(len(lines_frame))
     temp_line = ''
     for num in range(len(lines_frame)):
         if num % 2 == 0:
@@ -63,13 +72,13 @@ def main():
     #    print(len(line))
 
     df = pd.DataFrame(combined_lines_frame, columns=get_head)
-    print(df)
-    #for num, line in enumerate(lines_frame):
-        
-        #df = pd.read_csv(main_vcf, header=0, names = get_head , comment = '#', sep='\t')
-        #print(df)
+    #print(df)
+    
+    print(args.vcf_dir)
+    find_correct_name = find_taxon(get_head, args.vcf_dir)
 
-        #df.to_csv("trimmed_sim.vcf")
+
+
 
 if __name__ == '__main__':
     main()

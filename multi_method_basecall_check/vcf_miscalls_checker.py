@@ -153,7 +153,38 @@ def main():
         assert len(line) == len(get_single_tax_head)
         sing_tax_vcf_dict_tax_of_interest[line[sing_tax_pos_position]] = [line[sing_tax_ref_position], line[sing_tax_alt_position]] 
 
-    print(sing_tax_vcf_dict_tax_of_interest)
+    #print(sing_tax_vcf_dict_tax_of_interest)
+
+    should_have_variants = 0
+    actually_has_variants = 0
+    has_variant_dict = {}
+    doesnt_have_variant_dict = {}
+
+    for key, value in prime_vcf_dict_tax_of_interest.items():
+        #print(key)
+        if value[2] != '0':
+            should_have_variants+=1
+            doesnt_have_variant_dict[key] = value
+        if key in sing_tax_vcf_dict_tax_of_interest:
+            actually_has_variants+=1
+            has_variant_dict[key] = value
+
+    for key, value in has_variant_dict.items():
+        doesnt_have_variant_dict.pop(key, None)
+
+    print(should_have_variants)
+    print(doesnt_have_variant_dict)
+
+    print(actually_has_variants)
+    print(has_variant_dict)
+
+
+
+
+
+
+
+
 
     #df = pd.DataFrame(combined_lines_frame, columns=get_head)
     

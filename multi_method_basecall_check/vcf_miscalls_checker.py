@@ -10,6 +10,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--main_vcf')
     parser.add_argument('--vcf_dir')
+    parser.add_argument('--msa')
     return parser.parse_args()
 
 def get_header(file_name):
@@ -83,6 +84,7 @@ def main():
     #print(combined_lines_frame)
     vcf_path = args.vcf_dir + "/snps.vcf"
     find_correct_name = find_taxon(get_head, args.vcf_dir)
+    taxon_name_compile = re.compile(find_correct_name)
 
     print(find_correct_name)
     print(len(find_correct_name))
@@ -172,17 +174,47 @@ def main():
     for key, value in has_variant_dict.items():
         doesnt_have_variant_dict.pop(key, None)
 
-    print(should_have_variants)
-    print(doesnt_have_variant_dict)
+    #print(should_have_variants)
+    #print(doesnt_have_variant_dict)
 
-    print(actually_has_variants)
-    print(has_variant_dict)
+    #print(actually_has_variants)
+    #print(has_variant_dict)
 
+    
+    msa = open(args.msa, 'r')
+    read_msa = msa.read()
 
+    split_msa = read_msa.split('>')
 
+    n_positions = []
+    gap_positions = []
+    for taxon in split_msa:
+        if len(taxon) > 0:
+            split_taxon = taxon.split('\n',1)
+            taxon_name_search = re.search(taxon_name_compile, split_taxon[0])
+            if taxon_name_search:
+                print(split_taxon[0])
+                contig_seq = ''.join(split_taxon[1].split('\n'))
+                #print(contig_seq)
+                for num, letter in enumerate(contig_seq):
+                    if letter == 'N':
+                        n_positions.append(num)
+                    elif letter == '-':
+                        gap_positions.append(num)
 
+    #print(n_positions)
+    #print(gap_positions)
 
+    non_missing_data_miscalls = {}
+    for key, value in doesnt_have_variant_dict.items():
+        key = int(key)
+        if key not in n_positions:
+            if key not in gap_positions:
+                non_missing_data_miscalls[key] = value
 
+    #print(non_missing_data_miscalls)
+
+    
 
 
 

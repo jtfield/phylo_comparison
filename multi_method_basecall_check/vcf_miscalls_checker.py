@@ -35,6 +35,17 @@ def find_taxon(main_vcf_header, simulated_vcf_file):
 
     return taxon_name
 
+
+
+
+def check_miscalls(prime_dataframe, secondary_dataframe):
+    output_values = []
+    for index, row in prime_dataframe.iterrows():
+        position = row['POS']
+        ref = row['REF']
+        alt = row['ALT']
+        #print(secondary_dataframe['POS'] == position)
+
 def main():
     args = parse_args()
 
@@ -70,25 +81,106 @@ def main():
             combined_lines_frame.append(temp_line + lines_frame[num])
 
     #print(combined_lines_frame)
-    #for line in combined_lines_frame:
-    #    print(line)
-    #    print(len(line))
-
-    df = pd.DataFrame(combined_lines_frame, columns=get_head)
-    #print(df)
-    
-    #print(args.vcf_dir)
-    find_correct_name = find_taxon(get_head, args.vcf_dir)
-    print(find_correct_name)
-
     vcf_path = args.vcf_dir + "/snps.vcf"
+    find_correct_name = find_taxon(get_head, args.vcf_dir)
+
+    print(find_correct_name)
+    print(len(find_correct_name))
+
+    #print(get_head)
+    pos_position = 0
+    ref_position = 0
+    alt_position = 0
+    tax_of_interest_position = 0
+    for num, info in enumerate(get_head):
+        #print(info)
+        #print(type(info))
+        info = info.strip('\n')
+        if info == 'POS':
+            pos_position = num
+        elif info == 'REF':
+            ref_position = num
+        elif info == 'ALT':
+            alt_position = num
+        elif info == find_correct_name:
+            tax_of_interest_position = num
+
+    #print(pos_position)
+    #print(ref_position)
+    #print(alt_position)
+    #print(tax_of_interest_position)
+
+    prime_vcf_dict_tax_of_interest = {}
+    for line in combined_lines_frame:
+        assert len(line) == len(get_head)
+        prime_vcf_dict_tax_of_interest[line[pos_position]] = [line[ref_position], line[alt_position], line[tax_of_interest_position]]
+
+    #print(prime_vcf_dict_tax_of_interest)
+
     get_single_tax_head = get_header(vcf_path)
+
+    single_tax_lines = []
+    with open(vcf_path) as single_tax_vcf:
+        for num, line in enumerate(single_tax_vcf):
+            if not line.startswith('#'):
+                single_tax_lines.append(line)
+
+
+    sing_tax_pos_position = 0
+    sing_tax_ref_position = 0
+    sing_tax_alt_position = 0
+    #tax_of_interest_position = 0
+    for num, info in enumerate(get_single_tax_head):
+        #print(info)
+        #print(type(info))
+        info = info.strip('\n')
+        if info == 'POS':
+            sing_tax_pos_position = num
+        elif info == 'REF':
+            sing_tax_ref_position = num
+        elif info == 'ALT':
+            sing_tax_alt_position = num
     
-    print(get_single_tax_head)
+    #print(get_single_tax_head)
+    #print(len(get_single_tax_head))
+    #print(single_tax_lines[0])
 
-    single_tax_df = pd.read_csv(vcf_path, comment = '#', sep='\t', names=get_single_tax_head)
+    sing_tax_vcf_dict_tax_of_interest = {}
+    for line in single_tax_lines:
+        line = line.split()
+        #print(line)
+        #print(len(line))
+        assert len(line) == len(get_single_tax_head)
+        sing_tax_vcf_dict_tax_of_interest[line[sing_tax_pos_position]] = [line[sing_tax_ref_position], line[sing_tax_alt_position]] 
+
+    print(sing_tax_vcf_dict_tax_of_interest)
+
+    #df = pd.DataFrame(combined_lines_frame, columns=get_head)
+    
+    #find_correct_name = find_taxon(get_head, args.vcf_dir)
+    #print(find_correct_name)
+
+    #vcf_path = args.vcf_dir + "/snps.vcf"
+    #get_single_tax_head = get_header(vcf_path)
+    
+    #print(get_single_tax_head)
+
+    #single_tax_df = pd.read_csv(vcf_path, comment = '#', sep='\t', names=get_single_tax_head)
     #print(single_tax_df)
+    
+    #single_tax_values_of_interest = single_tax_df[['POS', 'REF', 'ALT']].copy()
+    #print(single_tax_values_of_interest)
+    
+    #specific_tax_in_original_vcf = df[['POS', 'REF', 'ALT' ,find_correct_name]].copy()
 
+    #orig_to_dict = specific_tax_in_original_vcf.to_dict()
+    #print(orig_to_dict)
+
+    #single_tax_to_dict = single_tax_values_of_interest.to_dict()
+    #print(single_tax_to_dict)
+
+
+    #check = check_miscalls(specific_tax_in_original_vcf, single_tax_values_of_interest)
 
 if __name__ == '__main__':
     main()

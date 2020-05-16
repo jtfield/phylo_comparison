@@ -12,7 +12,7 @@ def parse_args():
     #parser.add_argument('--align_2')
     #parser.add_argument('--align_3')
     #parser.add_argument('--align_4')
-    #parser.add_argument('--output_stub', nargs='?', type=str, default="NONE")
+    parser.add_argument('--output_stub', nargs='?', type=str, default="NONE")
     #parser.add_argument('--output_miscalls', nargs='?', type=str, default="NONE")
     #parser.add_argument('--orientation', nargs='?', type=str, default="NONE")
     return parser.parse_args()
@@ -94,8 +94,8 @@ def check_alignment(list_of_paired_nucs):
     output = []
     for num, pair in enumerate(list_of_paired_nucs):
         assert len(pair) == 2
-        print(pair[0])
-        print(pair[1])
+        #print(pair[0])
+        #print(pair[1])
         if str(pair[0].upper()) in gap_set or str(pair[1].upper()) in gap_set:
             #if pair[0] in gap_set:
             #    print(pair[0])
@@ -103,10 +103,10 @@ def check_alignment(list_of_paired_nucs):
             #    print(pair[1])
             gaps+=1
             gap_positions.append(num)
-            print('gap')
+            #print('gap')
 
         elif pair[0] and pair[1] not in gap_set:
-            print('no gap')
+            #print('no gap')
             if pair[0].upper() == pair[1].upper():
                 identical_nucs+=1
                 identical_positions.append(num)
@@ -119,6 +119,8 @@ def check_alignment(list_of_paired_nucs):
     output.append(identical_nucs)
     output.append(non_identical_nucs)
     output.append(gaps)
+    output.append(identical_positions)
+    output.append(non_identical_positions)
     output.append(gap_positions)
 
     #return identical_nucs
@@ -214,14 +216,35 @@ def main():
     #compare_identical_nucs = [compare_seqs_1[0], compare_seqs_2[0], compare_seqs_3[0], compare_seqs_4[0]]
     #best_align = max(compare_identical_nucs)
 
-#    output_file = open(args.output_stub, 'w')
+    output_file = open(args.output_stub, 'w')
 #    
 #    if best_align == compare_seqs_1[0]:
-#        output_file.write(args.align_1)
-#        output_file.write("\n")
-#        output_file.write(str(compare_seqs_1[0]))
-#        output_file.write("\n")
-#        output_file.write(str(compare_seqs_1[1]))
+    output_file.write(args.align_1)
+    output_file.write("\n")
+    output_file.write(">identical_nucs")
+    output_file.write("\n")
+    output_file.write(str(compare_seqs_1[0]))
+    output_file.write("\n")
+    output_file.write(">non_identical_nucs")
+    output_file.write("\n")
+    output_file.write(str(compare_seqs_1[1]))
+    output_file.write("\n")
+    output_file.write(">gaps")
+    output_file.write("\n")
+    output_file.write(str(compare_seqs_1[2]))
+    output_file.write("\n")
+    output_file.write(">identical_nucs")
+    output_file.write("\n")
+    output_file.write(str(compare_seqs_1[3]))
+    output_file.write("\n")
+    output_file.write(">non_identical_nucs")
+    output_file.write("\n")
+    output_file.write(str(compare_seqs_1[4]))
+    output_file.write("\n")
+    output_file.write(">gaps")
+    output_file.write("\n")
+    output_file.write(str(compare_seqs_1[5]))
+
 
 #    elif best_align == compare_seqs_2[0]:
 #        output_file.write(args.align_2)

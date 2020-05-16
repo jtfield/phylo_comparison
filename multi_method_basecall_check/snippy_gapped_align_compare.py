@@ -85,19 +85,44 @@ def trim_gaps(short_seq):
 def check_alignment(list_of_paired_nucs):
     identical_nucs = 0
     non_identical_nucs = 0
-    nuc_set = []
-    for pair in list_of_paired_nucs:
-
+    gaps = 0
+    gap_positions = []
+    identical_positions = []
+    non_identical_positions = []
+    gap_set = ['-','N']
+    nuc_set = ['A','C','G','T']
+    output = []
+    for num, pair in enumerate(list_of_paired_nucs):
         assert len(pair) == 2
-        if pair[0].upper() == pair[1].upper():
-            identical_nucs+=1
-        elif pair[0].upper() != pair[1].upper():
-            non_identical_nucs+=1
-    nuc_set.append(identical_nucs)
-    nuc_set.append(non_identical_nucs)
+        print(pair[0])
+        print(pair[1])
+        if str(pair[0].upper()) in gap_set or str(pair[1].upper()) in gap_set:
+            #if pair[0] in gap_set:
+            #    print(pair[0])
+            #elif pair[1] in gap_set:
+            #    print(pair[1])
+            gaps+=1
+            gap_positions.append(num)
+            print('gap')
+
+        elif pair[0] and pair[1] not in gap_set:
+            print('no gap')
+            if pair[0].upper() == pair[1].upper():
+                identical_nucs+=1
+                identical_positions.append(num)
+        
+            elif pair[0].upper() != pair[1].upper():
+                non_identical_nucs+=1
+                non_identical_positions.append(num)
+    
+
+    output.append(identical_nucs)
+    output.append(non_identical_nucs)
+    output.append(gaps)
+    output.append(gap_positions)
 
     #return identical_nucs
-    return nuc_set
+    return output
 
 def comparison(list_of_list_of_seqs):
 
@@ -153,7 +178,7 @@ def comparison(list_of_list_of_seqs):
     combined_positions = list(map(list, zip(split_trimmed_long, split_trimmed_short)))
     analyze_alignment = check_alignment(combined_positions)
 
-    print(analyze_alignment)
+    #print(analyze_alignment)
     
     return analyze_alignment
 
@@ -179,7 +204,9 @@ def main():
     #compare_seqs_2 = comparison(parse_align_2)
     #compare_seqs_3 = comparison(parse_align_3)
     #compare_seqs_4 = comparison(parse_align_4)
-    print("align 1", compare_seqs_1)
+    print("align 1", compare_seqs_1[0])
+    print("align 1", compare_seqs_1[1])
+    print("align 1", compare_seqs_1[2])
     #print("align 2", compare_seqs_2)
     #print("align 3", compare_seqs_3)
     #print("align 4", compare_seqs_4)

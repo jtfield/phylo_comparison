@@ -16,6 +16,14 @@ gon_phy_basecall=gon_phy_basecall
 rapup_basecall=rapup_basecall
 snippy_basecall=snippy_basecall
 
+mkdir $outdir/$loci_blast_indexes
+
+for i in $(ls $reference_dir);
+do
+        printf "\n$reference_dir/$i\n"
+        ln -s $reference_dir/$i $outdir/$loci_blast_indexes/$i
+
+done
 
 mkdir $gon_phy
 
@@ -57,13 +65,13 @@ snippy_ref_folder=$(ls $outdir/gon_phyling_dir/trimmed_reads/spades_output/*$sni
 
 #echo "find "$outdir/trimmed_reads/spades_output" -name "*$snip_ref*" -type d"
 
-#printf "\nwaffle2\n"
-snippy_ref="$outdir/gon_phyling_dir/trimmed_reads/spades_output/*$snip_ref*/scaffolds.fasta"
-#printf "\n$snippy_ref\n"
+printf "\nwaffle2\n"
+snippy_ref="$outdir/$loci_blast_indexes/*$snip_ref*"
+printf "\n$snippy_ref\n"
 
 cp $snippy_ref $outdir/$update_dir/snippy_ref.fas
 
-#printf "\nwaffle3\n"
+printf "\nwaffle3\n"
 
 printf "\nBEGINNING REFERENCE SELECTION\n"
 $rapup_path/ref_producer.py -s --ref_select $selected_ref --align_file $gon_phy_pwd/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas --out_file $outdir/$update_dir/alignment_ref.fas
@@ -149,15 +157,15 @@ fi
 #BEGIN SEPARATION OF LOCI IF NECESSARY AND ALIGNMENT OF CONSTRUCTED LOCI TO THE ORIGINAL GENOMES THAT PRODUCED THE READS
 
 # CONSTRUCT BLAST INDEXES
-mkdir $outdir/$loci_blast_indexes
-
-for i in $(ls $reference_dir);
-do
-	printf "\n$reference_dir/$i\n"
-	ln -s $reference_dir/$i $outdir/$loci_blast_indexes/$i
-#	makeblastdb -in $outdir/$loci_blast_indexes/$i -dbtype nucl -parse_seqids
-
-done
+#mkdir $outdir/$loci_blast_indexes
+#
+#for i in $(ls $reference_dir);
+#do
+#	printf "\n$reference_dir/$i\n"
+#	ln -s $reference_dir/$i $outdir/$loci_blast_indexes/$i
+##	makeblastdb -in $outdir/$loci_blast_indexes/$i -dbtype nucl -parse_seqids
+#
+#done
 
 mkdir $outdir/$rapup_basecall
 mkdir $outdir/$snippy_basecall

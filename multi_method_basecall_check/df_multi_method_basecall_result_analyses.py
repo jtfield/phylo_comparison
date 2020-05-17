@@ -125,7 +125,7 @@ def basecall_method_checker(folder_path, input_folder, df):
         #if total_hit_first:
         if find_first_hit_with_header:
         
-            print(find_first_hit_with_header)
+            #print(find_first_hit_with_header)
             #print(total_hit_first[0])
             first_hit = find_first_hit_with_header[0]
             tax_name_search = re.findall(name_compile, first_hit)

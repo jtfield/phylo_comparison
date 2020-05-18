@@ -77,17 +77,19 @@ def trim_gaps(short_seq):
         trailing_gaps = len(find_trailing[0])
         print(leading_gaps)
 
-    output.append(identical_nucs)
-    output.append(non_identical_nucs)
-    output.append(gaps)
-    output.append(identical_positions)
-    output.append(non_identical_positions)
-    output.append(gap_positions) 
-    
+    #output.append(identical_nucs)
+    #output.append(non_identical_nucs)
+    #output.append(gaps)
+    #output.append(identical_positions)
+    #output.append(non_identical_positions)
+    #output.append(gap_positions) 
+    output.append(leading_gaps)
+    output.append(trailing_gaps)
+
     return output
     
 def check_alignment(list_of_paired_nucs):
-identical_nucs = 0
+    identical_nucs = 0
     non_identical_nucs = 0
     gaps = 0
     gap_positions = []
@@ -182,14 +184,41 @@ def comparison(list_of_list_of_seqs):
     
     shorter_seq = shorter[1]
     longer_seq = longer[1]
-    
+   
+    #print(len(shorter_seq))
+    #print(len(longer_seq))
+
+    print(shorter_seq)
+    print(longer_seq)
+
     get_gaps = trim_gaps(shorter_seq) 
     #print(get_gaps)
 
-    trimmed_shorter = shorter_seq[get_gaps[0]:-get_gaps[1]]
+    trimmed_shorter = ''
+    trimmed_longer = ''
+    print("waffle1")
+    if get_gaps[1] != 0:
+
+        #print(shorter_seq[get_gaps:-get_gaps[1]])
+        trimmed_shorter = shorter_seq[get_gaps[0]:-get_gaps[1]]
+        trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
+        #print(trimmed_shorter)
+        #print(trimmed_longer)
+    elif get_gaps[1] == 0:
+        #print(shorter_seq[get_gaps[0]:])
+        trimmed_shorter = shorter_seq[get_gaps[0]:]
+        trimmed_longer = longer_seq[get_gaps[0]:]
+        #print(trimmed_shorter)
+        #print(trimmed_longer)
+    print("waffle2")
+
+    #trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
+
+
+    #trimmed_shorter = shorter_seq[get_gaps[0]:-get_gaps[1]]
     #print(trimmed_shorter)
 
-    trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
+    #trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
     
     split_trimmed_short = list(trimmed_shorter)
     split_trimmed_long = list(trimmed_longer)
@@ -197,7 +226,7 @@ def comparison(list_of_list_of_seqs):
     combined_positions = list(map(list, zip(split_trimmed_long, split_trimmed_short)))
     analyze_alignment = check_alignment(combined_positions)
 
-    print(analyze_alignment)
+    #print(analyze_alignment)
     
     return analyze_alignment
 
@@ -223,10 +252,18 @@ def main():
     compare_seqs_2 = comparison(parse_align_2)
     compare_seqs_3 = comparison(parse_align_3)
     compare_seqs_4 = comparison(parse_align_4)
-    print("align 1", compare_seqs_1)
-    print("align 2", compare_seqs_2)
-    print("align 3", compare_seqs_3)
-    print("align 4", compare_seqs_4)
+    print("align 1", compare_seqs_1[0])
+    print("align 1", compare_seqs_1[1])
+    print("align 1", compare_seqs_1[2])
+    print("align 2", compare_seqs_2[0])
+    print("align 2", compare_seqs_2[1])
+    print("align 2", compare_seqs_2[2])
+    print("align 3", compare_seqs_3[0])
+    print("align 3", compare_seqs_3[1])
+    print("align 3", compare_seqs_3[2])
+    print("align 4", compare_seqs_4[0])
+    print("align 4", compare_seqs_4[1])
+    print("align 4", compare_seqs_4[2])
 
     compare_identical_nucs = [compare_seqs_1[0], compare_seqs_2[0], compare_seqs_3[0], compare_seqs_4[0]]
     best_align = max(compare_identical_nucs)

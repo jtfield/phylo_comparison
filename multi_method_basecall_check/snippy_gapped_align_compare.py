@@ -75,7 +75,7 @@ def trim_gaps(short_seq):
         #print("found trailing")
         #print(find_trailing)
         trailing_gaps = len(find_trailing[0])
-        print(leading_gaps)
+        print(trailing_gaps)
 
     output.append(leading_gaps)
     output.append(trailing_gaps)
@@ -160,8 +160,8 @@ def comparison(list_of_list_of_seqs):
         shorter = seq_2
         longer = seq_1
 
-    #print(shorter)
-    #print(longer)
+    print(len(shorter[1]))
+    print(len(longer[1]))
     
     shorter_seq = shorter[1]
     longer_seq = longer[1]
@@ -169,10 +169,22 @@ def comparison(list_of_list_of_seqs):
     get_gaps = trim_gaps(shorter_seq) 
     #print(get_gaps)
 
-    trimmed_shorter = shorter_seq[get_gaps[0]:-get_gaps[1]]
-    #print(trimmed_shorter)
+    trimed_shorter = ''
+    trimmed_longer = ''
+    #print("waffle1")
+    if get_gaps[1] != 0:
 
-    trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
+        #print(shorter_seq[get_gaps:-get_gaps[1]])
+        trimmed_shorter = shorter_seq[get_gaps[0]:-get_gaps[1]]
+        trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
+        #print(trimmed_shorter)
+    elif get_gaps[1] == 0:
+        #print(shorter_seq[get_gaps[0]:])
+        trimmed_shorter = shorter_seq[get_gaps[0]:]
+        trimmed_longer = longer_seq[get_gaps[0]:]
+    #print("waffle2")
+
+    #trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
     
     split_trimmed_short = list(trimmed_shorter)
     split_trimmed_long = list(trimmed_longer)
@@ -196,19 +208,21 @@ def main():
     #align_3 = open(args.align_3,'r').read()
     #align_4 = open(args.align_4,'r').read()
 
+    # Organizes sequences and deals with newlines in the sequences if applicable
     parse_align_1 = alignment_fixer(align_1)
     #print(parse_align_1)
     #parse_align_2 = alignment_fixer(align_2)
     #parse_align_3 = alignment_fixer(align_3)
     #parse_align_4 = alignment_fixer(align_4)
 
+
     compare_seqs_1 = comparison(parse_align_1)
     #compare_seqs_2 = comparison(parse_align_2)
     #compare_seqs_3 = comparison(parse_align_3)
     #compare_seqs_4 = comparison(parse_align_4)
-    print("align 1", compare_seqs_1[0])
-    print("align 1", compare_seqs_1[1])
-    print("align 1", compare_seqs_1[2])
+    print("identical nucs", compare_seqs_1[0])
+    print("non identical nucs", compare_seqs_1[1])
+    print("gaps", compare_seqs_1[2])
     #print("align 2", compare_seqs_2)
     #print("align 3", compare_seqs_3)
     #print("align 4", compare_seqs_4)

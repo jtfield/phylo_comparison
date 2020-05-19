@@ -89,6 +89,7 @@ def trim_gaps(short_seq):
     return output
     
 def check_alignment(list_of_paired_nucs):
+    total_nucs = 0
     identical_nucs = 0
     non_identical_nucs = 0
     gaps = 0
@@ -100,6 +101,7 @@ def check_alignment(list_of_paired_nucs):
     output = []
     for num, pair in enumerate(list_of_paired_nucs):
         assert len(pair) == 2
+        total_nucs+=1
         #print(pair[0])
         #print(pair[1])
         if str(pair[0].upper()) in gap_set or str(pair[1].upper()) in gap_set:
@@ -124,6 +126,7 @@ def check_alignment(list_of_paired_nucs):
     output.append(identical_nucs)
     output.append(non_identical_nucs)
     output.append(gaps)
+    output.append(total_nucs)
     output.append(identical_positions)
     output.append(non_identical_positions)
     output.append(gap_positions)
@@ -188,8 +191,8 @@ def comparison(list_of_list_of_seqs):
     #print(len(shorter_seq))
     #print(len(longer_seq))
 
-    print(shorter_seq)
-    print(longer_seq)
+    #print(shorter_seq)
+    #print(longer_seq)
 
     get_gaps = trim_gaps(shorter_seq) 
     #print(get_gaps)
@@ -255,15 +258,19 @@ def main():
     print("align 1", compare_seqs_1[0])
     print("align 1", compare_seqs_1[1])
     print("align 1", compare_seqs_1[2])
+    print("align 1", compare_seqs_1[3])
     print("align 2", compare_seqs_2[0])
     print("align 2", compare_seqs_2[1])
     print("align 2", compare_seqs_2[2])
+    print("align 2", compare_seqs_2[3])
     print("align 3", compare_seqs_3[0])
     print("align 3", compare_seqs_3[1])
     print("align 3", compare_seqs_3[2])
+    print("align 3", compare_seqs_3[3])
     print("align 4", compare_seqs_4[0])
     print("align 4", compare_seqs_4[1])
     print("align 4", compare_seqs_4[2])
+    print("align 4", compare_seqs_4[3])
 
     compare_identical_nucs = [compare_seqs_1[0], compare_seqs_2[0], compare_seqs_3[0], compare_seqs_4[0]]
     best_align = max(compare_identical_nucs)
@@ -285,21 +292,25 @@ def main():
         output_file.write("\n")
         output_file.write(str(compare_seqs_1[2]))
         output_file.write("\n")
-        output_file.write(">identical_nucs")
+        output_file.write(">total_nucleotides")
         output_file.write("\n")
         output_file.write(str(compare_seqs_1[3]))
         output_file.write("\n")
-        output_file.write(">non_identical_nucs")
+        output_file.write(">identical_nucs_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_1[4]))
         output_file.write("\n")
-        output_file.write(">gaps")
+        output_file.write(">non_identical_nucs_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_1[5]))
+        output_file.write("\n")
+        output_file.write(">gaps_positions")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[6]))
 
 
     elif best_align == compare_seqs_2[0]:
-        output_file.write(args.align_1)
+        output_file.write(args.align_2)
         output_file.write("\n")
         output_file.write(">identical_nucs")
         output_file.write("\n")
@@ -313,21 +324,24 @@ def main():
         output_file.write("\n")
         output_file.write(str(compare_seqs_2[2]))
         output_file.write("\n")
-        output_file.write(">identical_nucs")
+        output_file.write(">total_nucleotides")
         output_file.write("\n")
         output_file.write(str(compare_seqs_2[3]))
         output_file.write("\n")
-        output_file.write(">non_identical_nucs")
+        output_file.write(">identical_nucs_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_2[4]))
         output_file.write("\n")
-        output_file.write(">gaps")
+        output_file.write(">non_identical_nucs_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_2[5]))
-
+        output_file.write("\n")
+        output_file.write(">gaps_positions")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_2[6]))
 
     elif best_align == compare_seqs_3[0]:
-        output_file.write(args.align_1)
+        output_file.write(args.align_3)
         output_file.write("\n")
         output_file.write(">identical_nucs")
         output_file.write("\n")
@@ -341,21 +355,24 @@ def main():
         output_file.write("\n")
         output_file.write(str(compare_seqs_3[2]))
         output_file.write("\n")
-        output_file.write(">identical_nucs")
+        output_file.write(">total_nucleotides")
         output_file.write("\n")
         output_file.write(str(compare_seqs_3[3]))
         output_file.write("\n")
-        output_file.write(">non_identical_nucs")
+        output_file.write(">identical_nucs_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_3[4]))
         output_file.write("\n")
-        output_file.write(">gaps")
+        output_file.write(">non_identical_nucs_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_3[5]))
-
+        output_file.write("\n")
+        output_file.write(">gaps_positions")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_3[6]))
 
     elif best_align == compare_seqs_4[0]:
-        output_file.write(args.align_1)
+        output_file.write(args.align_4)
         output_file.write("\n")
         output_file.write(">identical_nucs")
         output_file.write("\n")
@@ -369,18 +386,21 @@ def main():
         output_file.write("\n")
         output_file.write(str(compare_seqs_4[2]))
         output_file.write("\n")
-        output_file.write(">identical_nucs")
+        output_file.write(">total_nucleotides")
         output_file.write("\n")
         output_file.write(str(compare_seqs_4[3]))
         output_file.write("\n")
-        output_file.write(">non_identical_nucs")
+        output_file.write(">identical_nucs_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_4[4]))
         output_file.write("\n")
-        output_file.write(">gaps")
+        output_file.write(">non_identical_nucs_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_4[5]))
-
+        output_file.write("\n")
+        output_file.write(">gaps_positions")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_4[6]))
 
 
     #align_1_split = align_1.split('\n', 1)

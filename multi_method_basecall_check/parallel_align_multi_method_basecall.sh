@@ -236,79 +236,59 @@ touch $outdir/$snippy_basecall/snippy_alignment_runs.txt
 cd $outdir/$snippy_basecall/sep_loci/individual_tax
 
 ## SNIPPY FILES BLAST
-#for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
-#do
-#	file_name=$(basename $j)
-#	printf "\n$file_name\n"
-#	for i in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax);
-#	do
-#		#cluster=${i:19:8}
-#		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
-#		#printf "\n$cluster_grep\n"
-#		#echo ${i:28:14}
-#		seq_grep=$( echo $i | grep -o "$file_name$")
-#		#printf "\n $seq_grep \n"
-#		#printf '\nFILE TO BE MATCHED == '$i'\n'
-#		#seq=${i:28:14}
-#		#if [ "$seq" == "$file_name" ];
-#		if [ ! -z "$seq_grep" ];
-#		then
-#			printf "\nFOUND A MATCH BETWEEN A SNIPPY SEQUENCE AND BLAST INDEX\n"
-#			
-#			$program_path/seq_producer.py --align $outdir/$snippy_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
-#
-#			cat $cluster_grep-$seq_grep-complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-complement.fasta
-#			cat $cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-#			cat $cluster_grep-$seq_grep-reverse.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse.fasta
-#			cat $i <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-original.fasta
-#			
-#			mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
-#			mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-#			mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
-#			mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
-#
-#
-#			#Perform basecall comparison on all method sequences with the sequence that produced the reads
-#			$program_path/align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$snippy_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt
-#
-#			#echo "$program_path/alignment_checker.py --align_1 $j.fasta --align_2 $outdir/$snippy_basecall/sep_loci/individual_tax/$i --output_align $outdir/$snippy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta --output_miscalls $outdir/$snippy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out" >> $outdir/$snippy_basecall/snippy_alignment_runs.txt
-#			
-#			#echo "$program_path/alignment_checker.py+--align_1+$j.fasta+--align_2+$outdir/$snippy_basecall/sep_loci/individual_tax/$i+--output_align+$outdir/$snippy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta+--output_miscalls+$outdir/$snippy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out" >> $outdir/$snippy_basecall/snippy_alignment_runs.txt
-#
-#
-#			#blastn -db $j.fasta -query $outdir/$snippy_basecall/sep_loci/individual_tax/$i -out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
-#			#printf "\n$j\n"
-#			#printf "\n$i\n"
-#		fi
-#	done
-#done
+for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
+do
+	file_name=$(basename $j)
+	printf "\n$file_name\n"
+	for i in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax);
+	do
+		#cluster=${i:19:8}
+		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
+		#printf "\n$cluster_grep\n"
+		#echo ${i:28:14}
+		seq_grep=$( echo $i | grep -o "$file_name$")
+		#printf "\n $seq_grep \n"
+		#printf '\nFILE TO BE MATCHED == '$i'\n'
+		#seq=${i:28:14}
+		#if [ "$seq" == "$file_name" ];
+		if [ ! -z "$seq_grep" ];
+		then
+			printf "\nFOUND A MATCH BETWEEN A SNIPPY SEQUENCE AND BLAST INDEX\n"
+			
+			#$program_path/seq_producer.py --align $outdir/$snippy_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
+
+			cat $j.fasta $outdir/$snippy_basecall/sep_loci/individual_tax/$i > $cluster_grep-$seq_grep-single-tax-single-locus.fasta
+
+			#cat $cluster_grep-$seq_grep-complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-complement.fasta
+			#cat $cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+			#cat $cluster_grep-$seq_grep-reverse.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse.fasta
+			#cat $i <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-original.fasta
+			
+			#mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
+			#mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+			#mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
+			#mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
+
+
+			#Perform basecall comparison on all method sequences with the sequence that produced the reads
+			$program_path/snippy_gapped_align_compare.py --align_1 $cluster_grep-$seq_grep-single-tax-single-locus.fasta --output_stub $outdir/$snippy_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt
+			
+			
+			#$program_path/align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$snippy_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt
+
+			#echo "$program_path/alignment_checker.py --align_1 $j.fasta --align_2 $outdir/$snippy_basecall/sep_loci/individual_tax/$i --output_align $outdir/$snippy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta --output_miscalls $outdir/$snippy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out" >> $outdir/$snippy_basecall/snippy_alignment_runs.txt
+			
+			#echo "$program_path/alignment_checker.py+--align_1+$j.fasta+--align_2+$outdir/$snippy_basecall/sep_loci/individual_tax/$i+--output_align+$outdir/$snippy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta+--output_miscalls+$outdir/$snippy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out" >> $outdir/$snippy_basecall/snippy_alignment_runs.txt
+
+
+			#blastn -db $j.fasta -query $outdir/$snippy_basecall/sep_loci/individual_tax/$i -out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
+			#printf "\n$j\n"
+			#printf "\n$i\n"
+		fi
+	done
+done
 
 cd $outdir
-
-#split up alignment runs for parallel processing
-#cd $outdir/$snippy_basecall/
-
-#cat $outdir/$snippy_basecall/snippy_alignment_runs.txt | split -d -l $align_threads
-
-#for j in $(ls x*); do
-#        for i in $(cat $j); do
-#        	
-#		echo "$i"
-#                echo "split"
-#                split=$(echo $i | sed -e 's/+/ /g')
-#                echo "$split"
-#                echo "waffle"
-#		split_array=($split)
-#		$program_path/parallel_alignment_checker.py --align_1 ${split_array[2]} --align_2 ${split_array[4]} --output_align ${split_array[6]} --output_miscalls ${split_array[8]}
-#		echo "${split_array[0]}"
-#                echo "waffle"
-#
-#
-#	done
-#        wait
-#done
-#
-#cd -
 
 
 
@@ -318,64 +298,43 @@ touch $outdir/$rapup_basecall/rapup_alignment_runs.txt
 
 cd $outdir/$rapup_basecall/sep_loci/individual_tax
 
-#for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
-#do
-#        file_name=$(basename $j)
-#        printf "\n$file_name\n"
-#        for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax);
-#        do
-#		#cluster=${i:19:8}
-#		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
-#		seq_grep=$( echo $i | grep -o "$file_name$")
-#                #printf "\n$cluster_grep\n"i
-#                #echo ${i:27:14}
-#                #seq=${i:27:14}
-#                #if [ "$seq" == "$file_name" ];
-#		if [ ! -z "$seq_grep" ];
-#                then
-#                        printf "\nFOUND A MATCH BETWEEN A RAPUP SEQUENCE AND BLAST INDEX\n"
-#                        $program_path/seq_producer.py --align $outdir/$rapup_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
-#
-#                        cat $cluster_grep-$seq_grep-complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-complement.fasta
-#                        cat $cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-#                        cat $cluster_grep-$seq_grep-reverse.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse.fasta
-#                        cat $i <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-original.fasta
-#
-#                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
-#                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-#                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
-#                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
-#
-#
-#                        #Perform basecall comparison on all method sequences with the sequence that produced the reads
-#                        $program_path/align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$rapup_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt	
-#		
-#			#echo "$program_path/alignment_checker.py --align_1 $j.fasta --align_2 $outdir/$rapup_basecall/sep_loci/individual_tax/$i --output_align $outdir/$rapup_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta --output_miscalls $outdir/$rapup_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out" >> $outdir/$rapup_basecall/rapup_alignment_runs.txt
-#			
-#			#blastn -db $j.fasta -query $outdir/$rapup_basecall/sep_loci/individual_tax/$i -out $outdir/$rapup_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
-#                        #printf "\n$j\n"
-#                        #printf "\n$i\n"
-#                fi
-#        done
-#done
+for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
+do
+        file_name=$(basename $j)
+        printf "\n$file_name\n"
+        for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax);
+        do
+		#cluster=${i:19:8}
+		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
+		seq_grep=$( echo $i | grep -o "$file_name$")
+                #printf "\n$cluster_grep\n"i
+                #echo ${i:27:14}
+                #seq=${i:27:14}
+                #if [ "$seq" == "$file_name" ];
+		if [ ! -z "$seq_grep" ];
+                then
+                        printf "\nFOUND A MATCH BETWEEN A RAPUP SEQUENCE AND BLAST INDEX\n"
+                        $program_path/seq_producer.py --align $outdir/$rapup_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
+
+                        cat $cluster_grep-$seq_grep-complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-complement.fasta
+                        cat $cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+                        cat $cluster_grep-$seq_grep-reverse.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse.fasta
+                        cat $i <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-original.fasta
+
+                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
+                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
+                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
+
+
+                        #Perform basecall comparison on all method sequences with the sequence that produced the reads
+                        $program_path/align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$rapup_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt	
+		
+                fi
+        done
+done
 
 cd $outdir
-
-#split up alignment runs for parallel processing
-#cd $outdir/$rapup_basecall/
-
-#cat $outdir/$rapup_basecall/rapup_alignment_runs.txt | split -d -l $align_threads
-
-#for j in $(ls x*); do
-#        #for i in $(cat $j  | ls -1); do
-#        while read i; do
-#               echo "${i[0]}"
-#        done < $j
-#        wait
-#done
-
-#cd -
-
 
 
 ## gon_phy FILES BLAST
@@ -384,70 +343,51 @@ cd $outdir/$gon_phy_basecall/sep_loci/individual_tax
 
 touch $outdir/$gon_phy_basecall/gon_phy_alignment_runs.txt
 
-#for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
-#do
-#        file_name=$(basename $j)
-#        printf "\n$file_name\n"
-#        for i in $(ls $outdir/$gon_phy_basecall/sep_loci/individual_tax);
-#        do
-#		#cluster=${i:19:8}
-#		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
-#                seq_grep=$( echo $i | grep -o "$file_name$")
-#		#printf "\n$cluster_grep\n"
-#                #echo ${i:29:14}
-#                #seq=${i:29:14}
-#                #if [ "$seq" == "$file_name" ];
-#		if [ ! -z "$seq_grep" ];
-#                then
-#                        printf "\nFOUND A MATCH BETWEEN A GON_PHY SEQUENCE AND BLAST INDEX\n"
-#                        $program_path/seq_producer.py --align $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
-#		
-#			cat $cluster_grep-$seq_grep-complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-complement.fasta
-#                        cat $cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-#                        cat $cluster_grep-$seq_grep-reverse.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse.fasta
-#                        cat $i <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-original.fasta
-#
-#                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
-#                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-#                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
-#                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
-#
-#
-#                        #Perform basecall comparison on all method sequences with the sequence that produced the reads
-#                        $program_path/align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$gon_phy_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt	
-#			
-#			
-#			#echo "$program_path/alignment_checker.py --align_1 $j.fasta --align_2 $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i --output_align $outdir/$gon_phy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta --output_miscalls $outdir/$gon_phy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out" >> $outdir/$gon_phy_basecall/gon_phy_alignment_runs.txt
-#			
-#			#blastn -db $j.fasta -query $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i -out $outdir/$gon_phy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out -max_hsps 1 -outfmt 5
-#                        #printf "\n$j\n"
-#                        #printf "\n$i\n"
-#                fi
-#        done
-#done
+for j in $(ls $outdir/$loci_blast_indexes/*.fasta | sed -e 's/.fasta//g');
+do
+        file_name=$(basename $j)
+        printf "\n$file_name\n"
+        for i in $(ls $outdir/$gon_phy_basecall/sep_loci/individual_tax);
+        do
+		#cluster=${i:19:8}
+		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
+                seq_grep=$( echo $i | grep -o "$file_name$")
+		#printf "\n$cluster_grep\n"
+                #echo ${i:29:14}
+                #seq=${i:29:14}
+                #if [ "$seq" == "$file_name" ];
+		if [ ! -z "$seq_grep" ];
+                then
+                        printf "\nFOUND A MATCH BETWEEN A GON_PHY SEQUENCE AND BLAST INDEX\n"
+                        $program_path/seq_producer.py --align $outdir/$gon_phy_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
+		
+			cat $cluster_grep-$seq_grep-complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-complement.fasta
+                        cat $cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+                        cat $cluster_grep-$seq_grep-reverse.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse.fasta
+                        cat $i <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-original.fasta
+
+                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
+                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
+                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
+
+
+                        #Perform basecall comparison on all method sequences with the sequence that produced the reads
+                        $program_path/align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$gon_phy_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt	
+			
+			
+                fi
+        done
+done
 
 cd $outdir
 
-#split up alignment runs for parallel processing
-#cd $outdir/$gon_phy_basecall/
-
-#cat $outdir/$gon_phy_basecall/gon_phy_alignment_runs.txt | split -d -l $align_threads
-
-#for j in $(ls x*); do
-#        #for i in $(cat $j  | ls -1); do
-#	while read i; do
-#               echo "${i[0]}"
-#        done < $j
-#        wait
-#done
-
-#cd -
 # COPY TRUE TREE TO OUTPUT FOLDER
 cp $true_tree $outdir/true_tree.tre
 
 
 # BOOTSTRAP RAPUP AND GONPHYLING FOR CONSENSUS TREE PRODUCTION
-cd $gon_phy_pwd/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/ 
+cd $outdir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/ 
 
 raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.core_genome_run.out -n gon_phy_MR_CONS
 

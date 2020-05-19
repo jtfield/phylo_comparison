@@ -10,8 +10,9 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--align_1')
     parser.add_argument('--align_2')
-    parser.add_argument('--output_align')
-    parser.add_argument('--output_miscalls')
+    parser.add_argument('--output_align', nargs='?', type=str, default="NONE")
+    parser.add_argument('--output_miscalls', nargs='?', type=str, default="NONE")
+    parser.add_argument('--orientation', nargs='?', type=str, default="NONE")
     return parser.parse_args()
 
 
@@ -47,6 +48,9 @@ def perform_alignment_check(short, long_seq):
     #add_gaps_short = ((added_gaps_on_front * '-') + shorter)
     #extended_short_length = len(shorter) + added_gaps_on_front
     #fixed_shorter
+
+    #pool = mp.Pool(mp.cpu_count()) 
+
     while added_gaps_on_front + len(short) < int(len(long_seq)):
     #while added_gaps_on_front + len(shorter) < 500:
         #add_gaps_short = ((added_gaps_on_front * '-') + shorter)
@@ -57,15 +61,18 @@ def perform_alignment_check(short, long_seq):
         #print(split_short)
         #print("waffle")
 
-
+         
         combined_positions = list(map(list, zip(split_long, split_short)))
         check_identity = check_alignment(combined_positions)
+        #parallel_check = [pool.apply(check_alignment, args=(base_set)) for base_set in check_identity] 
         if check_identity[0] > identical_bases:
             #print(check_identity)
             identical_bases = check_identity[0]
             non_identical_bases = check_identity[1]
             identical_bases_by_position = added_gaps_on_front
             best_seq = split_short
+    
+    #pool.close()
 
     output.append(identical_bases_by_position)
     output.append(identical_bases)
@@ -78,7 +85,7 @@ def perform_alignment_check(short, long_seq):
 def main():
     args = parse_args()
 
-    pool = mp.Pool(mp.cpu_count())
+    #pool = mp.Pool(mp.cpu_count())
     print("Number of processors: ", mp.cpu_count())
 
 
@@ -117,37 +124,102 @@ def main():
     
     shorter = shorter.replace('\n','')
     longer = longer.replace('\n','')
-
-    print(len(longer))
-    print(len(shorter))
+    
+    print("Longer sequence length: ", len(longer))
+    print("Shorter sequence length: ", len(shorter))
+    
 
     main_short = Seq(shorter, generic_dna)
-    short_comp = main_short.complement()
-    short_reverse = main_short[::-1]
-    short_rev_comp = main_short.reverse_complement()
+    #short_comp = main_short.complement()
+    #short_reverse = main_short[::-1]
+    #short_rev_comp = main_short.reverse_complement()
     
-    #print(main_short)
-    #print(short_comp)
-    #print(short_reverse)
-    #print(short_rev_comp)
+    all_seqs_align_scores = []
+    analyzed_main_short = []
+    analyzed_short_comp = []
+    analyzed_reverse = []
+    analyzed_rev_comp = []
 
+    if args.orientation == "NONE":
 
-    identical_bases_by_position = 0
-    identical_bases = 0
+        #main_short = Seq(shorter, generic_dna)
+        short_comp = main_short.complement()
+        short_reverse = main_short[::-1]
+        short_rev_comp = main_short.reverse_complement()
     
-    print("comparing short input sequence against long input sequence")
-    analyzed_main_short = perform_alignment_check(main_short, longer)
+        #print(main_short)
+        #print(short_comp)
+        #print(short_reverse)
+        #print(short_rev_comp)
 
-    print("analyzing complimentary short sequence against long input sequence")
-    analyzed_short_comp = perform_alignment_check(short_comp, longer)
 
-    print("analyzing reverse short sequence against long input sequence")
-    analyzed_reverse = perform_alignment_check(short_reverse, longer)
+        identical_bases_by_position = 0
+        identical_bases = 0
+    
+        print("comparing short input sequence against long input sequence")
+        analyzed_main_short = perform_alignment_check(main_short, longer)
 
-    print("analyzing reverse complimentary short sequence against long input sequence")
-    analyzed_rev_comp = perform_alignment_check(short_rev_comp, longer)
+        print("analyzing complimentary short sequence against long input sequence")
+        analyzed_short_comp = perform_alignment_check(short_comp, longer)
 
-    all_seqs_align_scores = [analyzed_main_short[1], analyzed_short_comp[1], analyzed_reverse[1], analyzed_rev_comp[1]]
+        print("analyzing reverse short sequence against long input sequence")
+        analyzed_reverse = perform_alignment_check(short_reverse, longer)
+
+        print("analyzing reverse complimentary short sequence against long input sequence")
+        analyzed_rev_comp = perform_alignment_check(short_rev_comp, longer)
+
+        all_seqs_align_scores = [analyzed_main_short[1], analyzed_short_comp[1], analyzed_reverse[1], analyzed_rev_comp[1]]
+
+    elif args.orientation == "input":
+
+        #main_short = Seq(shorter, generic_dna)
+
+        identical_bases_by_position = 0
+        identical_bases = 0
+
+        print("comparing short input sequence against long input sequence")
+        analyzed_main_short = perform_alignment_check(main_short, longer)
+    
+        all_seqs_align_scores.append(analyzed_main_short[1])
+
+    elif args.orientation == "complement":
+
+        short_comp = main_short.complement()
+    
+        identical_bases_by_position = 0
+        identical_bases = 0
+
+        print("analyzing complimentary short sequence against long input sequence")
+        analyzed_short_comp = perform_alignment_check(short_comp, longer)
+
+        all_seqs_align_scores.append(analyzed_short_comp[1])
+
+    elif args.orientation == "reverse":
+
+        short_reverse = main_short[::-1]
+
+        identical_bases_by_position = 0
+        identical_bases = 0
+
+        print("analyzing reverse short sequence against long input sequence")
+        analyzed_reverse = perform_alignment_check(short_reverse, longer)
+    
+        all_seqs_align_scores.append(analyzed_reverse[1])
+
+    elif args.orientation == "reverse_complement":
+
+        short_rev_comp = main_short.reverse_complement()
+
+        identical_bases_by_position = 0
+        identical_bases = 0
+
+        print("analyzing reverse complimentary short sequence against long input sequence")
+        analyzed_rev_comp = perform_alignment_check(short_rev_comp, longer)
+        
+        all_seqs_align_scores.append(analyzed_rev_comp[1])
+   
+    print(all_seqs_align_scores)
+    print(analyzed_main_short)
 
     best_seq = ''
     best_score = max(all_seqs_align_scores)
@@ -193,29 +265,33 @@ def main():
     #print(identical_bases)
     #print(identical_bases_by_position)
     #fixed_short = ''.join(split_short)
+    
+    print(best_seq)
 
     fixed_short = ''.join(best_seq[2])
 
     print("miscalled bases for this alignment")
     print(best_seq[3])
 
-    miscalls_file = open(args.output_miscalls, 'w')
-    miscalls_file.write(shorter_label)
-    miscalls_file.write('\n')
-    miscalls_file.write(str(best_seq[3]))
+    if args.output_miscalls != "NONE":
+        miscalls_file = open(args.output_miscalls, 'w')
+        miscalls_file.write(shorter_label)
+        miscalls_file.write('\n')
+        miscalls_file.write(str(best_seq[3]))
 
-    #output_file = open('test_output_align.fasta','w')
-    output_file = open(args.output_align, 'w')
-    output_file.write(longer_label)
-    output_file.write('\n')
-    output_file.write(longer)
-    output_file.write('\n')
-    output_file.write(shorter_label)
-    output_file.write('\n')
-    output_file.write(((best_seq[0] - 1) * '-') + fixed_short)
-    #output_file.write((identical_bases_by_position * '-') + shorter)
-    #output_file.write((27 * '-') + shorter)
-    output_file.close()
+    if args.output_align != "NONE":
+        #output_file = open('test_output_align.fasta','w')
+        output_file = open(args.output_align, 'w')
+        output_file.write(longer_label)
+        output_file.write('\n')
+        output_file.write(longer)
+        output_file.write('\n')
+        output_file.write(shorter_label)
+        output_file.write('\n')
+        output_file.write(((best_seq[0] - 1) * '-') + fixed_short)
+        #output_file.write((identical_bases_by_position * '-') + shorter)
+        #output_file.write((27 * '-') + shorter)
+        output_file.close()
 
     #print("Number of processors: ", mp.cpu_count())
 

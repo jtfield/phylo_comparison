@@ -155,30 +155,36 @@ def main():
         assert len(line) == len(get_single_tax_head)
         sing_tax_vcf_dict_tax_of_interest[line[sing_tax_pos_position]] = [line[sing_tax_ref_position], line[sing_tax_alt_position]] 
 
-    #print(sing_tax_vcf_dict_tax_of_interest)
+    print(sing_tax_vcf_dict_tax_of_interest)
+    #print(prime_vcf_dict_tax_of_interest)
 
     should_have_variants = 0
     actually_has_variants = 0
     has_variant_dict = {}
-    doesnt_have_variant_dict = {}
+    should_have_variant_dict = {}
 
     for key, value in prime_vcf_dict_tax_of_interest.items():
         #print(key)
         if value[2] != '0':
             should_have_variants+=1
-            doesnt_have_variant_dict[key] = value
-        if key in sing_tax_vcf_dict_tax_of_interest:
-            actually_has_variants+=1
-            has_variant_dict[key] = value
+            should_have_variant_dict[key] = value
+            if key in sing_tax_vcf_dict_tax_of_interest:
+                actually_has_variants+=1
+                has_variant_dict[key] = value
+
+    #print(has_variant_dict)
+    #print("waffle")
+    #print(should_have_variant_dict)
+
 
     for key, value in has_variant_dict.items():
-        doesnt_have_variant_dict.pop(key, None)
+        should_have_variant_dict.pop(key, None)
 
     #print(should_have_variants)
-    #print(doesnt_have_variant_dict)
+    print(should_have_variant_dict)
 
     #print(actually_has_variants)
-    #print(has_variant_dict)
+    print(has_variant_dict)
 
     
     msa = open(args.msa, 'r')
@@ -188,34 +194,39 @@ def main():
 
     n_positions = []
     gap_positions = []
+    sequence_of_interest = []
     for taxon in split_msa:
         if len(taxon) > 0:
             split_taxon = taxon.split('\n',1)
             taxon_name_search = re.search(taxon_name_compile, split_taxon[0])
             if taxon_name_search:
-                print(split_taxon[0])
+                #print(split_taxon[0])
                 contig_seq = ''.join(split_taxon[1].split('\n'))
                 #print(contig_seq)
                 for num, letter in enumerate(contig_seq):
+                    sequence_of_interest.append(letter)
                     if letter == 'N':
                         n_positions.append(num)
                     elif letter == '-':
                         gap_positions.append(num)
 
-    #print(n_positions)
-    #print(gap_positions)
-
-    non_missing_data_miscalls = {}
-    for key, value in doesnt_have_variant_dict.items():
-        key = int(key)
-        if key not in n_positions:
-            if key not in gap_positions:
-                non_missing_data_miscalls[key] = value
-
-    #print(non_missing_data_miscalls)
-
-    
-
+#    #print(n_positions)
+#    #print(gap_positions)
+#
+#    non_missing_data_miscalls = {}
+#    for key, value in doesnt_have_variant_dict.items():
+#        key = int(key)
+#        if key not in n_positions:
+#            if key not in gap_positions:
+#                non_missing_data_miscalls[key] = value
+#
+#    #print(non_missing_data_miscalls)
+#
+#    for key, value in non_missing_data_miscalls.items():
+#        #print(key)
+#        #print(value)
+#        #print(sequence_of_interest[key-1])
+#        continue
 
 
     #df = pd.DataFrame(combined_lines_frame, columns=get_head)

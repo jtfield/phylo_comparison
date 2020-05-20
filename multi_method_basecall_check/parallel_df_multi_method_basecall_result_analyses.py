@@ -482,6 +482,12 @@ def main():
     print("total nucleotides summed", rapup_total_total_nuc)
     #print(rapup_basecall_check['sums'])
     rapup_total_nuc_check = rapup_total_check.rename(columns={'sums' : 'rapup_sums'})
+    
+    #per-base results
+    rapup_per_base_miscall = rapup_total_miscalls / rapup_total_total_nuc 
+    rapup_per_base_gap = rapup_total_gaps / rapup_total_total_nuc
+    print(rapup_per_base_miscall)
+    print(rapup_per_base_gap)
 
 
     print("\n\n")
@@ -522,7 +528,11 @@ def main():
     #print(snippy_basecall_check['sums'])
     snippy_total_nuc_check = snippy_total_nuc_check.rename(columns={'sums' : 'snippy_sums'})
 
-
+    #get per-base miscall and gap rate
+    snippy_per_base_miscall = snippy_total_miscalls / snippy_total_total_nuc
+    snippy_per_base_gap = snippy_total_gaps / snippy_total_total_nuc
+    print(snippy_per_base_miscall)
+    print(snippy_per_base_gap)
 
 
     print("\n\n")
@@ -559,7 +569,12 @@ def main():
     print("summed total of nucleotides", gon_phy_total_total_nuc)
     #print(gon_phy_basecall_check['sums'])
     gon_phy_total_nuc_check = gon_phy_total_nuc_check.rename(columns={'sums' : 'gon_phy_sums'})
-    
+   
+    #per-base analysis results
+    gon_phy_per_base_miscall = gon_phy_total_miscalls / gon_phy_total_total_nuc
+    gon_phy_per_base_gap = gon_phy_total_gaps / gon_phy_total_total_nuc
+    print(gon_phy_per_base_miscall)
+    print(gon_phy_per_base_gap)
     
     #print(gon_phy_basecall_check['gon_phy_sums'])    
     #combine_sums_df = pd.concat([rapup_basecall_check['rapup_sums'], snippy_basecall_check['snippy_sums'], gon_phy_basecall_check['gon_phy_sums']] , axis=1, ignore_index=False, sort=True)

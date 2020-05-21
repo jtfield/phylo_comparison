@@ -41,9 +41,9 @@ done
 
 #CALL GON_PHYLING ON ALL TAXA READS
 if [ $intermediate_files == "KEEP" ]; then
-	$rapup_path/gon_phyling.sh -d $gon_phy_pwd -1 $r1_tail -2 $r2_tail -o LOCUS -l $loci_positions
+	$rapup_path/gon_phyling.sh -d $gon_phy_pwd -1 $r1_tail -2 $r2_tail -o LOCUS -l $loci_positions -b $bootstrapping
 elif [ $intermediate_files == "CLEAN" ]; then
-	$rapup_path/gon_phyling.sh -d $gon_phy_pwd -1 $r1_tail -2 $r2_tail -o LOCUS -l $loci_positions -i $intermediate_files
+	$rapup_path/gon_phyling.sh -d $gon_phy_pwd -1 $r1_tail -2 $r2_tail -o LOCUS -l $loci_positions -i $intermediate_files -b $bootstrapping
 fi
 
 sed -i -e '/.ref//g' $gon_phy_pwd/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas
@@ -93,9 +93,9 @@ mv $gon_phy_pwd/trimmed_reads $outdir/trimmed_reads
 
 #BEGIN ROUNDS OF RAPUP AND SNIPPY
 if [ $intermediate_files == "KEEP" ]; then
-	$rapup_path/multi_map.sh -a $outdir/$update_dir/alignment_ref.fas -d $gon_phy_pwd -1 $r1_tail -2 $r2_tail -o $outdir/rapup_run -g LOCUS -f rapup_loci_positions.csv
+	$rapup_path/multi_map.sh -a $outdir/$update_dir/alignment_ref.fas -d $gon_phy_pwd -1 $r1_tail -2 $r2_tail -o $outdir/rapup_run -g LOCUS -f rapup_loci_positions.csv -b $bootstrapping
 elif [ $intermediate_files == "CLEAN" ]; then
-	$rapup_path/multi_map.sh -a $outdir/$update_dir/alignment_ref.fas -d $gon_phy_pwd -1 $r1_tail -2 $r2_tail -o $outdir/rapup_run -g LOCUS -f rapup_loci_positions.csv -i $intermediate_files
+	$rapup_path/multi_map.sh -a $outdir/$update_dir/alignment_ref.fas -d $gon_phy_pwd -1 $r1_tail -2 $r2_tail -o $outdir/rapup_run -g LOCUS -f rapup_loci_positions.csv -i $intermediate_files -b $bootstrapping
 fi
 
 touch $update_dir/snippy_run.tab

@@ -214,7 +214,8 @@ do
 done
 
 #Create single taxa locus files for snippy output
-for j in $(ls $outdir/$snippy_basecall/sep_loci/*.fasta);
+for j in $(ls $outdir/core.full.aln);
+#for j in $(ls $outdir/$snippy_basecall/sep_loci/*.fasta);
 do
         for i in $(grep ">" $j | sed -e 's/>//g');
         do
@@ -243,7 +244,7 @@ do
 	for i in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax);
 	do
 		#cluster=${i:19:8}
-		cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
+		#cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
 		#printf "\n$cluster_grep\n"
 		#echo ${i:28:14}
 		seq_grep=$( echo $i | grep -o "$file_name$")
@@ -259,6 +260,11 @@ do
 
 			cat $j.fasta $outdir/$snippy_basecall/sep_loci/individual_tax/$i > $cluster_grep-$seq_grep-single-tax-single-locus.fasta
 
+			cat $j.fasta $outdir/$snippy_basecall/sep_loci/individual_tax/$i > $seq_grep-single-tax-single-locus.fasta
+
+
+
+
 			#cat $cluster_grep-$seq_grep-complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-complement.fasta
 			#cat $cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
 			#cat $cluster_grep-$seq_grep-reverse.fasta <(echo) $j.fasta > combine-$cluster_grep-$seq_grep-reverse.fasta
@@ -270,10 +276,19 @@ do
 			#mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
 
 
+
+
 			#Perform basecall comparison on all method sequences with the sequence that produced the reads
-			$program_path/snippy_gapped_align_compare.py --align_1 $cluster_grep-$seq_grep-single-tax-single-locus.fasta --output_stub $outdir/$snippy_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt
+			#$program_path/snippy_gapped_align_compare.py --align_1 $cluster_grep-$seq_grep-single-tax-single-locus.fasta --output_stub $outdir/$snippy_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt
 			
-			
+			$program_path/snippy_gapped_align_compare.py --align_1 $seq_grep-single-tax-single-locus.fasta --output_stub $outdir/$snippy_basecall/blast_results/basecall_results-$seq_grep-.txt
+
+
+
+
+
+
+
 			#$program_path/align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$snippy_basecall/blast_results/basecall_results-$cluster_grep-$seq_grep-.txt
 
 			#echo "$program_path/alignment_checker.py --align_1 $j.fasta --align_2 $outdir/$snippy_basecall/sep_loci/individual_tax/$i --output_align $outdir/$snippy_basecall/blast_results/realignment_$cluster_grep-$file_name-$seq_grep.fasta --output_miscalls $outdir/$snippy_basecall/blast_results/miscalls_output_$cluster_grep-$file_name-$seq_grep.out" >> $outdir/$snippy_basecall/snippy_alignment_runs.txt

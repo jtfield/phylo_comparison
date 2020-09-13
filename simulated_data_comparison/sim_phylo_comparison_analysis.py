@@ -115,7 +115,7 @@ def basecall_identical_nucs_checker(folder_path, input_folder, df):
 
 # for checking the number of gaps in a comparison output
 def basecall_gap_checker(folder_path, input_folder, df):
-    # LIST CLUSTERS/LOCI IN THIS ANALYSIS
+#10503188    # LIST CLUSTERS/LOCI IN THIS ANALYSIS
     cluster_names = 'cluster\d+'
     cluster_len = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
     cluster_compile = re.compile(cluster_names)
@@ -527,17 +527,17 @@ def main():
     rapup_miscall_df = make_df(rapup_results, rapup_blast_results)
     rapup_gap_df = make_df(rapup_results, rapup_blast_results)
     rapup_total_nucs_df = make_df(rapup_results, rapup_blast_results)
-    #print(rapup_df)
+    #print(rapup_total_nucs_df)
 
     snippy_miscall_df = snippy_make_df(snippy_results, snippy_blast_results)
     snippy_gap_df = snippy_make_df(snippy_results, snippy_blast_results)
     snippy_total_nucs_df = snippy_make_df(snippy_results, snippy_blast_results)
-    print(snippy_miscall_df)
+    #print(snippy_total_nucs_df)
 
     gon_phy_miscall_df = make_df(gon_phy_results, gon_phy_blast_results)
     gon_phy_gap_df = make_df(gon_phy_results, gon_phy_blast_results)
     gon_phy_total_nucs_df = make_df(gon_phy_results, gon_phy_blast_results)
-    #print(gon_phy_df)
+    #print(gon_phy_total_nucs_df)
 
 
 ###################################################################################################
@@ -679,7 +679,7 @@ def main():
     print("miscall results")
     rapup_basecall_check = basecall_method_checker(rapup_results, rapup_blast_results, rapup_miscall_df) 
     #print(rapup_basecall_check)
-    rapup_avg_miscalled = rapup_basecall_check['mean'].mean()
+    rapup_avg_miscalled = rapup_basecall_check['sums'].mean()
     print("average miscalls", rapup_avg_miscalled)
     rapup_miscalled_std = rapup_basecall_check.loc[:,"sums"].std()
     print("miscall standard deviation", rapup_miscalled_std)
@@ -690,8 +690,8 @@ def main():
  
     #check gaps
     rapup_gap_check = basecall_gap_checker(rapup_results, rapup_blast_results, rapup_gap_df)
-    #print(rapup_basecall_check)
-    rapup_avg_gap = rapup_gap_check['mean'].mean()
+    #print(rapup_gap_check)
+    rapup_avg_gap = rapup_gap_check['sums'].mean()
     print("average gaps", rapup_avg_gap)
     rapup_gap_std = rapup_gap_check.loc[:,"sums"].std()
     print("gaps standard deviasion", rapup_gap_std)
@@ -702,8 +702,8 @@ def main():
  
     #check total nucleotides
     rapup_total_check = basecall_identical_nucs_checker(rapup_results, rapup_blast_results, rapup_total_nucs_df)
-    #print(rapup_basecall_check)
-    rapup_avg_total_nuc = rapup_total_check['mean'].mean()
+    #print(rapup_total_check)
+    rapup_avg_total_nuc = rapup_total_check['sums'].mean()
     print("average all nuleotides per taxon nuleotides", rapup_avg_total_nuc)
     rapup_total_nuc_std = rapup_total_check.loc[:,"sums"].std()
     print("total nucleotides standard deviation per taxon", rapup_total_nuc_std)
@@ -728,7 +728,7 @@ def main():
     #miscall check
     snippy_miscall_check = snippy_basecall_method_checker(snippy_results, snippy_blast_results, snippy_miscall_df)
     #print(snippy_basecall_check)
-    snippy_avg_miscalled = snippy_miscall_check['mean'].mean()
+    snippy_avg_miscalled = snippy_miscall_check['sums'].mean()
     print("average miscalls per taxon", snippy_avg_miscalled)
     snippy_miscall_std = snippy_miscall_check.loc[:,"sums"].std()
     print("standard deviation of miscalls per taxon", snippy_miscall_std)
@@ -740,7 +740,7 @@ def main():
     #gap check
     snippy_gap_check = snippy_basecall_gap_checker(snippy_results, snippy_blast_results, snippy_gap_df)
     #print(snippy_gap_check)
-    snippy_avg_gap = snippy_gap_check['mean'].mean()
+    snippy_avg_gap = snippy_gap_check['sums'].mean()
     print("average gaps per taxon", snippy_avg_gap)
     snippy_gap_std = snippy_gap_check.loc[:,"sums"].std()
     print("standard deviation of gaps per taxon", snippy_gap_std)
@@ -752,7 +752,7 @@ def main():
     #total nucleotide check
     snippy_total_nuc_check = snippy_basecall_total_nucs_checker(snippy_results, snippy_blast_results, snippy_total_nucs_df)
     #print(snippy_basecall_check)
-    snippy_avg_total_nuc = snippy_total_nuc_check['mean'].mean()
+    snippy_avg_total_nuc = snippy_total_nuc_check['sums'].mean()
     print("average total nucleotides per taxon", snippy_avg_total_nuc)
     snippy_total_nuc_std = snippy_total_nuc_check.loc[:,"sums"].std()
     print("standard deviation of total nucleotides per taxon", snippy_total_nuc_std)
@@ -774,7 +774,7 @@ def main():
     print("gon_phy results")
     gon_phy_basecall_check = basecall_method_checker(gon_phy_results, gon_phy_blast_results, gon_phy_miscall_df)
     #print(gon_phy_basecall_check)
-    gon_phy_avg_miscalled = gon_phy_basecall_check['mean'].mean()
+    gon_phy_avg_miscalled = gon_phy_basecall_check['sums'].mean()
     print("average miscalls per taxon", gon_phy_avg_miscalled)
     gon_phy_miscall_std = gon_phy_basecall_check.loc[:,"sums"].std()
     print("standard deviation of miscalls per taxon", gon_phy_miscall_std)
@@ -785,7 +785,7 @@ def main():
 
     gon_phy_gap_check = basecall_gap_checker(gon_phy_results, gon_phy_blast_results, gon_phy_gap_df)
     #print(gon_phy_basecall_check)
-    gon_phy_avg_gap = gon_phy_gap_check['mean'].mean()
+    gon_phy_avg_gap = gon_phy_gap_check['sums'].mean()
     print("average gaps per taxon", gon_phy_avg_gap)
     gon_phy_gap_std = gon_phy_gap_check.loc[:,"sums"].std()
     print("standard deviation of gaps per taxon", gon_phy_gap_std)
@@ -796,7 +796,7 @@ def main():
 
     gon_phy_total_nuc_check = basecall_identical_nucs_checker(gon_phy_results, gon_phy_blast_results, gon_phy_total_nucs_df)
     #print(gon_phy_basecall_check)
-    gon_phy_avg_total_nuc = gon_phy_total_nuc_check['mean'].mean()
+    gon_phy_avg_total_nuc = gon_phy_total_nuc_check['sums'].mean()
     print("average total nucleotides per taxon", gon_phy_avg_total_nuc)
     gon_phy_total_nuc_std = gon_phy_total_nuc_check.loc[:,"sums"].std()
     print("standard deviation of total nucleotides per taxon", gon_phy_total_nuc_std)

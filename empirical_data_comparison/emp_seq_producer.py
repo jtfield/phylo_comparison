@@ -48,10 +48,22 @@ def main():
     short_comp = main_short.complement()
     short_reverse = main_short[::-1]
     short_rev_comp = main_short.reverse_complement()
+
+    assert len(main_short) > 0
+    assert len(short_comp) > 0
+    assert len(short_reverse) > 0
+    assert len(short_rev_comp) > 0
+
+    print("SEQ_LENGTHS")
+    print(len(main_short))
+    print(len(short_comp))
+    print(len(short_reverse))
+    print(len(short_rev_comp))
+
    
    
    #Produce reverse sequence
-    output_file = open(args.output_align_stub + "-reverse.fasta", 'w')
+    output_file = open(args.output_align_stub + "-reverse.fasta", 'w+')
     output_file.write(label)
     output_file.write('\n')
     output_file.write(str(short_reverse))
@@ -59,7 +71,7 @@ def main():
 
 
    #Produce compliment sequence
-    output_file = open(args.output_align_stub + "-complement.fasta", 'w')
+    output_file = open(args.output_align_stub + "-complement.fasta", 'w+')
     output_file.write(label)
     output_file.write('\n')
     output_file.write(str(short_comp))
@@ -67,7 +79,7 @@ def main():
 
 
     #Produce reverse complement sequence
-    output_file = open(args.output_align_stub + "-reverse_complement.fasta", 'w')
+    output_file = open(args.output_align_stub + "-reverse_complement.fasta", 'w+')
     output_file.write(label)
     output_file.write('\n')
     output_file.write(str(short_rev_comp))

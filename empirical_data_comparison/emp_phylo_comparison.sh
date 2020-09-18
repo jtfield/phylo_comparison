@@ -381,6 +381,28 @@ done
 
 cd $outdir
 
+mv ${outdir}/${rapup_basecall} ${outdir}/rapup_to_gon_phy_basecall
+mv ${outdir}/${snippy_basecall} ${outdir}/snippy_to_gon_phy_basecall
+
+# BOOTSTRAP RAPUP AND GONPHYLING FOR CONSENSUS TREE PRODUCTION
+cd $outdir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/ 
+
+raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.core_genome_run.out -n gon_phy_MR_CONS
+
+cat RAxML_MajorityRuleConsensusTree.gon_phy_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_gon_phy_MR.tre
+
+sed -i -e "s/;/:0.0;/g" fixed_gon_phy_MR.tre
+sed -i -e 's/.ref//g' fixed_gon_phy_MR.tre
+
+cd $outdir/rapup_run/combine_and_infer/
+
+raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.consensusFULL_bootstrap -n rapup_MR_CONS
+
+cat RAxML_MajorityRuleConsensusTree.rapup_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_rapup_MR.tre
+
+sed -i -e "s/;/:0.0;/g" fixed_rapup_MR.tre
+
+printf "\n$program_path\n"
 
 
 

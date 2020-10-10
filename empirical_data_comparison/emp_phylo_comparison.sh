@@ -152,6 +152,10 @@ chmod +x $outdir/runme.sh
 
 ${outdir}/runme.sh
 
+#REPLACE THE term REFERENCE with the actual reference name in the snippy output alignment
+printf "\nREPLACE SNIPPY REF\n"
+sed -i -e 's/Reference/${snip_ref}/g' $outdir/core.full.aln
+
 # WARNING WARNING WARNING: THIS RAXML COMMAND IS WONKY AS FUCK
 #raxmlHPC-PTHREADS -m GTRGAMMA -T $threads -s $outdir/core.full.aln -p 12345 -n consensusFULL
 
@@ -219,6 +223,7 @@ cd $outdir
 
 if [ $basecall == "ON" ]; then
 
+
 	mkdir $outdir/$rapup_basecall
 	mkdir $outdir/$snippy_basecall
 	mkdir $outdir/$gon_phy_basecall
@@ -229,21 +234,39 @@ if [ $basecall == "ON" ]; then
 	mkdir $outdir/$gon_phy_basecall/basecall_results
 	mkdir $outdir/$snippy_rapup_basecall/basecall_results
 
-	mkdir $outdir/$snippy_rapup_basecall/sep_loci
-	mkdir $outdir/$snippy_rapup_basecall/sep_loci/individual_tax
-
-	#REPLACE THE term REFERENCE with the actual reference name in the snippy output alignment
-	printf "\nREPLACE SNIPPY REF\n"
-	sed -i -e 's/Reference/${ref_name}/g' $outdir/core.full.aln
+	# # mkdir $outdir/$rapup_basecall/sep_loci
+	# mkdir $outdir/$snippy_basecall/sep_loci
+	# # mkdir $outdir/$gon_phy_basecall/sep_loci
+	# mkdir $outdir/$snippy_rapup_basecall/sep_loci
+	
+	# mkdir $outdir/$snippy_rapup_basecall/sep_loci/individual_tax
+	# mkdir $outdir/$rapup_basecall/sep_loci/individual_tax
+	# mkdir $outdir/$snippy_basecall/sep_loci/individual_tax
+	# mkdir $outdir/$gon_phy_basecall/sep_loci/individual_tax
 
 	${rapup_path}/modules/locus_position_identifier.py --out_file_dir ${outdir}/${rapup_basecall}/sep_loci --position_csv_file $loci_positions --concatenated_fasta ${outdir}/rapup_run/combine_and_infer/extended.aln
-	${rapup_path}/modules/locus_position_identifier.py --out_file_dir ${outdir}/${snippy_basecall}/sep_loci --position_csv_file $loci_positions --concatenated_fasta ${outdir}/core.full.aln
+	# ${rapup_path}/modules/locus_position_identifier.py --out_file_dir ${outdir}/${snippy_basecall}/sep_loci --position_csv_file $loci_positions --concatenated_fasta ${outdir}/core.full.aln
 	${rapup_path}/modules/locus_position_identifier.py --out_file_dir ${outdir}/${gon_phy_basecall}/sep_loci --position_csv_file $loci_positions --concatenated_fasta ${outdir}/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas
 
+	# mkdir $outdir/$rapup_basecall/sep_loci
+	mkdir $outdir/$snippy_basecall/sep_loci
+	# mkdir $outdir/$gon_phy_basecall/sep_loci
+	mkdir $outdir/$snippy_rapup_basecall/sep_loci
+	
+	mkdir $outdir/$snippy_rapup_basecall/sep_loci/individual_tax
 	mkdir $outdir/$rapup_basecall/sep_loci/individual_tax
 	mkdir $outdir/$snippy_basecall/sep_loci/individual_tax
 	mkdir $outdir/$gon_phy_basecall/sep_loci/individual_tax
 
+	mkdir $outdir/$rapup_basecall/blast_results
+	mkdir $outdir/$snippy_basecall/blast_results
+	mkdir $outdir/$gon_phy_basecall/blast_results
+
+	mkdir $outdir/$rapup_basecall/blast_results
+	mkdir $outdir/$snippy_basecall/blast_results
+	mkdir $outdir/$gon_phy_basecall/blast_results
+
+	# SEPARATE EACH LOCUS ALIGNMENT INTO INDIVIDUAL SEQUENCES (SNIPPY SEQS STAY FULL SIZE)
 	for j in $(ls ${outdir}/${gon_phy_basecall}/sep_loci/*.fasta);
 	do
 		for i in $(grep ">" $j | sed -e 's/>//g' | sed -e 's/.ref//g');
@@ -279,205 +302,316 @@ if [ $basecall == "ON" ]; then
 	        done
 	done
 
-	####################################################################################################
-	# Creating files for alignment comparison
-	#FIND THE CORRECT SEQUENCES TO BLAST AGAINST THE TRUE GENOME SEQUENCES
-	#TODO: the semi-hardcoding of file name based on structure isnt good coding and needs to be changed
+	snippy_seqs=$(ls $outdir/$snippy_basecall/sep_loci/individual_tax)
+	rapup_seqs=$(ls $outdir/$rapup_basecall/sep_loci/individual_tax)
+	gon_phyling_seqs=$(ls $outdir/$gon_phy_basecall/sep_loci/individual_tax)
 
-	touch ${outdir}/${snippy_basecall}/snippy_alignment_runs.txt
-
-	cd ${outdir}/${snippy_basecall}/sep_loci/individual_tax
-
-	## SNIPPY TO GON_PHYLING COMPARISON
-	printf "\nSnippy-Gon_phyling Alignment Comparison\n"
-	for j in $(ls ${outdir}/trimmed_reads/spades_output/genomes_for_parsnp/*.fasta | sed -e 's/.fasta//g');
+	# MAKE BLAST DB FOR RAPUP AND SNIPPY SEQUENCES
+	for i in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax);
 	do
-		file_name=$(basename $j)
-		printf "\n$file_name\n"
-		for i in $(ls ${outdir}/${snippy_basecall}/sep_loci/individual_tax);
-		do
-			seq_grep=$( echo $i | grep -o "$file_name$")
-			if [ ! -z "$seq_grep" ];
-			then
-				printf "\nFOUND A MATCH BETWEEN A SNIPPY SEQUENCE AND GON_PHYLING SEQUENCE\n"
-
-				printf "\nSnippy seq = $i\n"
-				printf "\nGon_phyling seq = $j\n"
-				# printf "\nvar seq_name = $seq_name\n"
-				printf "\n var seq_grep = $seq_grep\n"
-
-				${program_path}/empirical_data_comparison/emp_seq_producer.py --align ${outdir}/${snippy_basecall}/sep_loci/individual_tax/$i --output_align_stub $seq_grep
-
-
-				cat ${seq_grep}-complement.fasta <(echo) $j.fasta > combine-${seq_grep}-complement.fasta
-				cat ${seq_grep}-reverse_complement.fasta <(echo) $j.fasta > combine-${seq_grep}-reverse_complement.fasta
-				cat ${seq_grep}-reverse.fasta <(echo) $j.fasta > combine-${seq_grep}-reverse.fasta
-				cat $i <(echo) $j.fasta > combine-${seq_grep}-original.fasta
-
-				mafft --thread $align_threads combine-${seq_grep}-complement.fasta > aligned_combine-${seq_grep}-complement.fasta
-				mafft --thread $align_threads combine-${seq_grep}-reverse_complement.fasta > aligned_combine-${seq_grep}-reverse_complement.fasta
-				mafft --thread $align_threads combine-${seq_grep}-reverse.fasta > aligned_combine-${seq_grep}-reverse.fasta
-				mafft --thread $align_threads combine-${seq_grep}-original.fasta > aligned_combine-${seq_grep}-original.fasta
-
-				${program_path}/empirical_data_comparison/emp_align_compare.py --align_1 aligned_combine-${seq_grep}-reverse_complement.fasta --align_2 aligned_combine-${seq_grep}-complement.fasta --align_3 aligned_combine-${seq_grep}-reverse.fasta --align_4 aligned_combine-${seq_grep}-original.fasta --output_stub ${outdir}/${snippy_basecall}/basecall_results/basecall_results-${seq_grep}-.txt
-
-			fi
-		done
+		makeblastdb -in $outdir/$snippy_basecall/sep_loci/individual_tax/$i -dbtype nucl -parse_seqids
 	done
 
-	cd $outdir
-
-
-	## RAPUP TO GON_PHYLING COMPARISON
-	printf "\nRapUp-Gon_phyling Alignment Comparison\n"
-
-	touch ${outdir}/${rapup_basecall}/rapup_alignment_runs.txt
-
-	cd $outdir/$rapup_basecall/sep_loci/individual_tax
-
-	for j in $(ls $outdir/$gon_phy_basecall/sep_loci/individual_tax | sed -e 's/.ref//g');
+	for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax);
 	do
-			seq_name=$(head -1 $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j | grep ">" | sed -e 's/>//g' | sed -e 's/.ref//g')
-	        file_name=$(basename $j)
-
-	        for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax);
-	        	do
-
-				# printf "\ncluster1\n"
-				cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
-				# printf "\ncluster2\n"
-				cluster_2_grep=$( echo $j | grep -Eo 'cluster[0-9]+')
-				# printf "\nseq name\n"
-				seq_grep=$( echo $i | grep -Eo "\-$seq_name$")
-
-				# echo "$seq_name"      
-				# # echo "$i"
-				# # echo "$j"
-				# # echo "$file_name"
-				# echo " "
-
-				if [ ! -z "$seq_grep" ] && [ $cluster_grep == $cluster_2_grep ];
-	                then
-	                        printf "\nFOUND A MATCH BETWEEN A RAPUP SEQUENCE AND GON_PHYLING SEQUENCE\n"
-
-							printf "\nRapup seq = $i\n"
-							printf "\nGon_phyling seq = $j\n"
-							printf "\nvar seq_name = $seq_name\n"
-							printf "\n var seq_grep = $seq_grep\n"
-
-
-	                        $program_path/empirical_data_comparison/emp_seq_producer.py --align $outdir/$rapup_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
-
-							# head "$outdir/$gon_phy_basecall/sep_loci/individual_tax/$j"
-							# head "$i"
-
-	                        cat $cluster_grep-$seq_grep-complement.fasta <(echo) $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j > combine-$cluster_grep-$seq_grep-complement.fasta
-	                        cat $cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-	                        cat $cluster_grep-$seq_grep-reverse.fasta <(echo) $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j > combine-$cluster_grep-$seq_grep-reverse.fasta
-	                        cat $i <(echo) $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j > combine-$cluster_grep-$seq_grep-original.fasta
-
-	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
-	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
-	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
-
-	                        #Perform basecall comparison on all method sequences with the sequence that produced the reads
-	                        $program_path/empirical_data_comparison/emp_align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$rapup_basecall/basecall_results/basecall_results-$cluster_grep-$seq_grep-.txt	
-
-	                fi
-	        done
+		makeblastdb -in $outdir/$rapup_basecall/sep_loci/individual_tax/$i -dbtype nucl -parse_seqids
 	done
 
-	cd $outdir
-
-
-	#SNIPPY TO RAPUP COMPARISON
-	printf "\nRapUp-Snippy Alignment Comparison\n"
-
-	# touch $outdir/$rapup_basecall/rapup_alignment_runs.txt
-
-	cd $outdir/$snippy_rapup_basecall/sep_loci/individual_tax
-
-	for j in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax/single_tax_snippy-core* | sed -e 's/.ref//g');
+	printf "\nBeginning actual blasting to find matching seqs regardless of names\n"
+	printf "\n$gon_phyling_seqs\n"
+	# BLAST PERFORMED TO FIND HIGHEST MATCHING SEQUENCE
+	for i in ${gon_phyling_seqs};
 	do
-			seq_name=$(head -1 $j | grep ">" | sed -e 's/>//g' | sed -e 's/.ref//g')
-	        file_name=$(basename $j)
-
-	        for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax/single_tax_rapup-*);
-	        	do
-
-				# printf "\ncluster1\n"
-				cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
-				# printf "\ncluster2\n"
-				# cluster_2_grep=$( echo $j | grep -Eo 'cluster[0-9]+')
-				# printf "\nseq name\n"
-				seq_grep=$( echo $i | grep -Eo "\-$seq_name$")
-
-				# echo "$seq_name"      
-				# # echo "$i"
-				# # echo "$j"
-				# # echo "$file_name"
-				# echo " "
-
-				if [ ! -z "$seq_grep" ];
-	                then
-	                        printf "\nFOUND A MATCH BETWEEN A RAPUP SEQUENCE AND SNIPPY GENOME\n"
-							printf "\nRapup seq = $i\n"
-							printf "\nSnippy seq = $j\n"
-							printf "\nvar seq_name = $seq_name\n"
-							printf "\n var seq_grep = $seq_grep\n"
-
-	                        # $program_path/empirical_data_comparison/emp_seq_producer.py --align $outdir/$rapup_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
-
-							# head "$outdir/$gon_phy_basecall/sep_loci/individual_tax/$j"
-							# head "$i"
-
-	                        cat $outdir/$rapup_basecall/sep_loci/individual_tax/$cluster_grep-$seq_grep-complement.fasta <(echo) $j > combine-$cluster_grep-$seq_grep-complement.fasta
-	                        cat $outdir/$rapup_basecall/sep_loci/individual_tax/$cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $j > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-	                        cat $outdir/$rapup_basecall/sep_loci/individual_tax/$cluster_grep-$seq_grep-reverse.fasta <(echo) $j > combine-$cluster_grep-$seq_grep-reverse.fasta
-	                        cat $i <(echo) $j > combine-$cluster_grep-$seq_grep-original.fasta
-
-	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
-	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
-	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
-	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
-
-	                        #Perform basecall comparison on all method sequences with the sequence that produced the reads
-	                        $program_path/empirical_data_comparison/emp_align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$snippy_rapup_basecall/basecall_results/basecall_results-$cluster_grep-$seq_grep-.txt	
-
-	                fi
-	        done
+		printf "\n$i\n"
+		blastn \
+		-db $j.fasta \
+		-query $outdir/$snippy_basecall/sep_loci/individual_tax/$i \
+		-out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out \
+		-max_hsps 1 \
+		-outfmt 5
 	done
 
-	cd $outdir
-
-	mv ${outdir}/${rapup_basecall} ${outdir}/rapup_to_gon_phy_basecall
-	mv ${outdir}/${snippy_basecall} ${outdir}/snippy_to_gon_phy_basecall
-
-	# BOOTSTRAP RAPUP AND GONPHYLING FOR CONSENSUS TREE PRODUCTION
-	cd $outdir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/ 
-
-	raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.core_genome_run.out -n gon_phy_MR_CONS
-
-	cat RAxML_MajorityRuleConsensusTree.gon_phy_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_gon_phy_MR.tre
-
-	sed -i -e "s/;/:0.0;/g" fixed_gon_phy_MR.tre
-	sed -i -e 's/.ref//g' fixed_gon_phy_MR.tre
-
-	cd $outdir/rapup_run/combine_and_infer/
-
-	raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.consensusFULL_bootstrap -n rapup_MR_CONS
-
-	cat RAxML_MajorityRuleConsensusTree.rapup_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_rapup_MR.tre
-
-	sed -i -e "s/;/:0.0;/g" fixed_rapup_MR.tre
-
-	printf "\n$program_path\n"
 
 elif [ $basecall == "OFF" ]; then
-	printf "\nSKIPPING BASECALL SECTION OF PIPELINE PER USER SETTING\n"
+printf "\nSKIPPING BASECALL SECTION OF PIPELINE PER USER SETTING\n"
 
 fi
+
+
+
+
+
+
+
+
+
+
+
+
+#####################################################################################################
+####################################################################################################
+# BEFORE BLAST WAS ADDED BACK IN
+# OLD STUFF
+
+# 	mkdir $outdir/$rapup_basecall
+# 	mkdir $outdir/$snippy_basecall
+# 	mkdir $outdir/$gon_phy_basecall
+# 	mkdir $outdir/$snippy_rapup_basecall
+
+# 	mkdir $outdir/$rapup_basecall/basecall_results
+# 	mkdir $outdir/$snippy_basecall/basecall_results
+# 	mkdir $outdir/$gon_phy_basecall/basecall_results
+# 	mkdir $outdir/$snippy_rapup_basecall/basecall_results
+
+# 	mkdir $outdir/$snippy_rapup_basecall/sep_loci
+# 	mkdir $outdir/$snippy_rapup_basecall/sep_loci/individual_tax
+
+# 	#REPLACE THE term REFERENCE with the actual reference name in the snippy output alignment
+# 	printf "\nREPLACE SNIPPY REF\n"
+# 	sed -i -e 's/Reference/${ref_name}/g' $outdir/core.full.aln
+
+# 	${rapup_path}/modules/locus_position_identifier.py --out_file_dir ${outdir}/${rapup_basecall}/sep_loci --position_csv_file $loci_positions --concatenated_fasta ${outdir}/rapup_run/combine_and_infer/extended.aln
+# 	# ${rapup_path}/modules/locus_position_identifier.py --out_file_dir ${outdir}/${snippy_basecall}/sep_loci --position_csv_file $loci_positions --concatenated_fasta ${outdir}/core.full.aln
+# 	${rapup_path}/modules/locus_position_identifier.py --out_file_dir ${outdir}/${gon_phy_basecall}/sep_loci --position_csv_file $loci_positions --concatenated_fasta ${outdir}/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas
+
+# 	mkdir $outdir/$rapup_basecall/sep_loci/individual_tax
+# 	mkdir $outdir/$snippy_basecall/sep_loci/individual_tax
+# 	mkdir $outdir/$gon_phy_basecall/sep_loci/individual_tax
+
+# 	for j in $(ls ${outdir}/${gon_phy_basecall}/sep_loci/*.fasta);
+# 	do
+# 		for i in $(grep ">" $j | sed -e 's/>//g' | sed -e 's/.ref//g');
+# 		do
+# 			#printf "\n$j\n$i\n"
+# 			msa_file=$(basename $j | sed -e 's/.fasta//g')
+# 			#printf "\n$msa_file\n"
+# 			${rapup_path}/modules/ref_producer.py -s --align_file $j --out_file ${outdir}/${gon_phy_basecall}/sep_loci/individual_tax/single_tax_gon_phy-${msa_file}-${i} --ref_select $i
+# 		done
+# 	done
+
+# 	for j in $(ls ${outdir}/${rapup_basecall}/sep_loci/*.fasta);
+# 	do
+# 	        for i in $(grep ">" $j | sed -e 's/>//g' | sed -e 's/.ref//g');
+# 	        do
+# 	                #printf "\n$j\n$i\n"
+# 	                msa_file=$(basename $j | sed -e 's/.fasta//g')
+# 			#printf "\n$msa_file\n"
+# 	                ${rapup_path}/modules/ref_producer.py -s --align_file $j --out_file ${outdir}/${rapup_basecall}/sep_loci/individual_tax/single_tax_rapup-${msa_file}-${i} --ref_select $i
+# 	        done
+# 	done
+
+# 	#Create single taxa locus files for snippy output
+# 	for j in $(ls ${outdir}/core.full.aln);
+# 	#for j in $(ls $outdir/$snippy_basecall/sep_loci/*.fasta);
+# 	do
+# 	        for i in $(grep ">" $j | sed -e 's/>//g' | sed -e 's/.ref//g');
+# 	        do
+# 	                #printf "\n$j\n$i\n"
+# 	                msa_file=$(basename $j | sed -e 's/.fasta//g')
+# 			#printf "\n$msa_file\n"
+# 	                ${rapup_path}/modules/ref_producer.py -s --align_file $j --out_file ${outdir}/${snippy_basecall}/sep_loci/individual_tax/single_tax_snippy-${msa_file}-${i} --ref_select $i
+# 	        done
+# 	done
+
+# 	####################################################################################################
+# 	# Creating files for alignment comparison
+# 	#FIND THE CORRECT SEQUENCES TO BLAST AGAINST THE TRUE GENOME SEQUENCES
+# 	#TODO: the semi-hardcoding of file name based on structure isnt good coding and needs to be changed
+
+# 	touch ${outdir}/${snippy_basecall}/snippy_alignment_runs.txt
+
+# 	cd ${outdir}/${snippy_basecall}/sep_loci/individual_tax
+
+# 	## SNIPPY TO GON_PHYLING COMPARISON
+# 	printf "\nSnippy-Gon_phyling Alignment Comparison\n"
+# 	for j in $(ls ${outdir}/trimmed_reads/spades_output/genomes_for_parsnp/*.fasta | sed -e 's/.fasta//g');
+# 	do
+# 		file_name=$(basename $j)
+# 		printf "\n$file_name\n"
+# 		for i in $(ls ${outdir}/${snippy_basecall}/sep_loci/individual_tax);
+# 		do
+# 			seq_grep=$( echo $i | grep -o "$file_name$")
+# 			if [ ! -z "$seq_grep" ];
+# 			then
+# 				printf "\nFOUND A MATCH BETWEEN A SNIPPY SEQUENCE AND GON_PHYLING SEQUENCE\n"
+
+# 				printf "\nSnippy seq = $i\n"
+# 				printf "\nGon_phyling seq = $j\n"
+# 				# printf "\nvar seq_name = $seq_name\n"
+# 				printf "\n var seq_grep = $seq_grep\n"
+
+# 				${program_path}/empirical_data_comparison/emp_seq_producer.py --align ${outdir}/${snippy_basecall}/sep_loci/individual_tax/$i --output_align_stub $seq_grep
+
+
+# 				cat ${seq_grep}-complement.fasta <(echo) $j.fasta > combine-${seq_grep}-complement.fasta
+# 				cat ${seq_grep}-reverse_complement.fasta <(echo) $j.fasta > combine-${seq_grep}-reverse_complement.fasta
+# 				cat ${seq_grep}-reverse.fasta <(echo) $j.fasta > combine-${seq_grep}-reverse.fasta
+# 				cat $i <(echo) $j.fasta > combine-${seq_grep}-original.fasta
+
+# 				mafft --thread $align_threads combine-${seq_grep}-complement.fasta > aligned_combine-${seq_grep}-complement.fasta
+# 				mafft --thread $align_threads combine-${seq_grep}-reverse_complement.fasta > aligned_combine-${seq_grep}-reverse_complement.fasta
+# 				mafft --thread $align_threads combine-${seq_grep}-reverse.fasta > aligned_combine-${seq_grep}-reverse.fasta
+# 				mafft --thread $align_threads combine-${seq_grep}-original.fasta > aligned_combine-${seq_grep}-original.fasta
+
+# 				${program_path}/empirical_data_comparison/emp_align_compare.py --align_1 aligned_combine-${seq_grep}-reverse_complement.fasta --align_2 aligned_combine-${seq_grep}-complement.fasta --align_3 aligned_combine-${seq_grep}-reverse.fasta --align_4 aligned_combine-${seq_grep}-original.fasta --output_stub ${outdir}/${snippy_basecall}/basecall_results/basecall_results-${seq_grep}-.txt
+
+# 			fi
+# 		done
+# 	done
+
+# 	cd $outdir
+
+
+# 	## RAPUP TO GON_PHYLING COMPARISON
+# 	printf "\nRapUp-Gon_phyling Alignment Comparison\n"
+
+# 	touch ${outdir}/${rapup_basecall}/rapup_alignment_runs.txt
+
+# 	cd $outdir/$rapup_basecall/sep_loci/individual_tax
+
+# 	for j in $(ls $outdir/$gon_phy_basecall/sep_loci/individual_tax | sed -e 's/.ref//g');
+# 	do
+# 			seq_name=$(head -1 $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j | grep ">" | sed -e 's/>//g' | sed -e 's/.ref//g')
+# 	        file_name=$(basename $j)
+
+# 	        for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax);
+# 	        	do
+
+# 				# printf "\ncluster1\n"
+# 				cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
+# 				# printf "\ncluster2\n"
+# 				cluster_2_grep=$( echo $j | grep -Eo 'cluster[0-9]+')
+# 				# printf "\nseq name\n"
+# 				seq_grep=$( echo $i | grep -Eo "\-$seq_name$")
+
+# 				# echo "$seq_name"      
+# 				# # echo "$i"
+# 				# # echo "$j"
+# 				# # echo "$file_name"
+# 				# echo " "
+
+# 				if [ ! -z "$seq_grep" ] && [ $cluster_grep == $cluster_2_grep ];
+# 	                then
+# 	                        printf "\nFOUND A MATCH BETWEEN A RAPUP SEQUENCE AND GON_PHYLING SEQUENCE\n"
+
+# 							printf "\nRapup seq = $i\n"
+# 							printf "\nGon_phyling seq = $j\n"
+# 							printf "\nvar seq_name = $seq_name\n"
+# 							printf "\n var seq_grep = $seq_grep\n"
+
+
+# 	                        $program_path/empirical_data_comparison/emp_seq_producer.py --align $outdir/$rapup_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
+
+# 							# head "$outdir/$gon_phy_basecall/sep_loci/individual_tax/$j"
+# 							# head "$i"
+
+# 	                        cat $cluster_grep-$seq_grep-complement.fasta <(echo) $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j > combine-$cluster_grep-$seq_grep-complement.fasta
+# 	                        cat $cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+# 	                        cat $cluster_grep-$seq_grep-reverse.fasta <(echo) $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j > combine-$cluster_grep-$seq_grep-reverse.fasta
+# 	                        cat $i <(echo) $outdir/$gon_phy_basecall/sep_loci/individual_tax/$j > combine-$cluster_grep-$seq_grep-original.fasta
+
+# 	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
+# 	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+# 	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
+# 	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
+
+# 	                        #Perform basecall comparison on all method sequences with the sequence that produced the reads
+# 	                        $program_path/empirical_data_comparison/emp_align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$rapup_basecall/basecall_results/basecall_results-$cluster_grep-$seq_grep-.txt	
+
+# 	                fi
+# 	        done
+# 	done
+
+# 	cd $outdir
+
+
+# 	#SNIPPY TO RAPUP COMPARISON
+# 	printf "\nRapUp-Snippy Alignment Comparison\n"
+
+# 	# touch $outdir/$rapup_basecall/rapup_alignment_runs.txt
+
+# 	cd $outdir/$snippy_rapup_basecall/sep_loci/individual_tax
+
+# 	for j in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax/single_tax_snippy-core* | sed -e 's/.ref//g');
+# 	do
+# 			seq_name=$(head -1 $j | grep ">" | sed -e 's/>//g' | sed -e 's/.ref//g')
+# 	        file_name=$(basename $j)
+
+# 	        for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax/single_tax_rapup-*);
+# 	        	do
+
+# 				# printf "\ncluster1\n"
+# 				cluster_grep=$( echo $i | grep -Eo 'cluster[0-9]+')
+# 				# printf "\ncluster2\n"
+# 				# cluster_2_grep=$( echo $j | grep -Eo 'cluster[0-9]+')
+# 				# printf "\nseq name\n"
+# 				seq_grep=$( echo $i | grep -Eo "\-$seq_name$")
+
+# 				# echo "$seq_name"      
+# 				# # echo "$i"
+# 				# # echo "$j"
+# 				# # echo "$file_name"
+# 				# echo " "
+
+# 				if [ ! -z "$seq_grep" ];
+# 	                then
+# 	                        printf "\nFOUND A MATCH BETWEEN A RAPUP SEQUENCE AND SNIPPY GENOME\n"
+# 							printf "\nRapup seq = $i\n"
+# 							printf "\nSnippy seq = $j\n"
+# 							printf "\nvar seq_name = $seq_name\n"
+# 							printf "\n var seq_grep = $seq_grep\n"
+
+# 	                        # $program_path/empirical_data_comparison/emp_seq_producer.py --align $outdir/$rapup_basecall/sep_loci/individual_tax/$i --output_align_stub $cluster_grep-$seq_grep
+
+# 							# head "$outdir/$gon_phy_basecall/sep_loci/individual_tax/$j"
+# 							# head "$i"
+
+# 	                        cat $outdir/$rapup_basecall/sep_loci/individual_tax/$cluster_grep-$seq_grep-complement.fasta <(echo) $j > combine-$cluster_grep-$seq_grep-complement.fasta
+# 	                        cat $outdir/$rapup_basecall/sep_loci/individual_tax/$cluster_grep-$seq_grep-reverse_complement.fasta <(echo) $j > combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+# 	                        cat $outdir/$rapup_basecall/sep_loci/individual_tax/$cluster_grep-$seq_grep-reverse.fasta <(echo) $j > combine-$cluster_grep-$seq_grep-reverse.fasta
+# 	                        cat $i <(echo) $j > combine-$cluster_grep-$seq_grep-original.fasta
+
+# 	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-complement.fasta > aligned_combine-$cluster_grep-$seq_grep-complement.fasta
+# 	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse_complement.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta
+# 	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-reverse.fasta > aligned_combine-$cluster_grep-$seq_grep-reverse.fasta
+# 	                        mafft --thread $align_threads combine-$cluster_grep-$seq_grep-original.fasta > aligned_combine-$cluster_grep-$seq_grep-original.fasta
+
+# 	                        #Perform basecall comparison on all method sequences with the sequence that produced the reads
+# 	                        $program_path/empirical_data_comparison/emp_align_compare.py --align_1 aligned_combine-$cluster_grep-$seq_grep-reverse_complement.fasta --align_2 aligned_combine-$cluster_grep-$seq_grep-complement.fasta --align_3 aligned_combine-$cluster_grep-$seq_grep-reverse.fasta --align_4 aligned_combine-$cluster_grep-$seq_grep-original.fasta --output_stub $outdir/$snippy_rapup_basecall/basecall_results/basecall_results-$cluster_grep-$seq_grep-.txt	
+
+# 	                fi
+# 	        done
+# 	done
+
+# 	cd $outdir
+
+# 	mv ${outdir}/${rapup_basecall} ${outdir}/rapup_to_gon_phy_basecall
+# 	mv ${outdir}/${snippy_basecall} ${outdir}/snippy_to_gon_phy_basecall
+
+# 	# BOOTSTRAP RAPUP AND GONPHYLING FOR CONSENSUS TREE PRODUCTION
+# 	cd $outdir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/ 
+
+# 	raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.core_genome_run.out -n gon_phy_MR_CONS
+
+# 	cat RAxML_MajorityRuleConsensusTree.gon_phy_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_gon_phy_MR.tre
+
+# 	sed -i -e "s/;/:0.0;/g" fixed_gon_phy_MR.tre
+# 	sed -i -e 's/.ref//g' fixed_gon_phy_MR.tre
+
+# 	cd $outdir/rapup_run/combine_and_infer/
+
+# 	raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.consensusFULL_bootstrap -n rapup_MR_CONS
+
+# 	cat RAxML_MajorityRuleConsensusTree.rapup_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_rapup_MR.tre
+
+# 	sed -i -e "s/;/:0.0;/g" fixed_rapup_MR.tre
+
+# 	printf "\n$program_path\n"
+
+# elif [ $basecall == "OFF" ]; then
+# 	printf "\nSKIPPING BASECALL SECTION OF PIPELINE PER USER SETTING\n"
+
+# fi
 
 
 

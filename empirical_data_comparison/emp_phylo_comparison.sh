@@ -14,6 +14,7 @@ rapup_basecall=rapup_basecall
 snippy_basecall=snippy_basecall
 snippy_rapup_basecall=snip_rap_basecall
 short_ref=five_align
+snippy_reads=snippy_reads
 
 mkdir -p $outdir
 
@@ -21,18 +22,36 @@ printf "\n$outdir\n"
 
 cd $outdir
 
+mkdir $snippy_reads
 mkdir $gon_phy
 
 cd $gon_phy
 
 gon_phy_pwd=$(pwd)
 
+cd $outdir
+
+cd $snippy_reads
+snippy_reads_pwd=$(pwd)
+
+cd ${gon_phy_pwd}
+
+
+# Make folders holding reads for gon_phyling/rapup and Snippy
+# This folder is for gon_phyling and rapup
 ls ${master_reads}/*$r1_tail | sort -R > ${outdir}/taxa_list.txt
 
 for i in $(cat ${outdir}/taxa_list.txt);
 do
 	ln -s $i $gon_phy_pwd/
   	ln -s ${i%$r1_tail}$r2_tail $gon_phy_pwd/
+done
+
+# this folder is for Snippy
+for i in $(cat ${outdir}/taxa_list.txt);
+do
+	ln -s $i ${snippy_reads_pwd}/
+  	ln -s ${i%$r1_tail}$r2_tail ${snippy_reads_pwd}/
 done
 
 #CALL GON_PHYLING ON ALL TAXA READS
@@ -55,7 +74,9 @@ mkdir ${outdir}/${short_ref}
 
 for i in $(ls -1 ${gon_phy_pwd}/trimmed_reads/spades_output/genomes_for_parsnp/*.fasta | head -5);
 do
+	ref_read_names=$(basename $i .fasta)
 	cp ${i} ${outdir}/${short_ref}/
+	rm ${gon_phy_pwd}/*${ref_read_names}*
 	printf "\n${i}\n"
 done
 
@@ -70,7 +91,7 @@ snip_ref=$(ls -1 | head -1 | sed 's/.fasta//g')
 
 printf "\nref = $snip_ref\n"
 
-rm "${gon_phy_pwd}/$snip_ref"*
+# rm "${gon_phy_pwd}/$snip_ref"*
 
 ${rapup_path}/multi_map.sh \
 -a ${outdir}/${short_ref}/P*/parsnp.xmfa \
@@ -113,13 +134,15 @@ cp $snippy_ref $outdir/$update_dir/snippy_ref.fas
 touch ${update_dir}/snippy_run.tab
 
 #SET UP FOR SNIPPY MULTI-TAXON RUN
-for i in $(ls ${gon_phy_pwd}/*$r1_tail);
+for i in $(ls ${snippy_reads_pwd}/*$r1_tail);
 do
 	isolate_name=$(basename $i $r1_tail)
-	printf "$isolate_name"
-	printf "\n$i\n"
-	printf "\n${i%$r1_tail}$r2_tail\n"
-	echo "$isolate_name	$i	${i%$r1_tail}$r2_tail" >> ${update_dir}/snippy_run.tab
+	if [ $isolate_name != $snip_ref ]; then
+		printf "$isolate_name"
+		printf "\n$i\n"
+		printf "\n${i%$r1_tail}$r2_tail\n"
+		echo "$isolate_name	$i	${i%$r1_tail}$r2_tail" >> ${update_dir}/snippy_run.tab
+	fi
 
 done
 

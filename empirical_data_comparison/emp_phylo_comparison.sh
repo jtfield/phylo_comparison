@@ -257,6 +257,8 @@ if [ $basecall == "ON" ]; then
 	mkdir $outdir/$rapup_basecall/sep_loci/individual_tax
 	mkdir $outdir/$snippy_basecall/sep_loci/individual_tax
 	mkdir $outdir/$gon_phy_basecall/sep_loci/individual_tax
+	mkdir ${outdir}/${gon_phy_basecall}/chosen_loci
+	mkdir ${outdir}/${gon_phy_basecall}/chosen_loci/individual_tax
 
 	mkdir $outdir/$rapup_basecall/blast_results
 	mkdir $outdir/$snippy_basecall/blast_results
@@ -264,6 +266,7 @@ if [ $basecall == "ON" ]; then
 
 	mkdir $outdir/$gon_phy_basecall/match_finding_loci
 	mkdir $outdir/$gon_phy_basecall/loci_finding_results
+	mkdir $outdir/$gon_phy_basecall/matched_loci_results
 
 	ls ${outdir}/${gon_phy_basecall}/sep_loci/*.fasta | sort -R | head -20 > ${outdir}/${gon_phy_basecall}/loci_list.txt
 
@@ -306,7 +309,7 @@ if [ $basecall == "ON" ]; then
 	#IDENTIFY EACH GON_PHY LOCUS AND ANALYZE ALL BLAST ALIGNMENTS TO FIND THE BEST ALIGNMENT
 		${program_path}/empirical_data_comparison/emp_blast_matcher.py \
 		--input_folder ${outdir}/${gon_phy_basecall}/loci_finding_results \
-		--output_file ${outdir}/${gon_phy_basecall}/loci_finding_results/locus_file_matches.txt
+		--output_file ${outdir}/${gon_phy_basecall}/matched_loci_results/locus_file_matches_
 	
 	# SEPARATE EACH LOCUS ALIGNMENT INTO INDIVIDUAL SEQUENCES (SNIPPY SEQS STAY FULL SIZE)
 	for j in $(ls ${outdir}/${gon_phy_basecall}/sep_loci/*.fasta);
@@ -316,20 +319,24 @@ if [ $basecall == "ON" ]; then
 			#printf "\n$j\n$i\n"
 			msa_file=$(basename $j | sed -e 's/.fasta//g')
 			#printf "\n$msa_file\n"
-			${rapup_path}/modules/ref_producer.py -s --align_file $j --out_file ${outdir}/${gon_phy_basecall}/sep_loci/individual_tax/single_tax_gon_phy-${msa_file}-${i} --ref_select $i
+			${rapup_path}/modules/ref_producer.py \
+			-s \
+			--align_file $j \
+			--out_file ${outdir}/${gon_phy_basecall}/sep_loci/individual_tax/single_tax_gon_phy-${msa_file}-${i} \
+			--ref_select $i
 		done
 	done
 
-	for j in $(ls ${outdir}/${rapup_basecall}/sep_loci/*.fasta);
-	do
-	        for i in $(grep ">" $j | sed -e 's/>//g' | sed -e 's/.ref//g');
-	        do
-	                #printf "\n$j\n$i\n"
-	                msa_file=$(basename $j | sed -e 's/.fasta//g')
-			#printf "\n$msa_file\n"
-	                ${rapup_path}/modules/ref_producer.py -s --align_file $j --out_file ${outdir}/${rapup_basecall}/sep_loci/individual_tax/single_tax_rapup-${msa_file}-${i} --ref_select $i
-	        done
-	done
+	# for j in $(ls ${outdir}/${rapup_basecall}/sep_loci/*.fasta);
+	# do
+	#         for i in $(grep ">" $j | sed -e 's/>//g' | sed -e 's/.ref//g');
+	#         do
+	#                 #printf "\n$j\n$i\n"
+	#                 msa_file=$(basename $j | sed -e 's/.fasta//g')
+	# 		#printf "\n$msa_file\n"
+	#                 ${rapup_path}/modules/ref_producer.py -s --align_file $j --out_file ${outdir}/${rapup_basecall}/sep_loci/individual_tax/single_tax_rapup-${msa_file}-${i} --ref_select $i
+	#         done
+	# done
 
 	#Create single taxa locus files for snippy output
 	for j in $(ls ${outdir}/core.full.aln);
@@ -340,7 +347,10 @@ if [ $basecall == "ON" ]; then
 	                #printf "\n$j\n$i\n"
 	                msa_file=$(basename $j | sed -e 's/.fasta//g')
 			#printf "\n$msa_file\n"
-	                ${rapup_path}/modules/ref_producer.py -s --align_file $j --out_file ${outdir}/${snippy_basecall}/sep_loci/individual_tax/single_tax_snippy-${msa_file}-${i} --ref_select $i
+	                ${rapup_path}/modules/ref_producer.py \
+					-s --align_file $j \
+					--out_file ${outdir}/${snippy_basecall}/sep_loci/individual_tax/single_tax_snippy-${msa_file}-${i} \
+					--ref_select $i
 	        done
 	done
 
@@ -350,10 +360,51 @@ if [ $basecall == "ON" ]; then
 
 	# NOW MAKE THE ACTUAL ALIGNMENTS AND COMPARISONS
 	# BETWEEN RAPUP AND GON_PHYLING FIRST
-	for i in $(cat ${outdir}/${gon_phy_basecall}/loci_list.txt);
+	for j in $(cat ${outdir}/${gon_phy_basecall}/loci_list.txt);
 	do
-		locus=$(basename ${i} | sed 's/.fasta//g')
+		# locus=$(basename ${j} | sed 's/.fasta//g')
+		msa_file=$(basename ${j} | sed -e 's/.fasta//g')
+		ln -s ${j} ${outdir}/${gon_phy_basecall}/chosen_loci/
+		for i in $(grep ">" $j | sed -e 's/>//g' | sed -e 's/.ref//g');
+		do
+			#printf "\n$j\n$i\n"
+			# msa_file=$(basename $j | sed -e 's/.fasta//g')
+			#printf "\n$msa_file\n"
+			${rapup_path}/modules/ref_producer.py \
+			-s \
+			--align_file $j \
+			--out_file ${outdir}/${gon_phy_basecall}/chosen_loci/individual_tax/single_tax_gon_phy-${msa_file}-${i} \
+			--ref_select $i
+		done
 	done
+
+	for file in $(ls -1 ${outdir}/${gon_phy_basecall}/matched_loci_results/);
+	do
+		gon_phy_locus=$(head -1 ${outdir}/${gon_phy_basecall}/matched_loci_results/$file | sed 's/single_tax_gon_phy-//g')
+		rapup_locus=$(tail -1 ${outdir}/${gon_phy_basecall}/matched_loci_results/$file | \
+		sed 's/\/home\/vortacs\/git-repos\/phylo_comparison\/multi_method_basecall_check\/emp_test\/output\/rapup_basecall\/sep_loci\///g'| \
+		sed 's/.fasta//g')
+		echo $gon_phy_locus
+		echo $rapup_locus
+		if [ $gon_phy_locus == $rapup_locus ];
+		then
+			echo "WAFFLE"
+		else
+			echo "NO WAFFLE"
+		fi
+	done
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	# # MAKE BLAST DB FOR RAPUP AND SNIPPY SEQUENCES

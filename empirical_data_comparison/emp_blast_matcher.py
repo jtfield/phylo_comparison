@@ -85,15 +85,18 @@ def main():
 
     print(locus_match_dict)
 
-    output = open(args.output_file, 'w')
+    # output = open(args.output_file, 'w')
     # output.write()
+    locus_count = 0
     for key, value in locus_match_dict.items():
+        locus_count+=1
+        output = open(args.output_file + str(locus_count) + '.txt', 'w')
         output.write(key)
-        output.write('\t')
-        output.write(value)
         output.write('\n')
+        output.write(value)
+        # output.write('\n')
 
-    output.close() 
+        output.close() 
         
         
     print("DONE")

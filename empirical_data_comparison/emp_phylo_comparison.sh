@@ -262,10 +262,52 @@ if [ $basecall == "ON" ]; then
 	mkdir $outdir/$snippy_basecall/blast_results
 	mkdir $outdir/$gon_phy_basecall/blast_results
 
-	mkdir $outdir/$rapup_basecall/blast_results
-	mkdir $outdir/$snippy_basecall/blast_results
-	mkdir $outdir/$gon_phy_basecall/blast_results
+	mkdir $outdir/$gon_phy_basecall/match_finding_loci
+	mkdir $outdir/$gon_phy_basecall/loci_finding_results
 
+	ls ${outdir}/${gon_phy_basecall}/sep_loci/*.fasta | sort -R | head -20 > ${outdir}/${gon_phy_basecall}/loci_list.txt
+
+	for i in $(cat ${outdir}/${gon_phy_basecall}/loci_list.txt);
+	do
+		cluster_name=$(basename ${i} | sed 's/.fasta//g')
+		printf "\n$i\n"
+		printf "\n$(basename $i)\n"
+		${rapup_path}/modules/ref_producer.py -r --align_file $i \
+		--out_file ${outdir}/${gon_phy_basecall}/match_finding_loci/single_tax_gon_phy-${cluster_name}
+	done
+
+	for i in $(ls $outdir/$rapup_basecall/sep_loci/*.fasta);
+	# for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax);
+	do
+		# makeblastdb -in $outdir/$rapup_basecall/sep_loci/individual_tax/$i -dbtype nucl -parse_seqids
+		makeblastdb -in $i -dbtype nucl -parse_seqids
+	done
+
+	# BLAST THE SELECTED GON_PHYLING LOCI AGAINST THE RAPUP ALIGNMENTS
+	# TO FIND THE MATCHING RAPUP LOCUS
+	for i in $(ls ${outdir}/${gon_phy_basecall}/match_finding_loci/);
+	do
+		gon_phy_seq=$(basename $i | sed 's/.fasta//g')
+		gon_phy_seq_path=$(realpath $i)
+		for j in $(ls ${outdir}/${rapup_basecall}/sep_loci/*.fasta);
+		do
+			echo "${i}"
+			echo "${j}"
+			rapup_file=$(basename $j | sed 's/.fasta//g')
+			blastn \
+			-db $j \
+			-query ${outdir}/${gon_phy_basecall}/match_finding_loci/$i \
+			-out $outdir/$gon_phy_basecall/loci_finding_results/blast_output_${rapup_file}-${gon_phy_seq}.out \
+			-max_hsps 1 \
+			-outfmt 5
+		done
+	done
+
+	#IDENTIFY EACH GON_PHY LOCUS AND ANALYZE ALL BLAST ALIGNMENTS TO FIND THE BEST ALIGNMENT
+		${program_path}/empirical_data_comparison/emp_blast_matcher.py \
+		--input_folder ${outdir}/${gon_phy_basecall}/loci_finding_results \
+		--output_file ${outdir}/${gon_phy_basecall}/loci_finding_results/locus_file_matches.txt
+	
 	# SEPARATE EACH LOCUS ALIGNMENT INTO INDIVIDUAL SEQUENCES (SNIPPY SEQS STAY FULL SIZE)
 	for j in $(ls ${outdir}/${gon_phy_basecall}/sep_loci/*.fasta);
 	do
@@ -306,30 +348,43 @@ if [ $basecall == "ON" ]; then
 	rapup_seqs=$(ls $outdir/$rapup_basecall/sep_loci/individual_tax)
 	gon_phyling_seqs=$(ls $outdir/$gon_phy_basecall/sep_loci/individual_tax)
 
-	# MAKE BLAST DB FOR RAPUP AND SNIPPY SEQUENCES
-	for i in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax);
+	# NOW MAKE THE ACTUAL ALIGNMENTS AND COMPARISONS
+	# BETWEEN RAPUP AND GON_PHYLING FIRST
+	for i in $(cat ${outdir}/${gon_phy_basecall}/loci_list.txt);
 	do
-		makeblastdb -in $outdir/$snippy_basecall/sep_loci/individual_tax/$i -dbtype nucl -parse_seqids
+		locus=$(basename ${i} | sed 's/.fasta//g')
 	done
 
-	for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax);
-	do
-		makeblastdb -in $outdir/$rapup_basecall/sep_loci/individual_tax/$i -dbtype nucl -parse_seqids
-	done
 
-	printf "\nBeginning actual blasting to find matching seqs regardless of names\n"
-	printf "\n$gon_phyling_seqs\n"
-	# BLAST PERFORMED TO FIND HIGHEST MATCHING SEQUENCE
-	for i in ${gon_phyling_seqs};
-	do
-		printf "\n$i\n"
-		blastn \
-		-db $j.fasta \
-		-query $outdir/$snippy_basecall/sep_loci/individual_tax/$i \
-		-out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out \
-		-max_hsps 1 \
-		-outfmt 5
-	done
+	# # MAKE BLAST DB FOR RAPUP AND SNIPPY SEQUENCES
+	# for i in $(ls $outdir/$snippy_basecall/sep_loci/individual_tax);
+	# do
+	# 	makeblastdb -in $outdir/$snippy_basecall/sep_loci/individual_tax/$i -dbtype nucl -parse_seqids
+	# done
+
+	# for i in $(ls $outdir/$rapup_basecall/sep_loci/*.fasta);
+	# # for i in $(ls $outdir/$rapup_basecall/sep_loci/individual_tax);
+	# do
+	# 	# makeblastdb -in $outdir/$rapup_basecall/sep_loci/individual_tax/$i -dbtype nucl -parse_seqids
+	# 	makeblastdb -in $outdir/$rapup_basecall/sep_loci/$i -dbtype nucl -parse_seqids
+	# done
+
+	# printf "\nBeginning actual blasting to find matching seqs regardless of names\n"
+	# printf "\n$gon_phyling_seqs\n"
+	
+	# # MAKE LIST OF LOCI FOR ALIGNMENT AND BASECALL ASSESSMENT
+	# ls ${gon_phyling_seqs} | sort -R | head -20 > ${outdir}/taxa_list.txt
+
+	# for i in ${gon_phyling_seqs};
+	# do
+	# 	printf "\n$i\n"
+	# 	blastn \
+	# 	-db $j.fasta \
+	# 	-query $outdir/$snippy_basecall/sep_loci/individual_tax/$i \
+	# 	-out $outdir/$snippy_basecall/blast_results/blast_output_$cluster_grep-$file_name-$seq_grep.out \
+	# 	-max_hsps 1 \
+	# 	-outfmt 5
+	# done
 
 
 elif [ $basecall == "OFF" ]; then

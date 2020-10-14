@@ -427,14 +427,19 @@ if [ $basecall == "ON" ]; then
 	# USE SINGLE SEQ FILES FROM GON_PHY AND RAPUP TO ALIGN TO SNIPPY SEQS
 
 	$program_path/empirical_data_comparison/emp_snippy_seq_matcher.py \
-	--folder_1 ${outdir}/${rapup_basecall}/chosen_loci/individual_tax \
-	--folder_2 $outdir/$snippy_basecall/sep_loci/individual_tax \
-	--output_dir ${outdir}/rapup_to_snippy/align_files
+	--manipulate_seqs_folder ${outdir}/${rapup_basecall}/chosen_loci/individual_tax \
+	--ref_seqs_folder $outdir/$snippy_basecall/sep_loci/individual_tax \
+	--output_dir ${outdir}/rapup_to_snippy/align_files \
+	--output_align_stub snip_rap_
 
 
+	$program_path/empirical_data_comparison/emp_snippy_seq_matcher.py \
+	--manipulate_seqs_folder ${outdir}/${gon_phy_basecall}/chosen_loci/individual_tax \
+	--ref_seqs_folder $outdir/$snippy_basecall/sep_loci/individual_tax \
+	--output_dir ${outdir}/gon_phy_to_snippy/align_files \
+	--output_align_stub snip_gon_
 
-
-
+	
 
 
 

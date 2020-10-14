@@ -80,7 +80,7 @@ def main():
                     file_2_read = matching_file_2.read()
 
                     #Produce normal sequence
-                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '_' + tax_name + "-original.fasta", 'w+')
+                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--original.fasta", 'w+')
                     output_file.write(label)
                     output_file.write('\n')
                     output_file.write(str(main_short))
@@ -89,7 +89,7 @@ def main():
                     output_file.close()
 
                     #Produce reverse sequence
-                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '_' + tax_name + "-reverse.fasta", 'w+')
+                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--reverse.fasta", 'w+')
                     output_file.write(label)
                     output_file.write('\n')
                     output_file.write(str(short_reverse))
@@ -99,7 +99,7 @@ def main():
 
 
                     # Produce compliment sequence
-                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '_' + tax_name + "-complement.fasta", 'w+')
+                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--complement.fasta", 'w+')
                     output_file.write(label)
                     output_file.write('\n')
                     output_file.write(str(short_comp))
@@ -109,7 +109,7 @@ def main():
 
 
                     #Produce reverse complement sequence
-                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '_' + tax_name + "-reverse_complement.fasta", 'w+')
+                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--reverse_complement.fasta", 'w+')
                     output_file.write(label)
                     output_file.write('\n')
                     output_file.write(str(short_rev_comp))

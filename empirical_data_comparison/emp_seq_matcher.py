@@ -9,7 +9,8 @@ def parse_args():
     parser.add_argument('--folder_2')
     parser.add_argument('--cluster_id_1', default='')
     parser.add_argument('--cluster_id_2', default='')
-    parser.add_argument('--output_dir')
+    parser.add_argument('--output_dir', default='NONE')
+    parser.add_argument('--matched_seq_output_dir', default='NONE')
     return parser.parse_args()
 
 def main():
@@ -62,12 +63,23 @@ def main():
 
                         # print(file_1)
                         # print(file_2)
-                        output = open(args.output_dir + "combined_" + args.cluster_id_1 + "_" + args.cluster_id_2 + "_" + ''.join(find_name_1), 'w')
-                        output.write(file_1)
-                        output.write('\n')
-                        output.write(file_2)
-                        output.close()
-    
+                        if args.output_dir != "NONE":
+                            output = open(args.output_dir + "combined_" + args.cluster_id_1 + "_" + args.cluster_id_2 + "_" + ''.join(find_name_1), 'w')
+                            output.write(file_1)
+                            output.write('\n')
+                            output.write(file_2)
+                            output.close()
+
+    print("Outputting separate single tax files for second dataset")
+    for file_name in matching_folder_2_contents:
+        find_name_2 = re.findall(compile_cluster_2_name, file_name)
+        if find_name_2:
+            print(find_name_2)
+            if args.matched_seq_output_dir != "NONE":
+                output = open(args.matched_seq_output_dir + '/' + 'single_tax-' + args.cluster_id_2 + '--' + ''.join(find_name_2),'w')
+                file_2 = open(path_to_input_folder_2 + '/' + file_name,'r').read()
+                output.write(file_2)
+                output.close()
 
 if __name__ == '__main__':
     main()

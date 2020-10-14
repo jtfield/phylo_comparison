@@ -154,7 +154,7 @@ ${outdir}/runme.sh
 
 #REPLACE THE term REFERENCE with the actual reference name in the snippy output alignment
 printf "\nREPLACE SNIPPY REF\n"
-sed -i -e 's/Reference/${snip_ref}/g' $outdir/core.full.aln
+sed -i -e 's/Reference/'$snip_ref'/g' $outdir/core.full.aln
 
 # WARNING WARNING WARNING: THIS RAXML COMMAND IS WONKY AS FUCK
 #raxmlHPC-PTHREADS -m GTRGAMMA -T $threads -s $outdir/core.full.aln -p 12345 -n consensusFULL
@@ -271,6 +271,8 @@ if [ $basecall == "ON" ]; then
 	mkdir $outdir/$gon_phy_basecall/sep_loci/individual_tax
 	mkdir ${outdir}/${gon_phy_basecall}/chosen_loci
 	mkdir ${outdir}/${gon_phy_basecall}/chosen_loci/individual_tax
+	mkdir ${outdir}/${rapup_basecall}/chosen_loci
+	mkdir ${outdir}/${rapup_basecall}/chosen_loci/individual_tax
 
 	mkdir $outdir/$rapup_basecall/blast_results
 	mkdir $outdir/$snippy_basecall/blast_results
@@ -399,12 +401,19 @@ if [ $basecall == "ON" ]; then
 		echo $gon_phy_locus
 		echo $rapup_locus
 
+		# PROGRAM TAKES IN THE FOLDER OF SELECTED LOCI PRODUCED BY GON_PHYLING
+		# FOLDER OF ALL RAPUP PRODUCED LOCI
+		# THE NAME OF THE LOCUS FOR THE GON_PHYLING DATASET
+		# THE NAME OF THE LOCUS FOR THE RAPUP DATASET
+		# THE OUTPUT DIRECTORY FOR THE RESULTING COMBINED SEQUENCE FILES
+		# THE OUTPUT DIRECTORY FOR THE MATCHED RAPUP SINGLE SEQUENCE FILES FOR FURTHER ALIGNMENT TO SNIPPY SEQS
 		${program_path}/empirical_data_comparison/emp_seq_matcher.py \
 		--folder_1 ${outdir}/${gon_phy_basecall}/chosen_loci/individual_tax \
 		--folder_2 ${outdir}/${rapup_basecall}/sep_loci/individual_tax \
 		--cluster_id_1 $gon_phy_locus \
 		--cluster_id_2 $rapup_locus \
-		--output_dir $outdir/gon_phy_to_rapup/align_files/
+		--output_dir $outdir/gon_phy_to_rapup/align_files/ \
+		--matched_seq_output_dir ${outdir}/${rapup_basecall}/chosen_loci/individual_tax
 
 	done
 
@@ -414,7 +423,13 @@ if [ $basecall == "ON" ]; then
 
 	done
 
+	#####################################################################################################
+	# USE SINGLE SEQ FILES FROM GON_PHY AND RAPUP TO ALIGN TO SNIPPY SEQS
 
+	$program_path/empirical_data_comparison/emp_snippy_seq_matcher.py \
+	--folder_1 ${outdir}/${rapup_basecall}/chosen_loci/individual_tax \
+	--folder_2 $outdir/$snippy_basecall/sep_loci/individual_tax \
+	--output_dir ${outdir}/rapup_to_snippy/align_files
 
 
 

@@ -420,7 +420,10 @@ if [ $basecall == "ON" ]; then
 	for align_file in $(ls -1 $outdir/gon_phy_to_rapup/align_files);
 	do
 		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/$align_file > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${align_file}.fasta
-
+		${program_path}/empirical_data_comparison/emp_snippy_gapped_align_compared.py \
+		--align_1 ${outdir}/gon_phy_to_rapup/align_files/aligned_combine-${align_file}.fasta \
+		--output_dir ${outdir}/gon_phy_to_rapup/assessment_output \
+		--output_stub basecall_results-${align_file}.txt
 	done
 
 	#####################################################################################################
@@ -429,18 +432,56 @@ if [ $basecall == "ON" ]; then
 	$program_path/empirical_data_comparison/emp_snippy_seq_matcher.py \
 	--manipulate_seqs_folder ${outdir}/${rapup_basecall}/chosen_loci/individual_tax \
 	--ref_seqs_folder $outdir/$snippy_basecall/sep_loci/individual_tax \
-	--output_dir ${outdir}/rapup_to_snippy/align_files \
+	--align_output_dir ${outdir}/rapup_to_snippy/align_files \
+	--list_output_dir ${outdir}/rapup_to_snippy \
 	--output_align_stub snip_rap_
 
 
 	$program_path/empirical_data_comparison/emp_snippy_seq_matcher.py \
 	--manipulate_seqs_folder ${outdir}/${gon_phy_basecall}/chosen_loci/individual_tax \
 	--ref_seqs_folder $outdir/$snippy_basecall/sep_loci/individual_tax \
-	--output_dir ${outdir}/gon_phy_to_snippy/align_files \
+	--align_output_dir ${outdir}/gon_phy_to_snippy/align_files \
+	--list_output_dir ${outdir}/gon_phy_to_snippy \
 	--output_align_stub snip_gon_
 
 	
+	for tax_name in $(cat ${outdir}/gon_phy_to_snippy/taxa_list.txt);
+	do
+		for locus in $(cat ${outdir}/gon_phy_to_snippy/loci_list.txt);
+		do
+			mafft --thread $align_threads ${outdir}/gon_phy_to_snippy/align_files/snip_gon__${locus}--${tax_name}--complement.fasta > ${outdir}/gon_phy_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-complement.fasta
+			mafft --thread $align_threads ${outdir}/gon_phy_to_snippy/align_files/snip_gon__${locus}--${tax_name}--reverse_complement.fasta > ${outdir}/gon_phy_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-reverse_complement.fasta
+			mafft --thread $align_threads ${outdir}/gon_phy_to_snippy/align_files/snip_gon__${locus}--${tax_name}--reverse.fasta > ${outdir}/gon_phy_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-reverse.fasta
+			mafft --thread $align_threads ${outdir}/gon_phy_to_snippy/align_files/snip_gon__${locus}--${tax_name}--original.fasta > ${outdir}/gon_phy_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-original.fasta
 
+			${program_path}/empirical_data_comparison/emp_align_compare.py \
+			--align_1 ${outdir}/gon_phy_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-reverse_complement.fasta \
+			--align_2 ${outdir}/gon_phy_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-complement.fasta \
+			--align_3 ${outdir}/gon_phy_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-reverse.fasta \
+			--align_4 ${outdir}/gon_phy_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-original.fasta \
+			--output_stub ${outdir}/gon_phy_to_snippy/assessment_output/basecall_results-${locus}--${tax_name}-.txt
+		done
+		wait
+	done
+
+for tax_name in $(cat ${outdir}/rapup_to_snippy/taxa_list.txt);
+	do
+		for locus in $(cat ${outdir}/rapup_to_snippy/loci_list.txt);
+		do
+			mafft --thread $align_threads ${outdir}/rapup_to_snippy/align_files/snip_rap__${locus}--${tax_name}--complement.fasta > ${outdir}/rapup_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-complement.fasta
+			mafft --thread $align_threads ${outdir}/rapup_to_snippy/align_files/snip_rap__${locus}--${tax_name}--reverse_complement.fasta > ${outdir}/rapup_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-reverse_complement.fasta
+			mafft --thread $align_threads ${outdir}/rapup_to_snippy/align_files/snip_rap__${locus}--${tax_name}--reverse.fasta > ${outdir}/rapup_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-reverse.fasta
+			mafft --thread $align_threads ${outdir}/rapup_to_snippy/align_files/snip_rap__${locus}--${tax_name}--original.fasta > ${outdir}/rapup_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-original.fasta
+
+			${program_path}/empirical_data_comparison/emp_align_compare.py \
+			--align_1 ${outdir}/rapup_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-reverse_complement.fasta \
+			--align_2 ${outdir}/rapup_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-complement.fasta \
+			--align_3 ${outdir}/rapup_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-reverse.fasta \
+			--align_4 ${outdir}/rapup_to_snippy/align_files/aligned_combine-${locus}--${tax_name}-original.fasta \
+			--output_stub ${outdir}/rapup_to_snippy/assessment_output/basecall_results-${locus}--${tax_name}-.txt
+		done
+		wait
+	done
 
 
 

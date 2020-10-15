@@ -13,6 +13,7 @@ def parse_args():
     #parser.add_argument('--align_3')
     #parser.add_argument('--align_4')
     parser.add_argument('--output_stub', nargs='?', type=str, default="NONE")
+    parser.add_argument('--output_dir', nargs='?', type=str, default="NONE")
     #parser.add_argument('--output_miscalls', nargs='?', type=str, default="NONE")
     #parser.add_argument('--orientation', nargs='?', type=str, default="NONE")
     return parser.parse_args()
@@ -233,7 +234,7 @@ def main():
     #compare_identical_nucs = [compare_seqs_1[0], compare_seqs_2[0], compare_seqs_3[0], compare_seqs_4[0]]
     #best_align = max(compare_identical_nucs)
 
-    output_file = open(args.output_stub, 'w')
+    output_file = open(args.output_dir + '/' + args.output_stub, 'w')
 #    
 #    if best_align == compare_seqs_1[0]:
     output_file.write(args.align_1)

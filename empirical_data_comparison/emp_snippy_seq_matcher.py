@@ -12,7 +12,8 @@ def parse_args():
     parser.add_argument('--output_align_stub')
     # parser.add_argument('--cluster_id_1', default='')
     # parser.add_argument('--cluster_id_2', default='')
-    parser.add_argument('--output_dir')
+    parser.add_argument('--align_output_dir')
+    parser.add_argument('--list_output_dir')
     # parser.add_argument('--matched_seq_output_dir')
     return parser.parse_args()
 
@@ -32,6 +33,9 @@ def main():
     print(input_folder_contents_2)
     print(path_to_input_folder_1)
     print(path_to_input_folder_2)
+
+    list_of_loci = []
+    list_of_taxa = []
 
     for file_name in input_folder_contents_1:
         find_info = re.findall(compile_regex, file_name)
@@ -75,12 +79,16 @@ def main():
                 # print(file_name_2)
                 find_name = re.findall(compile_tax_name, file_name_2)
                 if find_name:
+                    
+                    list_of_loci.append(cluster)
+                    list_of_taxa.append(tax_name)
+
                     matching_file_2 = open(path_to_input_folder_2 + '/' + file_name_2,'r')
                     # file_1_read = matching_file_1.read()
                     file_2_read = matching_file_2.read()
 
                     #Produce normal sequence
-                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--original.fasta", 'w+')
+                    output_file = open(args.align_output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--original.fasta", 'w+')
                     output_file.write(label)
                     output_file.write('\n')
                     output_file.write(str(main_short))
@@ -89,7 +97,7 @@ def main():
                     output_file.close()
 
                     #Produce reverse sequence
-                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--reverse.fasta", 'w+')
+                    output_file = open(args.align_output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--reverse.fasta", 'w+')
                     output_file.write(label)
                     output_file.write('\n')
                     output_file.write(str(short_reverse))
@@ -99,7 +107,7 @@ def main():
 
 
                     # Produce compliment sequence
-                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--complement.fasta", 'w+')
+                    output_file = open(args.align_output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--complement.fasta", 'w+')
                     output_file.write(label)
                     output_file.write('\n')
                     output_file.write(str(short_comp))
@@ -109,7 +117,7 @@ def main():
 
 
                     #Produce reverse complement sequence
-                    output_file = open(args.output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--reverse_complement.fasta", 'w+')
+                    output_file = open(args.align_output_dir + '/' + args.output_align_stub + '_'+ cluster + '--' + tax_name + "--reverse_complement.fasta", 'w+')
                     output_file.write(label)
                     output_file.write('\n')
                     output_file.write(str(short_rev_comp))
@@ -117,6 +125,17 @@ def main():
                     output_file.write(file_2_read)
                     output_file.close()
 
+    output_names = open(args.list_output_dir + '/' + "taxa_list.txt", 'w')
+    for name in list_of_taxa:
+        output_names.write(name)
+        output_names.write('\n')
+    output_names.close
+
+    output_taxa = open(args.list_output_dir + '/' + "loci_list.txt", 'w')
+    for locus in list(set(list_of_loci)):
+        output_taxa.write(locus)
+        output_taxa.write('\n')
+    output_taxa.close
 
     # print(input_folder_contents_1)
     # print(input_folder_contents_2)

@@ -72,12 +72,27 @@ printf "\nGON_PHYLING STAGE COMPLETE\n"
 printf "\nBeginning small parsnp run for rapup reference.\n"
 mkdir ${outdir}/${short_ref}
 
-for i in $(ls -1 ${gon_phy_pwd}/trimmed_reads/spades_output/genomes_for_parsnp/*.fasta | head -5);
+snip_ref_file=$(echo "${snip_ref}.fasta")
+cp ${gon_phy_pwd}/trimmed_reads/spades_output/genomes_for_parsnp/${snip_ref_file} ${outdir}/${short_ref}/
+
+for i in $(ls -1 ${gon_phy_pwd}/trimmed_reads/spades_output/genomes_for_parsnp/*.fasta | head -4);
 do
 	ref_read_names=$(basename $i .fasta)
-	cp ${i} ${outdir}/${short_ref}/
-	rm ${gon_phy_pwd}/*${ref_read_names}*
-	printf "\n${i}\n"
+	if [[ $ref_read_names != ${snip_ref} ]];
+	then
+		cp ${i} ${outdir}/${short_ref}/
+		rm ${gon_phy_pwd}/*${ref_read_names}*
+		printf "\n${i}\n"
+	elif [[ $ref_read_names == ${snip_ref} ]];
+	then
+		echo "Skipping reference assembly as this should already be in the five_align folder"
+		replace_ref=$(ls -1 ${gon_phy_pwd}/trimmed_reads/spades_output/genomes_for_parsnp/*.fasta | tail -2 | head -1)
+		ref_read_name=$(basename $replace_ref .fasta)
+		cp ${replace_ref} ${outdir}/${short_ref}/
+		rm ${gon_phy_pwd}/*${ref_read_name}*
+		printf "\n${replace_ref}\n"
+
+	fi
 done
 
 cd ${outdir}/${short_ref}
@@ -87,7 +102,7 @@ parsnp -c -d ${outdir}/${short_ref} -r !
 sed -i 's/.fasta//g' ${outdir}/${short_ref}/P*/parsnp.xmfa
 sed -i 's/.ref//g' ${outdir}/${short_ref}/P*/parsnp.xmfa
 
-snip_ref=$(ls -1 | head -1 | sed 's/.fasta//g')
+# snip_ref=$(ls -1 | head -1 | sed 's/.fasta//g')
 
 printf "\nref = $snip_ref\n"
 
@@ -127,6 +142,8 @@ snippy_ref=${outdir}/gon_phyling_dir/trimmed_reads/spades_output/genomes_for_par
 printf "\n$snippy_ref\n"
 
 cp $snippy_ref $outdir/$update_dir/snippy_ref.fas
+
+# sed -i -e 's/>.+$/'$snip_ref'/g' $outdir/$update_dir/snippy_ref.fas
 
 #printf "\nBEGINNING REFERENCE SELECTION\n"
 #$rapup_path/modules/ref_producer.py -s --ref_select $selected_ref --align_file $gon_phy_pwd/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/combo.fas --out_file $outdir/$update_dir/alignment_ref.fas
@@ -221,7 +238,7 @@ cd $outdir
 ##############################################################################################
 # Seperating alignments into loci (if applicable) and individual taxa
 
-if [ $basecall == "ON" ]; then
+if [[ $basecall == "ON" ]]; then
 
 
 	mkdir $outdir/$rapup_basecall
@@ -517,7 +534,7 @@ for tax_name in $(cat ${outdir}/rapup_to_snippy/taxa_list.txt);
 	# done
 
 
-elif [ $basecall == "OFF" ]; then
+elif [[ $basecall == "OFF" ]]; then
 printf "\nSKIPPING BASECALL SECTION OF PIPELINE PER USER SETTING\n"
 
 fi

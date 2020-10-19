@@ -126,7 +126,7 @@ def main():
                     output_file.close()
 
     output_names = open(args.list_output_dir + '/' + "taxa_list.txt", 'w')
-    for name in list_of_taxa:
+    for name in list(set(list_of_taxa)):
         output_names.write(name)
         output_names.write('\n')
     output_names.close

@@ -279,12 +279,12 @@ if [[ $basecall == "ON" ]]; then
 	rm -r $outdir/gon_phy_to_rapup
 	rm -r $outdir/gon_phy_to_snippy
 	rm -r $outdir/rapup_to_snippy
-	rm -r $outdir/gon_phy_to_rapup/align_files
-	rm -r $outdir/gon_phy_to_snippy/align_files
-	rm -r $outdir/rapup_to_snippy/align_files
-	rm -r $outdir/gon_phy_to_rapup/assessment_output
-	rm -r $outdir/gon_phy_to_snippy/assessment_output
-	rm -r $outdir/rapup_to_snippy/assessment_output
+	# rm -r $outdir/gon_phy_to_rapup/align_files
+	# rm -r $outdir/gon_phy_to_snippy/align_files
+	# rm -r $outdir/rapup_to_snippy/align_files
+	# rm -r $outdir/gon_phy_to_rapup/assessment_output
+	# rm -r $outdir/gon_phy_to_snippy/assessment_output
+	# rm -r $outdir/rapup_to_snippy/assessment_output
 
 
 
@@ -387,7 +387,7 @@ if [[ $basecall == "ON" ]]; then
 			blastn \
 			-db $j \
 			-query ${outdir}/${gon_phy_basecall}/match_finding_loci/$i \
-			-out $outdir/$gon_phy_basecall/loci_finding_results/blast_output_${rapup_file}-${gon_phy_seq}.out \
+			-out ${outdir}/${gon_phy_basecall}/loci_finding_results/blast_output_${rapup_file}-${gon_phy_seq}.out \
 			-max_hsps 1 \
 			-outfmt 5
 		done
@@ -469,8 +469,9 @@ if [[ $basecall == "ON" ]]; then
 	do
 		gon_phy_locus=$(head -1 ${outdir}/${gon_phy_basecall}/matched_loci_results/$file | sed 's/single_tax_gon_phy-//g' | sed 's/-//g')
 		rapup_locus=$(tail -1 ${outdir}/${gon_phy_basecall}/matched_loci_results/$file | \
-		sed 's/\/home\/vortacs\/git-repos\/phylo_comparison\/multi_method_basecall_check\/emp_test\/output\/rapup_basecall\/sep_loci\///g'| \
 		sed 's/.fasta//g' | sed 's/-//g')
+		stripped_path_rapup_file=$(basename ${rapup_locus})
+		rapup_locus=${stripped_path_rapup_file}
 		echo $gon_phy_locus
 		echo $rapup_locus
 

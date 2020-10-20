@@ -467,9 +467,12 @@ if [[ $basecall == "ON" ]]; then
 
 	for file in $(ls -1 ${outdir}/${gon_phy_basecall}/matched_loci_results/);
 	do
-		gon_phy_locus=$(head -1 ${outdir}/${gon_phy_basecall}/matched_loci_results/$file | sed 's/single_tax_gon_phy-//g' | sed 's/-//g')
+		gon_phy_locus=$(head -1 ${outdir}/${gon_phy_basecall}/matched_loci_results/$file | \
+		sed 's/single_tax_gon_phy-//g' | sed 's/-//g')
+		
 		rapup_locus=$(tail -1 ${outdir}/${gon_phy_basecall}/matched_loci_results/$file | \
 		sed 's/.fasta//g' | sed 's/-//g')
+		
 		stripped_path_rapup_file=$(basename ${rapup_locus})
 		rapup_locus=${stripped_path_rapup_file}
 		echo $gon_phy_locus
@@ -491,14 +494,29 @@ if [[ $basecall == "ON" ]]; then
 
 	done
 
-	for align_file in $(ls -1 $outdir/gon_phy_to_rapup/align_files);
+	for i in $(cat $outdir/gon_phy_to_rapup/align_files/taxa_name_list.txt);
 	do
-		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/$align_file > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${align_file}.fasta
-		${program_path}/empirical_data_comparison/emp_snippy_gapped_align_compared.py \
-		--align_1 ${outdir}/gon_phy_to_rapup/align_files/aligned_combine-${align_file}.fasta \
-		--output_dir ${outdir}/gon_phy_to_rapup/assessment_output \
-		--output_stub basecall_results-${align_file}.txt
+		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_original_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-original.fasta
+		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_reverse_complement_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse_complement.fasta
+		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_reverse_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse.fasta
+		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_complement_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-complement.fasta
+
+		${program_path}/empirical_data_comparison/emp_align_compare.py \
+		--align_1 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse_complement.fasta \
+		--align_2 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-complement.fasta \
+		--align_3 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse.fasta \
+		--align_4 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-original.fasta \
+		--output_stub $outdir/gon_phy_to_rapup//assessment_output/basecall_results-${gon_phy_locus}-${rapup_locus}--${i}-.txt
+
 	done
+	# for align_file in $(ls -1 $outdir/gon_phy_to_rapup/align_files);
+	# do
+	# 	mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/$align_file > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${align_file}.fasta
+	# 	${program_path}/empirical_data_comparison/emp_snippy_gapped_align_compared.py \
+	# 	--align_1 ${outdir}/gon_phy_to_rapup/align_files/aligned_combine-${align_file}.fasta \
+	# 	--output_dir ${outdir}/gon_phy_to_rapup/assessment_output \
+	# 	--output_stub basecall_results-${align_file}.txt
+	# done
 
 	#####################################################################################################
 	# USE SINGLE SEQ FILES FROM GON_PHY AND RAPUP TO ALIGN TO SNIPPY SEQS

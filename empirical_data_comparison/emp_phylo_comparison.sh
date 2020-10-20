@@ -492,23 +492,40 @@ if [[ $basecall == "ON" ]]; then
 		--output_dir $outdir/gon_phy_to_rapup/align_files/ \
 		--matched_seq_output_dir ${outdir}/${rapup_basecall}/chosen_loci/individual_tax
 
+		for i in $(cat $outdir/gon_phy_to_rapup/align_files/taxa_name_list.txt);
+		do
+			mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_original_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-original.fasta
+			mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_reverse_complement_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse_complement.fasta
+			mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_reverse_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse.fasta
+			mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_complement_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-complement.fasta
+
+			${program_path}/empirical_data_comparison/emp_align_compare.py \
+			--align_1 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse_complement.fasta \
+			--align_2 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-complement.fasta \
+			--align_3 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse.fasta \
+			--align_4 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-original.fasta \
+			--output_stub $outdir/gon_phy_to_rapup//assessment_output/basecall_results-${gon_phy_locus}-${rapup_locus}--${i}-.txt
+
+		done
+		wait
+
 	done
 
-	for i in $(cat $outdir/gon_phy_to_rapup/align_files/taxa_name_list.txt);
-	do
-		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_original_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-original.fasta
-		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_reverse_complement_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse_complement.fasta
-		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_reverse_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse.fasta
-		mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_complement_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-complement.fasta
+	# for i in $(cat $outdir/gon_phy_to_rapup/align_files/taxa_name_list.txt);
+	# do
+	# 	mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_original_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-original.fasta
+	# 	mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_reverse_complement_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse_complement.fasta
+	# 	mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_reverse_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse.fasta
+	# 	mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/combined_complement_${gon_phy_locus}_${rapup_locus}--${i}-- > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-complement.fasta
 
-		${program_path}/empirical_data_comparison/emp_align_compare.py \
-		--align_1 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse_complement.fasta \
-		--align_2 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-complement.fasta \
-		--align_3 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse.fasta \
-		--align_4 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-original.fasta \
-		--output_stub $outdir/gon_phy_to_rapup//assessment_output/basecall_results-${gon_phy_locus}-${rapup_locus}--${i}-.txt
+	# 	${program_path}/empirical_data_comparison/emp_align_compare.py \
+	# 	--align_1 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse_complement.fasta \
+	# 	--align_2 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-complement.fasta \
+	# 	--align_3 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse.fasta \
+	# 	--align_4 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-original.fasta \
+	# 	--output_stub $outdir/gon_phy_to_rapup//assessment_output/basecall_results-${gon_phy_locus}-${rapup_locus}--${i}-.txt
 
-	done
+	# done
 	# for align_file in $(ls -1 $outdir/gon_phy_to_rapup/align_files);
 	# do
 	# 	mafft --thread $align_threads $outdir/gon_phy_to_rapup/align_files/$align_file > $outdir/gon_phy_to_rapup/align_files/aligned_combine-${align_file}.fasta

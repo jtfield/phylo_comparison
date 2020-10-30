@@ -3,19 +3,16 @@ import argparse
 import os
 import re
 import multiprocessing as mp
+from itertools import zip_longest
 #from Bio.Seq import Seq
 #from Bio.Alphabet import generic_dna
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--align_1')
-    #parser.add_argument('--align_2')
-    #parser.add_argument('--align_3')
-    #parser.add_argument('--align_4')
     parser.add_argument('--output_stub', nargs='?', type=str, default="NONE")
     parser.add_argument('--output_dir', nargs='?', type=str, default="NONE")
-    #parser.add_argument('--output_miscalls', nargs='?', type=str, default="NONE")
-    #parser.add_argument('--orientation', nargs='?', type=str, default="NONE")
+    parser.add_argument('-t', action='store_true', help='Toggles writing of output')
     return parser.parse_args()
 
 def alignment_fixer(read_file):
@@ -70,18 +67,71 @@ def trim_gaps(short_seq):
         #print("found leading")
         #print(find_leading)
         leading_gaps = len(find_leading[0])
-        print(leading_gaps)
+
+        print("leading gap size", leading_gaps)
     
     if compile_trailing_match:
         #print("found trailing")
         #print(find_trailing)
         trailing_gaps = len(find_trailing[0])
-        print(trailing_gaps)
+        print("trailing gap size", trailing_gaps)
 
     output.append(leading_gaps)
     output.append(trailing_gaps)
     
     return output
+
+def check_for_gaps(processed_seq, gaps, nucs):
+    
+    output = {}
+    gap_positions = []
+    nuc_positions = []
+    for num, nuc in enumerate(processed_seq):
+        if nuc.upper() in nucs:
+            nuc_positions.append(num)
+        elif nuc.upper() in gaps:
+            gap_positions.append(num)
+    contiguous_nucs = []
+    
+    num_gaps = len(gap_positions)
+    num_nucs = len(nuc_positions)
+
+    # check if the number of gaps in this sequence (hypothetically, the shorter sequence)
+    # is greater or equal to 30% of the total number of nucleotides
+    # if so, we've got a problem. Fix
+    contiguous_nucs.append(nuc_positions[0])
+    if num_gaps >= num_nucs * 0.3:
+        for num, pos in enumerate(nuc_positions[1:]):
+            num = num + 1
+            if pos == nuc_positions[num-1] + 1:
+                print(pos)
+            else:
+                contiguous_nucs.append(nuc_positions[num-1])
+                contiguous_nucs.append(nuc_positions[num])
+        contiguous_nucs.append(max(nuc_positions))
+        print(contiguous_nucs)
+        largest_group = 0
+        selected_group = []
+        for num, item in enumerate(grouper(contiguous_nucs,2)):
+            total_len = item[1] - item[0]
+            if total_len > largest_group:
+                largest_group = total_len
+                selected_group.append([item[0],item[1]])
+        print(selected_group[-1])
+        output['anomalies'] = selected_group[-1]
+        return output
+    
+    elif num_gaps < num_nucs * 0.3:
+        output['no_anomalies'] = 0
+        return output
+   
+
+
+def grouper(iterable, n, fillvalue=None):
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
+
+
     
 def check_alignment(list_of_paired_nucs):
     total_nucs = 0
@@ -134,6 +184,8 @@ def comparison(list_of_list_of_seqs):
 
     seq_1 = None
     seq_2 = None
+    gap_set = ['-','N']
+    nuc_set = ['A','C','G','T']
     seq_count = 0
     for list_of_seqs in list_of_list_of_seqs:
         seq_count+=1
@@ -148,8 +200,8 @@ def comparison(list_of_list_of_seqs):
     count_nucs_1 = nuc_counter(seq_1)
     count_nucs_2 = nuc_counter(seq_2)
     
-    #print(count_nucs_1)
-    #print(count_nucs_2)
+    # print(count_nucs_1)
+    # print(count_nucs_2)
     
     nuc_lens = [count_nucs_1, count_nucs_2]
     small_seq = min(nuc_lens)
@@ -188,7 +240,14 @@ def comparison(list_of_list_of_seqs):
         trimmed_longer = longer_seq[get_gaps[0]:]
     #print("waffle2")
 
-    #trimmed_longer = longer_seq[get_gaps[0]:-get_gaps[1]]
+    gap_test = check_for_gaps(trimmed_shorter,gap_set, nuc_set)
+    print(gap_test)
+    for key, value in gap_test.items():
+        if key != 'no_anomalies':
+            print('no anomalous spread of nucleotides found.')
+        elif key == 'anomalies':
+            print('problem found')
+            #TODO: add stuff here for handling of problem
     
     split_trimmed_short = list(trimmed_shorter)
     split_trimmed_long = list(trimmed_longer)
@@ -208,142 +267,48 @@ def main():
 
 
     align_1 = open(args.align_1,'r').read()
-    #align_2 = open(args.align_2,'r').read()
-    #align_3 = open(args.align_3,'r').read()
-    #align_4 = open(args.align_4,'r').read()
 
     # Organizes sequences and deals with newlines in the sequences if applicable
     parse_align_1 = alignment_fixer(align_1)
-    #print(parse_align_1)
-    #parse_align_2 = alignment_fixer(align_2)
-    #parse_align_3 = alignment_fixer(align_3)
-    #parse_align_4 = alignment_fixer(align_4)
-
-
+    
     compare_seqs_1 = comparison(parse_align_1)
-    #compare_seqs_2 = comparison(parse_align_2)
-    #compare_seqs_3 = comparison(parse_align_3)
-    #compare_seqs_4 = comparison(parse_align_4)
+    
     print("identical nucs", compare_seqs_1[0])
     print("non identical nucs", compare_seqs_1[1])
     print("gaps", compare_seqs_1[2])
-    #print("align 2", compare_seqs_2)
-    #print("align 3", compare_seqs_3)
-    #print("align 4", compare_seqs_4)
 
-    #compare_identical_nucs = [compare_seqs_1[0], compare_seqs_2[0], compare_seqs_3[0], compare_seqs_4[0]]
-    #best_align = max(compare_identical_nucs)
-
-    output_file = open(args.output_dir + '/' + args.output_stub, 'w')
+    if args.t == True:
+        output_file = open(args.output_dir + '/' + args.output_stub, 'w')
 #    
-#    if best_align == compare_seqs_1[0]:
-    output_file.write(args.align_1)
-    output_file.write("\n")
-    output_file.write(">identical_nucs")
-    output_file.write("\n")
-    output_file.write(str(compare_seqs_1[0]))
-    output_file.write("\n")
-    output_file.write(">non_identical_nucs")
-    output_file.write("\n")
-    output_file.write(str(compare_seqs_1[1]))
-    output_file.write("\n")
-    output_file.write(">gaps")
-    output_file.write("\n")
-    output_file.write(str(compare_seqs_1[2]))
-    output_file.write("\n")
-    output_file.write(">total_nucleotides")
-    output_file.write("\n")
-    output_file.write(str(compare_seqs_1[3]))
-    output_file.write("\n")
-    output_file.write(">identical_nucs_positions")
-    output_file.write("\n")
-    output_file.write(str(compare_seqs_1[4]))
-    output_file.write("\n")
-    output_file.write(">non_identical_nucs_positions")
-    output_file.write("\n")
-    output_file.write(str(compare_seqs_1[5]))
-    output_file.write("\n")
-    output_file.write(">gaps_positions")
-    output_file.write("\n")
-    output_file.write(str(compare_seqs_1[6]))
-
-
-#    elif best_align == compare_seqs_2[0]:
-#        output_file.write(args.align_2)
-#        output_file.write("\n")
-#        output_file.write(str(compare_seqs_2[0]))
-#        output_file.write("\n")
-#        output_file.write(str(compare_seqs_2[1]))
-#
-#    elif best_align == compare_seqs_3[0]:
-#        output_file.write(args.align_3)
-#        output_file.write("\n")
-#        output_file.write(str(compare_seqs_3[0]))
-#        output_file.write("\n")
-#        output_file.write(str(compare_seqs_3[1]))
-#
-#    elif best_align == compare_seqs_4[0]:
-#        output_file.write(args.align_4)
-#        output_file.write("\n")
-#        output_file.write(str(compare_seqs_4[0]))
-#        output_file.write("\n")
-#        output_file.write(str(compare_seqs_4[1]))
-
-
-    #align_1_split = align_1.split('\n', 1)
-    #align_2_split = align_2.split('\n', 1)
-    #align_3_split = align_3.split('\n', 1)
-    #align_4_split = align_4.split('\n', 1)
-
-    #label = align_1_split[0]
-    #seq = align_1_split[1]
-
-    #len_align_1 = len(align_1_split[1])
-    #len_align_2 = len(align_2_split[1])
-
-    
-    #shorter = seq.replace('\n','')
-    #longer = longer.replace('\n','')
-    
-    #print("Longer sequence length: ", len(longer))
-    #print("Shorter sequence length: ", len(shorter))
-    
-    #print(len(shorter))
-
-
-
-    #main_short = Seq(shorter, generic_dna)
-    #short_comp = main_short.complement()
-    #short_reverse = main_short[::-1]
-    #short_rev_comp = main_short.reverse_complement()
-   
-   
-   #Produce reverse sequence
-    #output_file = open(args.output_align_stub + "-reverse.fasta", 'w')
-    #output_file.write(label)
-    #output_file.write('\n')
-    #output_file.write(str(short_reverse))
-    #output_file.close()
-
-
-   #Produce compliment sequence
-    #output_file = open(args.output_align_stub + "-complement.fasta", 'w')
-    #output_file.write(label)
-    #output_file.write('\n')
-    #output_file.write(str(short_comp))
-    #output_file.close()
-
-
-    #Produce reverse complement sequence
-    #output_file = open(args.output_align_stub + "-reverse_complement.fasta", 'w')
-    #output_file.write(label)
-    #output_file.write('\n')
-    #output_file.write(str(short_rev_comp))
-    #output_file.close()
-
-
-
-    #print("Number of processors: ", mp.cpu_count())
+        output_file.write(args.align_1)
+        output_file.write("\n")
+        output_file.write(">identical_nucs")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[0]))
+        output_file.write("\n")
+        output_file.write(">non_identical_nucs")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[1]))
+        output_file.write("\n")
+        output_file.write(">gaps")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[2]))
+        output_file.write("\n")
+        output_file.write(">total_nucleotides")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[3]))
+        output_file.write("\n")
+        output_file.write(">identical_nucs_positions")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[4]))
+        output_file.write("\n")
+        output_file.write(">non_identical_nucs_positions")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[5]))
+        output_file.write("\n")
+        output_file.write(">gaps_positions")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[6]))
 
 if __name__ == '__main__':
     main()

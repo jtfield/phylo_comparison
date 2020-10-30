@@ -514,49 +514,92 @@ if [[ $basecall == "ON" ]]; then
 
 	done
 
-	for i in $(ls ${outdir}/${snippy_basecall}/sep_loci/individual_tax/*);
-	do
-		# echo ${i}
-		makeblastdb -in $i -dbtype nucl -parse_seqids
-		snippy_genome_taxon=$(basename ${i} | sed -e 's/single_tax_snippy-core.full.aln-//g')
-		# echo ${snippy_genome_taxon}
+	# for i in $(ls ${outdir}/${snippy_basecall}/sep_loci/individual_tax/*);
+	# do
+	# 	# echo ${i}
+	# 	makeblastdb -in $i -dbtype nucl -parse_seqids
+	# 	snippy_genome_taxon=$(basename ${i} | sed -e 's/single_tax_snippy-core.full.aln-//g')
+	# 	# echo ${snippy_genome_taxon}
 		
 		
-		for j in $(cat ${outdir}/${gon_phy_basecall}/loci_list.txt);
-		do
-			locus=$(basename ${j} | sed -e 's/.fasta//g')
+	# 	for j in $(cat ${outdir}/${gon_phy_basecall}/loci_list.txt);
+	# 	do
+	# 		locus=$(basename ${j} | sed -e 's/.fasta//g')
 			
-			for k in $(ls ${outdir}/${gon_phy_basecall}/chosen_loci/individual_tax/*${locus}*);
-			do
-				gon_phy_single_locus_single_tax=$(basename ${k} | rev | cut -d "-" -f1 | rev)
-				if [[ ${gon_phy_single_locus_single_tax} == ${snippy_genome_taxon} ]];
-				then
-					blastn \
-					-db $i \
-					-query ${k} \
-					-out $outdir/gon_phy_to_snippy/blast_results/blast_output_${locus}-${snippy_genome_taxon}.out \
-					-max_hsps 1 \
-					-outfmt 5
+	# 		for k in $(ls ${outdir}/${gon_phy_basecall}/chosen_loci/individual_tax/*${locus}*);
+	# 		do
+	# 			gon_phy_single_locus_single_tax=$(basename ${k} | rev | cut -d "-" -f1 | rev)
+	# 			if [[ ${gon_phy_single_locus_single_tax} == ${snippy_genome_taxon} ]];
+	# 			then
+	# 				blastn \
+	# 				-db $i \
+	# 				-query ${k} \
+	# 				-out $outdir/gon_phy_to_snippy/blast_results/blast_output_${locus}-${snippy_genome_taxon}.out \
+	# 				-max_hsps 1 \
+	# 				-outfmt 5
 
-				fi
+	# 			fi
 
-			done	
+	# 		done	
 			
-		done
-		wait
-	done
+	# 	done
+	# 	wait
+	# done
 
 	for j in $(cat ${outdir}/${gon_phy_basecall}/loci_list.txt);
 	do
 		locus=$(basename ${j} | sed -e 's/.fasta//g')
 		${program_path}/empirical_data_comparison/blast_location_finder.py \
-		--blast_files_folder ${outdir}/gon_phy_to_snippy/blast_results \
-		--cluster_id ${locus} \
 		--long_seqs_folder ${outdir}/snippy_basecall/sep_loci/individual_tax \
 		--manipulate_seqs_folder ${outdir}/gon_phy_basecall/chosen_loci/individual_tax \
 		--output_dir ${outdir}/gon_phy_to_snippy/align_files
 
 	done
+
+	for i in $(ls ${outdir}/gon_phy_to_snippy/align_files);
+	do
+		mafft \
+		--thread $align_threads \
+		${outdir}/gon_phy_to_snippy/align_files/${i} \
+		> \
+		${outdir}/gon_phy_to_snippy/align_files/aligned_${i}
+
+		${program_path}/empirical_data_comparison/emp_snippy_gapped_align_compared.py \
+		--align_1 ${outdir}/gon_phy_to_snippy/align_files/aligned_${i} \
+		--output_stub snip_gon_assessment_${i} \
+		--output_dir ${outdir}/gon_phy_to_snippy/assessment_output
+
+	done
+
+#####################################################################################################
+# RAPUP TO SNIPPY SECTION
+
+	for j in $(ls -1 ${outdir}/${rapup_basecall}/chosen_loci/individual_tax/);
+	do
+		locus=$(basename ${j} | sed -e 's/single_tax-//g')
+		taxon=$(basename ${j} | rev | cut -d "-" -f1 | rev)
+		${program_path}/empirical_data_comparison/blast_location_finder.py \
+		--long_seqs_folder ${outdir}/snippy_basecall/sep_loci/individual_tax \
+		--manipulate_seqs_folder ${outdir}/rapup_basecall/chosen_loci/individual_tax \
+		--output_dir ${outdir}/rapup_to_snippy/align_files
+
+	done
+
+	for i in $(ls ${outdir}/rapup_to_snippy/align_files);
+	do
+		mafft \
+		--thread $align_threads \
+		${outdir}/rapup_to_snippy/align_files/${i} \
+		> \
+		${outdir}/rapup_to_snippy/align_files/aligned_${i}
+
+
+		${program_path}/empirical_data_comparison/emp_snippy_gapped_align_compared.py \
+		--align_1 ${outdir}/rapup_to_snippy/align_files/aligned_${i} \
+		--output_stub snip_rap_assessment_${i} \
+		--output_dir ${outdir}/rapup_to_snippy/assessment_output
+	done
+
 	#####################################################################################################
 	# USE SINGLE SEQ FILES FROM GON_PHY AND RAPUP TO ALIGN TO SNIPPY SEQS
 

@@ -2,6 +2,7 @@
 import argparse
 import os
 import re
+import random
 from Bio.Seq import Seq
 from Bio.Alphabet import generic_dna
 
@@ -9,129 +10,99 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--manipulate_seqs_folder')
     parser.add_argument('--long_seqs_folder')
-    parser.add_argument('--blast_files_folder')
-    parser.add_argument('--cluster_id')
     parser.add_argument('--output_dir')
     # parser.add_argument('--gon_phy', action='store_true', default=False)
     # parser.add_argument('--rapup', action='store_true', default=False)
     return parser.parse_args()
 
-def check_alignment_direction(blast_files, blast_folder_path, cluster):
-    cluster_dict = {}
-    align_numbers = []
-    hit_regex = r'<Hit>'
-    hit_compile = re.compile(hit_regex)
+def seq_converter(seq):
 
-    start_regex = r'<Hsp_hit-from>(\d+)</Hsp_hit-from>'
-    start_compile = re.compile(start_regex)
+    output = {}
 
-    end_regex = r'<Hsp_hit-to>(\d+)</Hsp_hit-to>'
-    end_compile = re.compile(end_regex)
+    seq_split = seq.split('\n', 1)
+    label = seq_split[0]
+    seq = seq_split[1]
 
-    cluster_regex = cluster + '-'
-    compile_regex = re.compile(cluster_regex)
+    len_seq = len(seq_split[1])
+    shorter = seq.replace('\n','')
+
+    main_short = Seq(shorter, generic_dna)
+    short_comp = main_short.complement()
+    short_reverse = main_short[::-1]
+    short_rev_comp = main_short.reverse_complement()
+
+    assert len(main_short) > 0
+    assert len(short_comp) > 0
+    assert len(short_reverse) > 0
+    assert len(short_rev_comp) > 0
+
+    assert len(main_short) == len(short_comp) == len(short_reverse) == len(short_rev_comp)
     
-    for file_name in blast_files:
-        
-        find_cluster = re.findall(compile_regex, file_name)
-        if find_cluster:
-            current_file = open(blast_folder_path +'/'+ file_name, 'r')
-            read_file = current_file.read()
-            find_hit = re.findall(hit_compile, read_file)
-            if find_hit:
-                file_start_stop = []
-                find_start = re.findall(start_compile, read_file)
-                find_stop = re.findall(end_compile, read_file)
-                if find_start:
-                    file_start_stop.append(find_start[0])
-                if find_stop:
-                    file_start_stop.append(find_stop[0])
-                # print(file_start_stop)
-                assert len(file_start_stop) == 2
-                align_numbers.append(file_start_stop)
-    cluster_dict[cluster] = align_numbers
-    
-    # print(cluster_dict)
-    return cluster_dict      
+    output['original'] = str(main_short)
+    output['complement'] = str(short_comp)
+    output['reverse'] = str(short_reverse)
+    output['reverse_complement'] = str(short_rev_comp)
 
-def analyze_direction(dict_of_align_nums):
-    strandedness = ''
-    increasing = 0
-    decreasing = 0
-    for key, value in dict_of_align_nums.items():
-        for start_stop in value:
-            start = int(start_stop[0])
-            stop = int(start_stop[1])
-            if start > stop:
-                decreasing+=1
-            elif start < stop:
-                increasing+=1
-    if increasing > 0 and increasing > decreasing:
-        strandedness = 'left_to_right'
-    elif decreasing > 0 and increasing < decreasing:
-        strandedness = 'right_to_left'
-
-    return strandedness    
-
-
-def find_long_seq_size(align_nums, direction):
-    seq_size = []
-    starts = []
-    stops = []
-    start = 0
-    stop = 0
-    for key, value in align_nums.items():
-        for start_stop in value:
-            potential_start = int(start_stop[0])
-            potential_stop = int(start_stop[1])
-            starts.append(potential_start)
-            stops.append(potential_stop)
-    
-    if direction == 'left_to_right':
-        start = min(starts)
-        stop = max(stops)
-    elif direction == 'right_to_left':
-        start = max(starts)
-        stop = min(stops)
-    seq_size.append(start)
-    seq_size.append(stop)
-   
-    return seq_size
-
-def convert_short_seq(direction, file_contents):
-    split_file = file_contents.split('\n',1)
-    assert len(split_file) > 1
-    name = split_file[0]
-    seq = split_file[1]
-
-    if direction == 'right_to_left':
-        reverse = seq[::-1]
-        output = name + '\n' + reverse
-        return output
-    elif direction == 'left_to_right':
-        return file_contents
-
-def trim_long_seq(start, stop, file_contents):
-    split_file = file_contents.split('\n',1)
-    assert len(split_file) > 1
-    name = split_file[0]
-    seq = split_file[1]
-
-    seq = ''.join(seq)
-
-    padded_start = start - 100
-    padded_stop = stop + 100
-
-    seq = seq[padded_start:padded_stop]
-
-    output = name + '\n' + seq
     return output
 
-def resize_long(sizes, direction, long_seqs, manip_seqs, outdir):
-    start = min(sizes)
-    stop = max(sizes)
-    manip_folder_contents = os.listdir(manip_seqs)
-    long_seqs_folder_contents = os.listdir(long_seqs)
+def generate_kmer_positions(seq_len):
+    output = []
+    
+    for i in range(0,50):
+        kmer_start = random.randint(0,seq_len)
+        if(kmer_start + 14 <= seq_len):
+            output.append(kmer_start)
+    return output
+
+
+def find_match(long_seq, dict_of_seqs):
+    orig_matches = 0
+    comp_matches = 0
+    rev_matches = 0
+    rev_comp_matches = 0
+    compare_nums = []
+    
+
+    for orientation, seq in dict_of_seqs.items():
+        seq_len = len(seq)
+        
+        get_kmer_starts = generate_kmer_positions(seq_len)
+
+        for position in get_kmer_starts:
+            kmer = seq[position:position + 14]
+            compile_kmer = re.compile(kmer.upper())
+            find_kmer = re.findall(compile_kmer, long_seq.upper())
+            if find_kmer:
+                if orientation == 'original':
+                    orig_matches+=1
+                elif orientation == 'complement':
+                    comp_matches+=1
+                elif orientation == 'reverse':
+                    rev_matches+=1
+                elif orientation == 'reverse_complement':
+                    rev_comp_matches+=1
+    
+    compare_nums.append(orig_matches)
+    compare_nums.append(comp_matches)
+    compare_nums.append(rev_matches)
+    compare_nums.append(rev_comp_matches)
+
+    print(compare_nums)
+
+    if max(compare_nums) == orig_matches:
+        return 'original'
+    elif max(compare_nums) == comp_matches:
+        return 'complement'
+    elif max(compare_nums) == rev_matches:
+        return 'reverse'
+    elif max(compare_nums) == rev_comp_matches:
+        return 'reverse_complement'
+
+
+
+def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
+    manip_folder_contents = os.listdir(manip_seq_path)
+    long_seqs_folder_contents = os.listdir(long_seq_path)
     file_info_regex = r'-(cluster\d+)--(.+)$'
     file_info_compile = re.compile(file_info_regex)
     long_name_regex = r'single_tax_snippy-core.full.aln-(\w+)$'
@@ -143,6 +114,9 @@ def resize_long(sizes, direction, long_seqs, manip_seqs, outdir):
         if find_info:
             manip_taxon = find_info[0][1]
             manip_locus = find_info[0][0]
+            print(manip_taxon)
+            print(manip_locus)
+
             for long_seq in long_seqs_folder_contents:
                 # print(long_seq)
                 find_long_info = re.findall(long_name_compile, long_seq)
@@ -150,26 +124,38 @@ def resize_long(sizes, direction, long_seqs, manip_seqs, outdir):
                     long_seq_name = find_long_info[0]
                     if long_seq_name == manip_taxon:
                         # print(manip_taxon)
-                        open_manip_file = open(manip_seqs +'/'+ manip_file,'r')
+                        open_manip_file = open(manip_seq_path +'/'+ manip_file,'r')
                         read_manip_file = open_manip_file.read()
 
-                        open_long_seq = open(long_seqs +'/'+ long_seq, 'r')
+                        open_long_seq = open(long_seq_path +'/'+ long_seq, 'r')
                         read_long_seq = open_long_seq.read()
 
-                        fix_short_seq = convert_short_seq(direction, read_manip_file)
+                        convert_manip = seq_converter(read_manip_file)
 
-                        trim = trim_long_seq(start, stop, read_long_seq)
-                        
-                        combined = trim + '\n' + fix_short_seq
+                        long_seq_split = read_long_seq.split('\n', 1)
+                        label = long_seq_split[0]
+                        seq = long_seq_split[1]
 
-                        output = open(outdir +'/'+ 'combined_'+ manip_locus + '-' + manip_taxon, 'w')
-                        output.write(combined)
+                        len_seq = len(long_seq_split[1])
+                        long_contiguous = seq.replace('\n','')
+
+                        match_maker = find_match(long_contiguous, convert_manip)
+                        print(match_maker)
+
+                        output = open(output_dir +'/'+ 'combined-' + manip_locus + '--' + manip_taxon, 'w')
+                        output.write(label)
+                        output.write('\n')
+                        output.write(long_contiguous)
+                        output.write('\n')
+                        output.write(label)
+                        output.write('\n')
+                        output.write(convert_manip[match_maker])
+
                         output.close()
+                        open_long_seq.close()
                         open_manip_file.close()
-                        open_long_seq.close() 
-                        
 
-                    
+
 
 
 
@@ -182,18 +168,8 @@ def main():
     path_to_long_seqs_folder = os.path.realpath(args.long_seqs_folder)
     long_seqs_folder_contents = os.listdir(path_to_long_seqs_folder)
 
-    path_to_blast_folder = os.path.realpath(args.blast_files_folder)
-    blast_folder_contents = os.listdir(path_to_blast_folder)
-    assert len(blast_folder_contents) > 0
-
-    direction_check = check_alignment_direction(blast_folder_contents, path_to_blast_folder, args.cluster_id)
-
-    give_directions = analyze_direction(direction_check)
-
-    find_resize = find_long_seq_size(direction_check, give_directions)
-    print(find_resize)
-
-    resize = resize_long(find_resize, give_directions, path_to_long_seqs_folder, path_to_manip_folder, args.output_dir)
+    find_orientation = match_long_with_loci(path_to_manip_folder, path_to_long_seqs_folder, args.output_dir)
+    
 
 
 if __name__ == '__main__':

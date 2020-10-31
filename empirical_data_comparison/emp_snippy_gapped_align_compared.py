@@ -104,7 +104,8 @@ def check_for_gaps(processed_seq, gaps, nucs):
         for num, pos in enumerate(nuc_positions[1:]):
             num = num + 1
             if pos == nuc_positions[num-1] + 1:
-                print(pos)
+                # print(pos)
+                pass
             else:
                 contiguous_nucs.append(nuc_positions[num-1])
                 contiguous_nucs.append(nuc_positions[num])
@@ -216,8 +217,8 @@ def comparison(list_of_list_of_seqs):
         shorter = seq_2
         longer = seq_1
 
-    print(len(shorter[1]))
-    print(len(longer[1]))
+    # print("length of longer seq", len(shorter[1]))
+    # print("length of shorter seq", len(longer[1]))
     
     shorter_seq = shorter[1]
     longer_seq = longer[1]
@@ -243,11 +244,15 @@ def comparison(list_of_list_of_seqs):
     gap_test = check_for_gaps(trimmed_shorter,gap_set, nuc_set)
     print(gap_test)
     for key, value in gap_test.items():
-        if key != 'no_anomalies':
+        if key == 'no_anomalies':
             print('no anomalous spread of nucleotides found.')
         elif key == 'anomalies':
             print('problem found')
             #TODO: add stuff here for handling of problem
+            print(value[0])
+            print(value[1])
+            trimmed_shorter = trimmed_shorter[value[0]:value[1]]
+            trimmed_longer = trimmed_longer[value[0]:value[1]]
     
     split_trimmed_short = list(trimmed_shorter)
     split_trimmed_long = list(trimmed_longer)

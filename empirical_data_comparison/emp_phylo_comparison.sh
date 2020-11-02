@@ -526,7 +526,7 @@ if [[ $basecall == "ON" ]]; then
 			--align_2 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-complement.fasta \
 			--align_3 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-reverse.fasta \
 			--align_4 $outdir/gon_phy_to_rapup/align_files/aligned_combine-${gon_phy_locus}-${rapup_locus}--${i}-original.fasta \
-			--output_stub $outdir/gon_phy_to_rapup/assessment_output/basecall_results-${gon_phy_locus}-${rapup_locus}--${i}-.txt
+			--output_stub $outdir/gon_phy_to_rapup/assessment_output/gon_rap_results-${gon_phy_locus}-${rapup_locus}--${i}
 
 		done
 		wait

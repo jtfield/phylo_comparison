@@ -115,7 +115,7 @@ def basecall_identical_nucs_checker(folder_path, input_folder, df):
 
 # for checking the number of gaps in a comparison output
 def basecall_gap_checker(folder_path, input_folder, df):
-#10503188    # LIST CLUSTERS/LOCI IN THIS ANALYSIS
+# LIST CLUSTERS/LOCI IN THIS ANALYSIS
     cluster_names = 'cluster\d+'
     cluster_len = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
     cluster_compile = re.compile(cluster_names)

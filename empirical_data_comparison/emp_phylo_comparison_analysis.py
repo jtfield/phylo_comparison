@@ -506,9 +506,9 @@ def main():
     path_to_output_folder = os.path.realpath(args.output_folder)
     
     # go through each methods output folder and get blast result files, tree files and the reference sequence file
-    rapup_to_gon_phy_results = path_to_output_folder + '/rapup_to_gon_phy_basecall/basecall_results'
-    snippy_to_gon_phy_results = path_to_output_folder + '/snippy_to_gon_phy_basecall/basecall_results'
-    snippy_to_rapup_results = path_to_output_folder + '/snip_rap_basecall/basecall_results'
+    rapup_to_gon_phy_results = path_to_output_folder + '/gon_phy_to_rapup/assessment_output'
+    snippy_to_gon_phy_results = path_to_output_folder + '/gon_phy_to_snippy/assessment_output'
+    snippy_to_rapup_results = path_to_output_folder + '/rapup_to_snippy/assessment_output'
     
     ref_file = path_to_output_folder + '/update_alignment_dir/update_alignment_dir/alignment_ref.fas'
 

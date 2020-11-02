@@ -253,6 +253,24 @@ then
 	--var_file ${outdir}/variables.txt \
 	--out_file ${outdir}/variables.txt
 
+	if [[ $bootstrapping == "ON" ]];
+	then
+		# BOOTSTRAP RAPUP AND GONPHYLING FOR CONSENSUS TREE PRODUCTION
+		cd $outdir/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/ 
+		raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.core_genome_run.out -n gon_phy_MR_CONS
+		cat RAxML_MajorityRuleConsensusTree.gon_phy_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_gon_phy_MR.tre
+		sed -i -e "s/;/:0.0;/g" fixed_gon_phy_MR.tre
+		sed -i -e 's/.ref//g' fixed_gon_phy_MR.tre
+		cd $outdir/rapup_run/combine_and_infer/
+		raxmlHPC -J MR -m GTRGAMMA -z RAxML_bootstrap.consensusFULL_bootstrap -n rapup_MR_CONS
+		cat RAxML_MajorityRuleConsensusTree.rapup_MR_CONS | sed -E 's/\[[0-9]+\]//g' > fixed_rapup_MR.tre
+		sed -i -e "s/;/:0.0;/g" fixed_rapup_MR.tre
+		printf "\n$program_path\n"
+
+	elif [[ $bootstrapping == "OFF" ]];
+	then
+		echo "BOOTSTRAPPING TURNED OFF"
+	fi
 
 
 elif [[ $assembly == "OFF" ]];
@@ -260,6 +278,7 @@ then
 	echo "Skipping assembly and read alignment stage as per user request"
 	echo "Reading variable file and beginning basecall stage"
 fi
+
 
 
 
@@ -565,6 +584,7 @@ if [[ $basecall == "ON" ]]; then
 		${outdir}/gon_phy_to_snippy/align_files/aligned_${i}
 
 		${program_path}/empirical_data_comparison/emp_snippy_gapped_align_compared.py \
+		-t \
 		--align_1 ${outdir}/gon_phy_to_snippy/align_files/aligned_${i} \
 		--output_stub snip_gon_assessment_${i} \
 		--output_dir ${outdir}/gon_phy_to_snippy/assessment_output
@@ -595,6 +615,7 @@ if [[ $basecall == "ON" ]]; then
 
 
 		${program_path}/empirical_data_comparison/emp_snippy_gapped_align_compared.py \
+		-t \
 		--align_1 ${outdir}/rapup_to_snippy/align_files/aligned_${i} \
 		--output_stub snip_rap_assessment_${i} \
 		--output_dir ${outdir}/rapup_to_snippy/assessment_output

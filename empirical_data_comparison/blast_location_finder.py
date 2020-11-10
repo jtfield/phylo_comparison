@@ -106,6 +106,7 @@ def find_match(long_seq, dict_of_seqs):
     elif max(compare_nums) == rev_comp_matches:
         return 'reverse_complement'
 
+
 def find_boundaries(manipulated_seq, long_seq):
     output_kmers = []
     front_kmers = []
@@ -128,7 +129,7 @@ def find_boundaries(manipulated_seq, long_seq):
             # print(find_kmer)
             front_kmers.append(find_kmer)
         else:
-            front_kmers.append('-')
+            front_kmers.append(0)
     
     # print("END SECTION ")
 
@@ -149,9 +150,9 @@ def find_boundaries(manipulated_seq, long_seq):
         
 
 
-    print(front_kmers)
+    # print(front_kmers)
     # print(manipulated_seq)
-    print(back_kmers)
+    # print(back_kmers)
     assert len(front_kmers) == 10
     assert len(back_kmers) == 10
     output_kmers.append(front_kmers)
@@ -166,17 +167,17 @@ def trim_boundaries(kmer_lists, long_seq, kmer_len):
     buffered_start_position = 0
     buffered_stop_position = 0
     step_count = 1
-    buffer_size = 500
+    buffer_size = 150
     for num, kmer_start in enumerate(seq_front_kmers):
-        print(num)
-        print(kmer_start)
+        # print(num)
+        # print(kmer_start)
         if num == 0:
             continue
         elif num > 0:
             if type(kmer_start) == int and type(seq_front_kmers[num - 1]) == int and kmer_start == seq_front_kmers[num - 1] + kmer_len:
                 contiguous_front_positions.append(num)
-    print(contiguous_front_positions)
-    if len(contiguous_front_positions) <= 1:
+    # print(contiguous_front_positions)
+    if len(contiguous_front_positions) == 0:
         contiguous_front_positions.append('no_useful_matches')
     else:
         earliest_starting_position = min(contiguous_front_positions)
@@ -191,33 +192,61 @@ def trim_boundaries(kmer_lists, long_seq, kmer_len):
     # CALCULATE ENDING REGION AND BUFFER
     print("CALCULATE ENDING REGION AND BUFFER")
     for num, kmer_start in enumerate(seq_back_kmers):
-        print(num)
-        print(kmer_start)
+        # print(num)
+        # print(kmer_start)
         if num == 0:
             continue
         elif num > 0:
             if type(kmer_start) == int and type(seq_front_kmers[num - 1]) == int and kmer_start == seq_back_kmers[num - 1] - kmer_len:
                 contiguous_back_positions.append(num)
     
-    print(contiguous_back_positions)
-    if len(contiguous_back_positions) <= 1:
+    # print(contiguous_back_positions)
+    if len(contiguous_back_positions) == 0:
         contiguous_back_positions.append('no_useful_matches')
     else:
+        # print("calculating backside")
         earliest_stopping_position = min(contiguous_back_positions)
+        # print(earliest_stopping_position)
 
         # calculate the number of steps between the contiguous starting point and the actual start of the kmers
         step_number = earliest_stopping_position - step_count
+        # print(step_number)
 
-        stopping_seqence_position = seq_back_kmers[max(contiguous_front_positions)] + (kmer_len * step_number)
+        stopping_seqence_position = seq_back_kmers[min(contiguous_back_positions)] + (kmer_len * step_number)
+        # print(stopping_seqence_position)
+
         buffered_stop_position = stopping_seqence_position + buffer_size
         print("stopping position: ", buffered_stop_position)
 
     if contiguous_front_positions[0] != 'no_useful_matches' and contiguous_back_positions[0] != 'no_useful_matches':
         print("LENGTH OF SEQUENCE REGION: ", buffered_stop_position - buffered_start_position)
+        output = [buffered_start_position, buffered_stop_position]
+        return output
+    elif contiguous_front_positions[0] == 'no_useful_matches':
+        output = ['no_useful_matches', buffered_stop_position]
+        return output
+    elif contiguous_back_positions[0] == 'no_useful_matches':
+        output = [buffered_start_position, 'no_useful_matches']
+        return output
     
 
-
-
+def long_seq_trimmer(long_seq, len_short_seq, start_stop_positions_list):
+    start = start_stop_positions_list[0]
+    stop = start_stop_positions_list[1]
+    if type(start) == int and type(stop) == int:
+        output = long_seq[start : stop]
+        # print(output)
+        return output
+    elif start == 'no_useful_matches':
+        start = stop - (len_short_seq + 500)
+        output = long_seq[start : stop]
+        # print(output)
+        return output
+    elif stop == 'no_useful_matches':
+        stop = start + (len_short_seq + 500)
+        output = long_seq[start : stop]
+        # print(output)
+        return output
 
 
 def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
@@ -230,16 +259,16 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
     long_name_compile = re.compile(long_name_regex)
 
     for manip_file in manip_folder_contents:
-        print(manip_file)
+        # print(manip_file)
         find_info = re.findall(file_info_compile, manip_file)
         if find_info:
             manip_taxon = find_info[0][1]
             manip_locus = find_info[0][0]
-            print(manip_taxon)
-            print(manip_locus)
+            # print(manip_taxon)
+            # print(manip_locus)
 
             for long_seq in long_seqs_folder_contents:
-                print(long_seq)
+                # print(long_seq)
                 find_long_info = re.findall(long_name_compile, long_seq)
                 if find_long_info:
                     long_seq_name = find_long_info[0]
@@ -266,15 +295,18 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
                         find_seq_location = find_boundaries(convert_manip[match_maker], long_contiguous)
 
                         trim_long = trim_boundaries(find_seq_location, long_contiguous, kmer_len)
+                        print(trim_long)
 
-                        # output = open(output_dir +'/'+ 'combined-' + manip_locus + '--' + manip_taxon, 'w')
-                        # output.write(label)
-                        # output.write('\n')
-                        # output.write(long_contiguous)
-                        # output.write('\n')
-                        # output.write(label)
-                        # output.write('\n')
-                        # output.write(convert_manip[match_maker])
+                        produce_trimmed_seq = long_seq_trimmer(long_contiguous, len(convert_manip[match_maker]), trim_long)
+
+                        output = open(output_dir +'/'+ 'combined-' + manip_locus + '--' + manip_taxon, 'w')
+                        output.write(label)
+                        output.write('\n')
+                        output.write(produce_trimmed_seq)
+                        output.write('\n')
+                        output.write(label)
+                        output.write('\n')
+                        output.write(convert_manip[match_maker])
 
                         # output.close()
                         open_long_seq.close()

@@ -45,7 +45,7 @@ def seq_converter(seq):
 
     return output
 
-def generate_kmer_positions(seq_len):
+def generate_random_kmer_positions(seq_len):
     output = []
     
     for i in range(0,50):
@@ -54,6 +54,14 @@ def generate_kmer_positions(seq_len):
             output.append(kmer_start)
     return output
 
+# def generate_kmer_positions(seq_len):
+#     output = []
+    
+#     for i in range(0,50):
+#         kmer_start = random.randint(0,seq_len)
+#         if(kmer_start + 14 <= seq_len):
+#             output.append(kmer_start)
+#     return output
 
 def find_match(long_seq, dict_of_seqs):
     orig_matches = 0
@@ -66,7 +74,7 @@ def find_match(long_seq, dict_of_seqs):
     for orientation, seq in dict_of_seqs.items():
         seq_len = len(seq)
         
-        get_kmer_starts = generate_kmer_positions(seq_len)
+        get_kmer_starts = generate_random_kmer_positions(seq_len)
 
         for position in get_kmer_starts:
             kmer = seq[position:position + 14]
@@ -98,9 +106,122 @@ def find_match(long_seq, dict_of_seqs):
     elif max(compare_nums) == rev_comp_matches:
         return 'reverse_complement'
 
+def find_boundaries(manipulated_seq, long_seq):
+    output_kmers = []
+    front_kmers = []
+    back_kmers = []
+    kmer_size = 50
+    current_kmer_position = 0
+    end_kmer_position = -1
+    
+    print(len(manipulated_seq))
+    # print('BEGINNING SECTION')
+    for num in range(0,10):
+        kmer = manipulated_seq[current_kmer_position:current_kmer_position + kmer_size]
+        # print(kmer)
+        # front_kmers.append(kmer)
+        current_kmer_position = current_kmer_position + kmer_size
+        compile_kmer = re.compile(kmer.upper())
+        find_kmer = re.search(compile_kmer, long_seq.upper())
+        if find_kmer:
+            find_kmer = find_kmer.start()
+            # print(find_kmer)
+            front_kmers.append(find_kmer)
+        else:
+            front_kmers.append('-')
+    
+    # print("END SECTION ")
+
+    for num in range(0,10):
+        kmer = manipulated_seq[end_kmer_position - kmer_size : end_kmer_position]
+        # print(kmer)
+        # back_kmers.append(kmer)
+        end_kmer_position = end_kmer_position - kmer_size
+        compile_kmer = re.compile(kmer.upper())
+        find_kmer = re.search(compile_kmer, long_seq.upper())
+        if find_kmer:
+            find_kmer = find_kmer.start()
+            # print(find_kmer)
+            back_kmers.append(find_kmer)
+        else:
+            # back_kmers.append('-')
+            back_kmers.append(0)
+        
+
+
+    print(front_kmers)
+    # print(manipulated_seq)
+    print(back_kmers)
+    assert len(front_kmers) == 10
+    assert len(back_kmers) == 10
+    output_kmers.append(front_kmers)
+    output_kmers.append(back_kmers)
+    return output_kmers
+    
+def trim_boundaries(kmer_lists, long_seq, kmer_len):
+    contiguous_front_positions = []
+    contiguous_back_positions = []
+    seq_front_kmers = kmer_lists[0]
+    seq_back_kmers = kmer_lists[1]
+    buffered_start_position = 0
+    buffered_stop_position = 0
+    step_count = 1
+    buffer_size = 500
+    for num, kmer_start in enumerate(seq_front_kmers):
+        print(num)
+        print(kmer_start)
+        if num == 0:
+            continue
+        elif num > 0:
+            if type(kmer_start) == int and type(seq_front_kmers[num - 1]) == int and kmer_start == seq_front_kmers[num - 1] + kmer_len:
+                contiguous_front_positions.append(num)
+    print(contiguous_front_positions)
+    if len(contiguous_front_positions) <= 1:
+        contiguous_front_positions.append('no_useful_matches')
+    else:
+        earliest_starting_position = min(contiguous_front_positions)
+
+        # calculate the number of steps between the contiguous starting point and the actual start of the kmers
+        step_number = earliest_starting_position - step_count
+
+        starting_seqence_position = seq_front_kmers[min(contiguous_front_positions)] - (kmer_len * step_number)
+        buffered_start_position = starting_seqence_position - buffer_size
+        print("starting position: ", buffered_start_position)
+    
+    # CALCULATE ENDING REGION AND BUFFER
+    print("CALCULATE ENDING REGION AND BUFFER")
+    for num, kmer_start in enumerate(seq_back_kmers):
+        print(num)
+        print(kmer_start)
+        if num == 0:
+            continue
+        elif num > 0:
+            if type(kmer_start) == int and type(seq_front_kmers[num - 1]) == int and kmer_start == seq_back_kmers[num - 1] - kmer_len:
+                contiguous_back_positions.append(num)
+    
+    print(contiguous_back_positions)
+    if len(contiguous_back_positions) <= 1:
+        contiguous_back_positions.append('no_useful_matches')
+    else:
+        earliest_stopping_position = min(contiguous_back_positions)
+
+        # calculate the number of steps between the contiguous starting point and the actual start of the kmers
+        step_number = earliest_stopping_position - step_count
+
+        stopping_seqence_position = seq_back_kmers[max(contiguous_front_positions)] + (kmer_len * step_number)
+        buffered_stop_position = stopping_seqence_position + buffer_size
+        print("stopping position: ", buffered_stop_position)
+
+    if contiguous_front_positions[0] != 'no_useful_matches' and contiguous_back_positions[0] != 'no_useful_matches':
+        print("LENGTH OF SEQUENCE REGION: ", buffered_stop_position - buffered_start_position)
+    
+
+
+
 
 
 def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
+    kmer_len = 50
     manip_folder_contents = os.listdir(manip_seq_path)
     long_seqs_folder_contents = os.listdir(long_seq_path)
     file_info_regex = r'-(cluster\d+)--(.+)$'
@@ -109,7 +230,7 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
     long_name_compile = re.compile(long_name_regex)
 
     for manip_file in manip_folder_contents:
-        # print(manip_file)
+        print(manip_file)
         find_info = re.findall(file_info_compile, manip_file)
         if find_info:
             manip_taxon = find_info[0][1]
@@ -118,7 +239,7 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
             print(manip_locus)
 
             for long_seq in long_seqs_folder_contents:
-                # print(long_seq)
+                print(long_seq)
                 find_long_info = re.findall(long_name_compile, long_seq)
                 if find_long_info:
                     long_seq_name = find_long_info[0]
@@ -142,16 +263,20 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
                         match_maker = find_match(long_contiguous, convert_manip)
                         print(match_maker)
 
-                        output = open(output_dir +'/'+ 'combined-' + manip_locus + '--' + manip_taxon, 'w')
-                        output.write(label)
-                        output.write('\n')
-                        output.write(long_contiguous)
-                        output.write('\n')
-                        output.write(label)
-                        output.write('\n')
-                        output.write(convert_manip[match_maker])
+                        find_seq_location = find_boundaries(convert_manip[match_maker], long_contiguous)
 
-                        output.close()
+                        trim_long = trim_boundaries(find_seq_location, long_contiguous, kmer_len)
+
+                        # output = open(output_dir +'/'+ 'combined-' + manip_locus + '--' + manip_taxon, 'w')
+                        # output.write(label)
+                        # output.write('\n')
+                        # output.write(long_contiguous)
+                        # output.write('\n')
+                        # output.write(label)
+                        # output.write('\n')
+                        # output.write(convert_manip[match_maker])
+
+                        # output.close()
                         open_long_seq.close()
                         open_manip_file.close()
 

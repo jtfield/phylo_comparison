@@ -127,7 +127,7 @@ def find_boundaries(manipulated_seq, long_seq):
         find_kmer = re.search(compile_kmer, long_seq.upper())
         if find_kmer:
             find_kmer = find_kmer.start()
-            print(find_kmer)
+            # print(find_kmer)
             front_kmers.append(find_kmer)
         else:
             front_kmers.append(0)
@@ -143,7 +143,7 @@ def find_boundaries(manipulated_seq, long_seq):
         find_kmer = re.search(compile_kmer, long_seq.upper())
         if find_kmer:
             find_kmer = find_kmer.start()
-            print(find_kmer)
+            # print(find_kmer)
             back_kmers.append(find_kmer)
         else:
             # back_kmers.append('-')
@@ -157,18 +157,22 @@ def find_boundaries(manipulated_seq, long_seq):
     assert len(front_kmers) == num_kmers
     assert len(back_kmers) == num_kmers
     
-    refine_start = refine_potential_boundaries(front_kmers, kmer_size)
+    refine_start = refine_potential_boundaries(front_kmers, kmer_size, "start")
+    refine_stop = refine_potential_boundaries(back_kmers, kmer_size, "stop")
     
     output_kmers.append(front_kmers)
     output_kmers.append(back_kmers)
     return output_kmers
     
-def refine_potential_boundaries(kmer_match_list, kmer_len):
+def refine_potential_boundaries(kmer_match_list, kmer_len, orientation):
     print("REFINE BOUNDARIES")
     regions = {}
     region_count = 0
     kmer_count = 0
     current_region = []
+    longest_region = 0
+    longest_region_value = 0
+    start = 0
     # while kmer_count != len(kmer_match_list) - 1:
     for num, kmer in enumerate(kmer_match_list):
         if num + 1 < len(kmer_match_list):
@@ -176,10 +180,10 @@ def refine_potential_boundaries(kmer_match_list, kmer_len):
             # print(kmer_match_list[num + 1])
             # print("WAAAAAAAAAAAAAAAAAAAAAAAAAFFLE")
 
-            if kmer_match_list[kmer_count] + kmer_len == kmer_match_list[kmer_count + 1]:
+            if kmer_match_list[kmer_count] + kmer_len == kmer_match_list[kmer_count + 1] or kmer_match_list[kmer_count] - kmer_len == kmer_match_list[kmer_count + 1]:
                 current_region.append(kmer_match_list[kmer_count])
                 # regions[region_count] = []
-            elif kmer_match_list[kmer_count] + kmer_len != kmer_match_list[kmer_count + 1]:
+            elif kmer_match_list[kmer_count] + kmer_len != kmer_match_list[kmer_count + 1] or kmer_match_list[kmer_count] - kmer_len == kmer_match_list[kmer_count + 1]:
                 current_region.append(kmer_match_list[kmer_count])
                 regions[region_count] = current_region
                 current_region = []
@@ -187,8 +191,29 @@ def refine_potential_boundaries(kmer_match_list, kmer_len):
 
             kmer_count+=1
     regions[region_count] = current_region
+    # for key, value in regions.items():
+        
+    #     if value[-1] + kmer_len == kmer_match_list[-1]:
+    #         value.append(kmer_match_list[-1])
+    
     print(regions)
-                
+    for key, value in regions.items():
+        if len(value) > longest_region_value:
+            longest_region_value = len(value)
+            longest_region = key
+
+    longest_match_region = regions.get(longest_region)
+
+    if orientation == "start":
+        start = min(longest_match_region)
+    
+    elif orientation == "stop":
+        start = max(longest_match_region)
+    
+    for num, position in enumerate(kmer_match_list):
+        if position == start:
+            
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")            
 
 
 def trim_boundaries(kmer_lists, long_seq, kmer_len):

@@ -579,9 +579,12 @@ if [[ $basecall == "ON" ]]; then
 	do
 		mafft \
 		--thread $align_threads \
+		--op 5 \
+		--lexp -0.5 \
 		${outdir}/gon_phy_to_snippy/align_files/${i} \
 		> \
 		${outdir}/gon_phy_to_snippy/align_files/aligned_${i}
+
 
 		${program_path}/empirical_data_comparison/emp_snippy_gapped_align_compared.py \
 		-t \
@@ -609,6 +612,8 @@ if [[ $basecall == "ON" ]]; then
 	do
 		mafft \
 		--thread $align_threads \
+		--op 5 \
+		--lexp -0.5 \
 		${outdir}/rapup_to_snippy/align_files/${i} \
 		> \
 		${outdir}/rapup_to_snippy/align_files/aligned_${i}

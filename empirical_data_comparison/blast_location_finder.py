@@ -159,6 +159,9 @@ def find_boundaries(manipulated_seq, long_seq):
     
     refine_start = refine_potential_boundaries(front_kmers, kmer_size, "start")
     refine_stop = refine_potential_boundaries(back_kmers, kmer_size, "stop")
+
+    print(refine_start, refine_stop)
+    print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")    
     
     output_kmers.append(front_kmers)
     output_kmers.append(back_kmers)
@@ -173,6 +176,7 @@ def refine_potential_boundaries(kmer_match_list, kmer_len, orientation):
     longest_region = 0
     longest_region_value = 0
     start = 0
+    output_position = 0
     # while kmer_count != len(kmer_match_list) - 1:
     for num, kmer in enumerate(kmer_match_list):
         if num + 1 < len(kmer_match_list):
@@ -212,8 +216,13 @@ def refine_potential_boundaries(kmer_match_list, kmer_len, orientation):
     
     for num, position in enumerate(kmer_match_list):
         if position == start:
-            
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")            
+            if orientation == "start":
+                output_position = start - (num * kmer_len)
+            elif orientation == "stop":
+                output_position = start + (num * kmer_len)
+    print(output_position)
+    return output_position
+    # print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")            
 
 
 def trim_boundaries(kmer_lists, long_seq, kmer_len):

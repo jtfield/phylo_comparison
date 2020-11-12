@@ -163,8 +163,8 @@ def find_boundaries(manipulated_seq, long_seq):
     print(refine_start, refine_stop)
     print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")    
     
-    output_kmers.append(front_kmers)
-    output_kmers.append(back_kmers)
+    output_kmers.append(refine_start)
+    output_kmers.append(refine_stop)
     return output_kmers
     
 def refine_potential_boundaries(kmer_match_list, kmer_len, orientation):
@@ -217,9 +217,9 @@ def refine_potential_boundaries(kmer_match_list, kmer_len, orientation):
     for num, position in enumerate(kmer_match_list):
         if position == start:
             if orientation == "start":
-                output_position = start - (num * kmer_len)
+                output_position = start - ((num + 1) * kmer_len)
             elif orientation == "stop":
-                output_position = start + (num * kmer_len)
+                output_position = start + ((num + 1 )* kmer_len)
     print(output_position)
     return output_position
     # print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")            
@@ -324,6 +324,15 @@ def long_seq_trimmer(long_seq, len_short_seq, start_stop_positions_list):
         # print(output)
         return output
 
+# Test to assert length of region calculated as locus boundaries
+# is similar in size to the length of the short locus
+def assess_boundaries(short_seq, boundaries):
+    split_seq_and_name = short_seq.split('\n', 1)
+    seq = split_seq_and_name[1]
+    short_len = len(seq)
+    boundary_len = boundaries[1] - boundaries[0]
+    assert boundary_len >= .999 * short_len
+    
 
 def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
     kmer_len = 50
@@ -370,21 +379,25 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
 
                         find_seq_location = find_boundaries(convert_manip[match_maker], long_contiguous)
 
+                        check_boundaries = assess_boundaries(read_manip_file, find_seq_location)
+
+                        trimmed_long = long_contiguous[find_seq_location[0]:find_seq_location[1]]
+
                         # trim_long = trim_boundaries(find_seq_location, long_contiguous, kmer_len)
                         # print(trim_long)
 
                         # produce_trimmed_seq = long_seq_trimmer(long_contiguous, len(convert_manip[match_maker]), trim_long)
 
-                        # output = open(output_dir +'/'+ 'combined-' + manip_locus + '--' + manip_taxon, 'w')
-                        # output.write(label)
-                        # output.write('\n')
-                        # output.write(produce_trimmed_seq)
-                        # output.write('\n')
-                        # output.write(label)
-                        # output.write('\n')
-                        # output.write(convert_manip[match_maker])
+                        output = open(output_dir +'/'+ 'combined-' + manip_locus + '--' + manip_taxon, 'w')
+                        output.write(label)
+                        output.write('\n')
+                        output.write(trimmed_long)
+                        output.write('\n')
+                        output.write(label)
+                        output.write('\n')
+                        output.write(convert_manip[match_maker])
 
-                        # output.close()
+                        output.close()
                         open_long_seq.close()
                         open_manip_file.close()
 

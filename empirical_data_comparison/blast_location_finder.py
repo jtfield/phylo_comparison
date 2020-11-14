@@ -381,7 +381,7 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
 
                         check_boundaries = assess_boundaries(read_manip_file, find_seq_location)
 
-                        trimmed_long = long_contiguous[find_seq_location[0]:find_seq_location[1]]
+                        trimmed_long = long_contiguous[find_seq_location[0]:find_seq_location[1] + 100]
 
                         # trim_long = trim_boundaries(find_seq_location, long_contiguous, kmer_len)
                         # print(trim_long)

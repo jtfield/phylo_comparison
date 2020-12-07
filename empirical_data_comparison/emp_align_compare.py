@@ -4,7 +4,7 @@ import os
 import re
 import multiprocessing as mp
 from Bio.Seq import Seq
-from Bio.Alphabet import generic_dna
+#from Bio.Alphabet import generic_dna
 
 def parse_args():
     parser = argparse.ArgumentParser()

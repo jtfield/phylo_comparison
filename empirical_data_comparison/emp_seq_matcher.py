@@ -3,7 +3,7 @@ import argparse
 import os
 import re
 from Bio.Seq import Seq
-from Bio.Alphabet import generic_dna
+#from Bio.Alphabet import generic_dna
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -12,7 +12,7 @@ def parse_args():
     parser.add_argument('--cluster_id_1', default='')
     parser.add_argument('--cluster_id_2', default='')
     parser.add_argument('--output_dir', default='NONE')
-    parser.add_argument('--matched_seq_output_dir', default='NONE')
+    #parser.add_argument('--matched_seq_output_dir', default='NONE')
     return parser.parse_args()
 
 def main():
@@ -77,7 +77,7 @@ def main():
                         len_align_2 = len(align_2_split[1])
                         shorter = seq.replace('\n','')
 
-                        main_short = Seq(shorter, generic_dna)
+                        main_short = Seq(shorter)
                         short_comp = main_short.complement()
                         short_reverse = main_short[::-1]
                         short_rev_comp = main_short.reverse_complement()
@@ -141,16 +141,16 @@ def main():
         names_output.write('\n')
     names_output.close()
 
-    print("Outputting separate single tax files for second dataset")
-    for file_name in matching_folder_2_contents:
-        find_name_2 = re.findall(compile_cluster_2_name, file_name)
-        if find_name_2:
-            print(find_name_2)
-            if args.matched_seq_output_dir != "NONE":
-                output = open(args.matched_seq_output_dir + '/' + 'single_tax-' + args.cluster_id_2 + '--' + ''.join(find_name_2),'w')
-                file_2 = open(path_to_input_folder_2 + '/' + file_name,'r').read()
-                output.write(file_2)
-                output.close()
+    #print("Outputting separate single tax files for second dataset")
+    #for file_name in matching_folder_2_contents:
+    #    find_name_2 = re.findall(compile_cluster_2_name, file_name)
+    #    if find_name_2:
+    #        print(find_name_2)
+    #        if args.matched_seq_output_dir != "NONE":
+    #            output = open(args.matched_seq_output_dir + '/' + 'single_tax-' + args.cluster_id_2 + '--' + ''.join(find_name_2),'w')
+    #            file_2 = open(path_to_input_folder_2 + '/' + file_name,'r').read()
+    #            output.write(file_2)
+    #            output.close()
 
 if __name__ == '__main__':
     main()

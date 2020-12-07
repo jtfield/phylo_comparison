@@ -222,6 +222,9 @@ def comparison(list_of_list_of_seqs):
     
     shorter_seq = shorter[1]
     longer_seq = longer[1]
+
+    len_short = nuc_counter(shorter)
+    len_long = nuc(longer)
     
     get_gaps = trim_gaps(shorter_seq) 
     #print(get_gaps)
@@ -261,6 +264,8 @@ def comparison(list_of_list_of_seqs):
     analyze_alignment = check_alignment(combined_positions)
 
     #print(analyze_alignment)
+    analyze_alignment.append(len_short)
+    analyze_alignment.append(len_long)
     
     return analyze_alignment
 
@@ -314,6 +319,14 @@ def main():
         output_file.write(">gaps_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_1[6]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_short_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[7]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_long_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[8]))
 
 if __name__ == '__main__':
     main()

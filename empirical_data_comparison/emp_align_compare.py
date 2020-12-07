@@ -191,6 +191,9 @@ def comparison(list_of_list_of_seqs):
     #print(len(shorter_seq))
     #print(len(longer_seq))
 
+    len_short = nuc_counter(shorter)
+    len_long = nuc_counter(longer)
+
     #print(shorter_seq)
     #print(longer_seq)
 
@@ -230,6 +233,8 @@ def comparison(list_of_list_of_seqs):
     analyze_alignment = check_alignment(combined_positions)
 
     #print(analyze_alignment)
+    analyze_alignment.append(len_short)
+    analyze_alignment.append(len_long)
     
     return analyze_alignment
 
@@ -307,6 +312,14 @@ def main():
         output_file.write(">gaps_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_1[6]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_short_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[7]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_long_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_1[8]))
 
 
     elif best_align == compare_seqs_2[0]:
@@ -339,6 +352,14 @@ def main():
         output_file.write(">gaps_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_2[6]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_short_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_2[7]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_long_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_2[8]))
 
     elif best_align == compare_seqs_3[0]:
         output_file.write(args.align_3)
@@ -370,6 +391,14 @@ def main():
         output_file.write(">gaps_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_3[6]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_short_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_3[7]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_long_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_3[8]))
 
     elif best_align == compare_seqs_4[0]:
         output_file.write(args.align_4)
@@ -401,6 +430,14 @@ def main():
         output_file.write(">gaps_positions")
         output_file.write("\n")
         output_file.write(str(compare_seqs_4[6]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_short_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_4[7]))
+        output_file.write("\n")
+        output_file.write(">unadjusted_long_seq_length")
+        output_file.write("\n")
+        output_file.write(str(compare_seqs_4[8]))
 
 
     #align_1_split = align_1.split('\n', 1)

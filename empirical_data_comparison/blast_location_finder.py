@@ -4,7 +4,7 @@ import os
 import re
 import random
 from Bio.Seq import Seq
-from Bio.Alphabet import generic_dna
+#from Bio.Alphabet import generic_dna
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -26,7 +26,7 @@ def seq_converter(seq):
     len_seq = len(seq_split[1])
     shorter = seq.replace('\n','')
 
-    main_short = Seq(shorter, generic_dna)
+    main_short = Seq(shorter)
     short_comp = main_short.complement()
     short_reverse = main_short[::-1]
     short_rev_comp = main_short.reverse_complement()

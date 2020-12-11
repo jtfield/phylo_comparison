@@ -224,7 +224,9 @@ def comparison(list_of_list_of_seqs):
     longer_seq = longer[1]
 
     len_short = nuc_counter(shorter)
-    len_long = nuc(longer)
+    #len_long = nuc(longer)
+    len_long = len(longer[1])
+    #print(longer)
     
     get_gaps = trim_gaps(shorter_seq) 
     #print(get_gaps)

@@ -1,10 +1,12 @@
-#! /usr/bin/env python3
+#! /home/jtoscanifield/.linuxbrew/bin/python3
 import argparse
 import os
 import re
 import random
 from Bio.Seq import Seq
 #from Bio.Alphabet import generic_dna
+#/home/jtoscanifield/.linuxbrew/bin/python3
+#/usr/bin/env python3
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -16,6 +18,7 @@ def parse_args():
     return parser.parse_args()
 
 def seq_converter(seq):
+    print("seq_converter")
 
     output = {}
 
@@ -46,6 +49,7 @@ def seq_converter(seq):
     return output
 
 def generate_random_kmer_positions(seq_len):
+    print("generate_random_kmer_positions")
     output = []
     
     for i in range(0,50):
@@ -108,6 +112,7 @@ def find_match(long_seq, dict_of_seqs):
 
 
 def find_boundaries(manipulated_seq, long_seq):
+    print("find_boundaries")
     output_kmers = []
     front_kmers = []
     back_kmers = []
@@ -168,6 +173,7 @@ def find_boundaries(manipulated_seq, long_seq):
     return output_kmers
     
 def refine_potential_boundaries(kmer_match_list, kmer_len, orientation):
+    print("refine_potential_boundaries")
     print("REFINE BOUNDARIES")
     regions = {}
     region_count = 0
@@ -226,6 +232,7 @@ def refine_potential_boundaries(kmer_match_list, kmer_len, orientation):
 
 
 def trim_boundaries(kmer_lists, long_seq, kmer_len):
+    print("trim_boundaries")
     contiguous_front_positions = []
     contiguous_back_positions = []
     seq_front_kmers = kmer_lists[0]
@@ -297,6 +304,7 @@ def trim_boundaries(kmer_lists, long_seq, kmer_len):
     
 
 def long_seq_trimmer(long_seq, len_short_seq, start_stop_positions_list):
+    print("long_seq_trimmer")
     # start = start_stop_positions_list[0]
     # stop = start_stop_positions_list[1]
     start = None
@@ -327,6 +335,7 @@ def long_seq_trimmer(long_seq, len_short_seq, start_stop_positions_list):
 # Test to assert length of region calculated as locus boundaries
 # is similar in size to the length of the short locus
 def assess_boundaries(short_seq, boundaries):
+    print("assess_boundaries")
     split_seq_and_name = short_seq.split('\n', 1)
     seq = split_seq_and_name[1]
     short_len = len(seq)
@@ -335,14 +344,16 @@ def assess_boundaries(short_seq, boundaries):
     
 
 def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
+    print("match_long_with_loci")
     kmer_len = 50
     manip_folder_contents = os.listdir(manip_seq_path)
     long_seqs_folder_contents = os.listdir(long_seq_path)
     file_info_regex = r'-(cluster\d+)--(.+)$'
     file_info_compile = re.compile(file_info_regex)
-    long_name_regex = r'single_tax_snippy-core.full.aln-(\w+)$'
+    long_name_regex = r'single_tax_snippy-fixed_core.full.aln-(\w+)$'
     long_name_compile = re.compile(long_name_regex)
 
+    print("iterate over manip files")
     for manip_file in manip_folder_contents:
         # print(manip_file)
         find_info = re.findall(file_info_compile, manip_file)
@@ -351,20 +362,24 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
             manip_locus = find_info[0][0]
             # print(manip_taxon)
             # print(manip_locus)
-
+            print("iterate over long files")
             for long_seq in long_seqs_folder_contents:
-                # print(long_seq)
+                print(long_seq)
                 find_long_info = re.findall(long_name_compile, long_seq)
+                print("finding long seq info")
                 if find_long_info:
+                    print("found long seq info")
                     long_seq_name = find_long_info[0]
                     if long_seq_name == manip_taxon:
-                        # print(manip_taxon)
+                        
+                        print(manip_taxon)
                         open_manip_file = open(manip_seq_path +'/'+ manip_file,'r')
                         read_manip_file = open_manip_file.read()
 
                         open_long_seq = open(long_seq_path +'/'+ long_seq, 'r')
                         read_long_seq = open_long_seq.read()
-
+                        
+                        print("files opened")
                         convert_manip = seq_converter(read_manip_file)
 
                         long_seq_split = read_long_seq.split('\n', 1)
@@ -408,11 +423,15 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
 def main():
     args = parse_args()
 
+    print("program begins")
     path_to_manip_folder = os.path.realpath(args.manipulate_seqs_folder)
     manip_folder_contents = os.listdir(path_to_manip_folder)
+    print("program has found data")
 
     path_to_long_seqs_folder = os.path.realpath(args.long_seqs_folder)
     long_seqs_folder_contents = os.listdir(path_to_long_seqs_folder)
+
+    print("program found 2nd set of data")
 
     find_orientation = match_long_with_loci(path_to_manip_folder, path_to_long_seqs_folder, args.output_dir)
     

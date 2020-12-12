@@ -364,7 +364,7 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
             print(manip_locus)
             print("iterate over long files")
             for long_seq in long_seqs_folder_contents:
-                print(long_seq)
+                # print(long_seq)
                 find_long_info = re.findall(long_name_compile, long_seq)
                 #print("finding long seq info")
                 if find_long_info:
@@ -416,8 +416,20 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
                         output.close()
                         open_long_seq.close()
                         open_manip_file.close()
+                    
+                    else:
+                        print("didnt find match between method sequences")
+                        print(manip_taxon + '    ' + long_seq_name)
 
 
+                else:
+                    print("didnt find long match")
+                    print(find_long_info)
+
+
+        else:
+            print("didnt find manip match")
+            print(file_info_compile)
 
 
 

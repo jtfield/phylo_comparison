@@ -516,13 +516,12 @@ def main():
     snippy_to_gon_phy_alignment_result_files = os.listdir(snippy_to_gon_phy_results)
     snippy_to_rapup_alignment_result_files = os.listdir(snippy_to_rapup_results)
 
-    #gon_phy_tree = open(path_to_output_folder + '/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/RAxML_bestTree.core_genome_run.out', 'r').read()
-    gon_phy_tree = open(path_to_output_folder + '/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/fixed_gon_phy_MR.tre', 'r').read()
-    #rapup_tree = open(path_to_output_folder + '/rapup_run/combine_and_infer/RAxML_bestTree.consensusFULL','r').read()
-    rapup_tree = open(path_to_output_folder + '/rapup_run/combine_and_infer/fixed_rapup_MR.tre','r').read()
-    #snippy_tree = open(path_to_output_folder + '/RAxML_bestTree.snippy_tree','r').read()
-    snippy_tree = open(path_to_output_folder + '/fixed_snippy_MR.tre','r').read()
-    # true_tree = open(path_to_output_folder + '/true_tree.tre','r').read()
+######################################################################3
+#TREE READ (NECESSARY)
+#    gon_phy_tree = open(path_to_output_folder + '/trimmed_reads/spades_output/genomes_for_parsnp/alignment_fixing/fixed_gon_phy_MR.tre', 'r').read()
+#    rapup_tree = open(path_to_output_folder + '/rapup_run/combine_and_infer/fixed_rapup_MR.tre','r').read()
+#    snippy_tree = open(path_to_output_folder + '/fixed_snippy_MR.tre','r').read()
+##########################################################################
 
     rapup_to_gon_phy_miscall_df = make_df(rapup_to_gon_phy_results,rapup_to_gon_phy_alignment_result_files)
     rapup_to_gon_phy_gap_df = make_df(rapup_to_gon_phy_results,rapup_to_gon_phy_alignment_result_files)
@@ -541,136 +540,136 @@ def main():
 
 
 ###################################################################################################
-    #TREE COMPARISON
-    tns = dendropy.TaxonNamespace()
+#    #TREE COMPARISON
+#    tns = dendropy.TaxonNamespace()
+#
+#    #name_grabber = '(\w+?):'
+#    #compile_name_grabber = re.compile(name_grabber)
+#
+#    snippy_ref_name = ''
+#    with open(path_to_output_folder + '/core.ref.fa') as f:
+#        first_line = f.readline().strip()
+#        snippy_ref_name = first_line.strip('>')
+#    print(snippy_ref_name)
+#    ref = 'Reference'
+#    ref_compile = re.compile(ref)
+#
+#    read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
+#    read_snippy_tree = dendropy.Tree.get(data = snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
+#    read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
+   # read_true_tree = dendropy.Tree.get(data = true_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
 
-    #name_grabber = '(\w+?):'
-    #compile_name_grabber = re.compile(name_grabber)
-
-    snippy_ref_name = ''
-    with open(path_to_output_folder + '/core.ref.fa') as f:
-        first_line = f.readline().strip()
-        snippy_ref_name = first_line.strip('>')
-    print(snippy_ref_name)
-    ref = 'Reference'
-    ref_compile = re.compile(ref)
-
-    read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
-    read_snippy_tree = dendropy.Tree.get(data = snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
-    read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
-    # read_true_tree = dendropy.Tree.get(data = true_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True)
-
-    # # str_true_tree = str(read_true_tree)
-    # str_rapup_tree = str(read_rapup_tree)
-    # str_snippy_tree = str(read_snippy_tree)
-    # str_gon_phy_tree = str(read_gon_phy_tree)
-    
-    # str_snippy_tree = str_snippy_tree.replace(ref, snippy_ref_name)
+   # # str_true_tree = str(read_true_tree)
+   # str_rapup_tree = str(read_rapup_tree)
+   # str_snippy_tree = str(read_snippy_tree)
+   # str_gon_phy_tree = str(read_gon_phy_tree)
    
-    # # str_true_tree = str_true_tree.replace('.ref', '')
-    # str_gon_phy_tree = str_gon_phy_tree.replace('.ref', '')
-    # str_rapup_tree = str_rapup_tree.replace('.ref', '')
-    # str_snippy_tree = str_snippy_tree.replace('.ref', '') 
+   # str_snippy_tree = str_snippy_tree.replace(ref, snippy_ref_name)
+  
+   # # str_true_tree = str_true_tree.replace('.ref', '')
+   # str_gon_phy_tree = str_gon_phy_tree.replace('.ref', '')
+   # str_rapup_tree = str_rapup_tree.replace('.ref', '')
+   # str_snippy_tree = str_snippy_tree.replace('.ref', '') 
+   # #print(str_true_tree)
 
-    # #print(str_true_tree)
+   # # true_names = get_taxa_names(str_true_tree)
+   # rapup_names = get_taxa_names(str_rapup_tree)
+   # snippy_names = get_taxa_names(str_snippy_tree)
+   # gon_phy_names = get_taxa_names(str_gon_phy_tree)
 
-    # # true_names = get_taxa_names(str_true_tree)
-    # rapup_names = get_taxa_names(str_rapup_tree)
-    # snippy_names = get_taxa_names(str_snippy_tree)
-    # gon_phy_names = get_taxa_names(str_gon_phy_tree)
+   # #IF USING TREETOREADS AND GAVE SIMULATED READS A PREFIX OR LEFT THE PREFIX AS DEFAULT
+   # # fixed_true_names = []
+   # # fixed_true_tree = ''
 
-    # #IF USING TREETOREADS AND GAVE SIMULATED READS A PREFIX OR LEFT THE PREFIX AS DEFAULT
-    # # fixed_true_names = []
-    # # fixed_true_tree = ''
+   # str_rapup_tree = str_rapup_tree.replace(prefix, '')
+   # str_snippy_tree = str_snippy_tree.replace(prefix, '')
+   # str_gon_phy_tree = str_gon_phy_tree.replace(prefix, '')
+   
 
-    # str_rapup_tree = str_rapup_tree.replace(prefix, '')
-    # str_snippy_tree = str_snippy_tree.replace(prefix, '')
-    # str_gon_phy_tree = str_gon_phy_tree.replace(prefix, '')
-    
+   #print(str_true_tree)
+   #print("\n")
+   #print(str_rapup_tree)
+   #print("\n")
+   #print(str_snippy_tree)
+   #print("\n")
+   #print(str_gon_phy_tree)
+   #print("\n")
+   #assert len(true_names) == len(rapup_names) == len(snippy_names) == len(gon_phy_names)
+   
+   #print(true_names)
+   #print(rapup_names)
+   #print(snippy_names)
+   #print(gon_phy_names)
 
-    #print(str_true_tree)
-    #print("\n")
-    #print(str_rapup_tree)
-    #print("\n")
-    #print(str_snippy_tree)
-    #print("\n")
-    #print(str_gon_phy_tree)
-    #print("\n")
-    #assert len(true_names) == len(rapup_names) == len(snippy_names) == len(gon_phy_names)
-    
-    #print(true_names)
-    #print(rapup_names)
-    #print(snippy_names)
-    #print(gon_phy_names)
+   #print(len(true_names))
+   #print(len(rapup_names))
+   #print(len(snippy_names))
+   #print(len(gon_phy_names))
 
-    #print(len(true_names))
-    #print(len(rapup_names))
-    #print(len(snippy_names))
-    #print(len(gon_phy_names))
+   
 
-    
+   #prepare to make comparisons
+   # fixed_true_tree = dendropy.Tree.get(data = str_true_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
 
-    #prepare to make comparisons
-    # fixed_true_tree = dendropy.Tree.get(data = str_true_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
+   # fixed_rapup_tree = dendropy.Tree.get(data = str_rapup_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
 
-    # fixed_rapup_tree = dendropy.Tree.get(data = str_rapup_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
+   # fixed_snippy_tree = dendropy.Tree.get(data = str_snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
 
-    # fixed_snippy_tree = dendropy.Tree.get(data = str_snippy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
+   # fixed_gon_phy_tree = dendropy.Tree.get(data = str_gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
 
-    # fixed_gon_phy_tree = dendropy.Tree.get(data = str_gon_phy_tree, schema='newick', taxon_namespace=tns, preserve_underscores=True, terminating_semicolon_required=False)
+   # # true_names = get_taxa_names(str_true_tree)
+   # rapup_names = get_taxa_names(str_rapup_tree)
+   # snippy_names = get_taxa_names(str_snippy_tree)
+   # gon_phy_names = get_taxa_names(str_gon_phy_tree)
 
-    # # true_names = get_taxa_names(str_true_tree)
-    # rapup_names = get_taxa_names(str_rapup_tree)
-    # snippy_names = get_taxa_names(str_snippy_tree)
-    # gon_phy_names = get_taxa_names(str_gon_phy_tree)
+   #print(true_names)
+   #print(rapup_names)
+   #print(snippy_names)
+   #print(gon_phy_names)
 
-    #print(true_names)
-    #print(rapup_names)
-    #print(snippy_names)
-    #print(gon_phy_names)
+   # #PRUNE OUT NAMES NOT FOUND IN METHOD TREES (IMPORTANT IF A SUBSET OF SIMULATED DATASET WAS USED)
+   # join_true_names = ''.join(true_names)
+   # #print(join_true_names)
+   # names_not_shared_list = []
+   # #for name in true_names:
+   # for name in rapup_names:
+   #     compile_name = re.compile(name)
+   #     find_name = re.findall(name, join_true_names)
+   #     #print(name)
+   #     assert name in snippy_names
+   #     assert name in gon_phy_names
+   #     if not find_name:
+   #         names_not_shared_list.append(name)
 
-    # #PRUNE OUT NAMES NOT FOUND IN METHOD TREES (IMPORTANT IF A SUBSET OF SIMULATED DATASET WAS USED)
-    # join_true_names = ''.join(true_names)
-    # #print(join_true_names)
-    # names_not_shared_list = []
-    # #for name in true_names:
-    # for name in rapup_names:
-    #     compile_name = re.compile(name)
-    #     find_name = re.findall(name, join_true_names)
-    #     #print(name)
-    #     assert name in snippy_names
-    #     assert name in gon_phy_names
-    #     if not find_name:
-    #         names_not_shared_list.append(name)
+   # if len(names_not_shared_list) > 0:
+   #     #read_true_tree.prune_taxa_with_labels(names_not_shared_list)
+   #     fixed_true_tree.prune_taxa_with_labels(names_not_shared_list)
 
-    # if len(names_not_shared_list) > 0:
-    #     #read_true_tree.prune_taxa_with_labels(names_not_shared_list)
-    #     fixed_true_tree.prune_taxa_with_labels(names_not_shared_list)
+   # print(names_not_shared_list)
 
-    # print(names_not_shared_list)
+   # assert len(fixed_true_tree.leaf_nodes()) == len(fixed_rapup_tree.leaf_nodes())
+   # read_true_tree.write(path= path_to_output_folder + "/true_tree_subset.tre", schema="newick")
+##########################################################################################################
+#PIMARY COMPARE SECTION
+#   print("rapup to gon_phyling RF results")
+#   rapup_to_gon_phy_phylo_compare = treecompare.symmetric_difference(read_gon_phy_tree, read_rapup_tree)
+#   print(rapup_to_gon_phy_phylo_compare)
+#   # rapup_error = calculate_error(len(rapup_names), rapup_phylo_compare)
+#   # print(rapup_error)
+#
+#   print("snippy to gon_phyling RF results")
+#   snippy_to_gon_phy_phylo_compare = treecompare.symmetric_difference(read_gon_phy_tree, read_snippy_tree)
+#   print(snippy_to_gon_phy_phylo_compare)
+#   # snippy_error = calculate_error(len(snippy_names), snippy_phylo_compare)
+#   # print(snippy_error)
+#
+#   print("snippy to rapup RF results")
+#   snippy_to_rapup_phylo_compare = treecompare.symmetric_difference(read_rapup_tree, read_snippy_tree)
+#   print(snippy_to_rapup_phylo_compare)
+#   # gon_phy_error = calculate_error(len(gon_phy_names), gon_phy_phylo_compare)
+#   # print(gon_phy_error)
 
-    # assert len(fixed_true_tree.leaf_nodes()) == len(fixed_rapup_tree.leaf_nodes())
-    # read_true_tree.write(path= path_to_output_folder + "/true_tree_subset.tre", schema="newick")
-
-    print("rapup to gon_phyling RF results")
-    rapup_to_gon_phy_phylo_compare = treecompare.symmetric_difference(read_gon_phy_tree, read_rapup_tree)
-    print(rapup_to_gon_phy_phylo_compare)
-    # rapup_error = calculate_error(len(rapup_names), rapup_phylo_compare)
-    # print(rapup_error)
-
-    print("snippy to gon_phyling RF results")
-    snippy_to_gon_phy_phylo_compare = treecompare.symmetric_difference(read_gon_phy_tree, read_snippy_tree)
-    print(snippy_to_gon_phy_phylo_compare)
-    # snippy_error = calculate_error(len(snippy_names), snippy_phylo_compare)
-    # print(snippy_error)
-
-    print("snippy to rapup RF results")
-    snippy_to_rapup_phylo_compare = treecompare.symmetric_difference(read_rapup_tree, read_snippy_tree)
-    print(snippy_to_rapup_phylo_compare)
-    # gon_phy_error = calculate_error(len(gon_phy_names), gon_phy_phylo_compare)
-    # print(gon_phy_error)
-
-####################################################################################################
+###################################################################################################
     
     #BASECALL COMPARISON
     print("\n\n")

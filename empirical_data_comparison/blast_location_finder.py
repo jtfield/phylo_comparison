@@ -364,14 +364,15 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
             # print(manip_locus)
             print("iterate over long files")
             for long_seq in long_seqs_folder_contents:
-                print(long_seq)
+                #print(long_seq)
                 find_long_info = re.findall(long_name_compile, long_seq)
-                print("finding long seq info")
+                #print("finding long seq info")
                 if find_long_info:
-                    print("found long seq info")
+                #    print("found long seq info")
                     long_seq_name = find_long_info[0]
                     if long_seq_name == manip_taxon:
-                        
+			print("taxon match")
+                        print(long_seq) 
                         print(manip_taxon)
                         open_manip_file = open(manip_seq_path +'/'+ manip_file,'r')
                         read_manip_file = open_manip_file.read()

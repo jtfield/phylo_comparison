@@ -360,13 +360,14 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
     print(num_short_files)
 
     manip_file_count = 0
-    
+    long_file_count = 0
 
     print("iterate over manip files")
     for manip_file in manip_folder_contents:
         # print(manip_file)
         find_info = re.findall(file_info_compile, manip_file)
         if find_info:
+            manip_file_count+=1
             manip_taxon = find_info[0][1]
             manip_locus = find_info[0][0]
             print(manip_taxon)
@@ -374,11 +375,10 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
             print("iterate over long files")
             long_file_count = 0
             for long_seq in long_seqs_folder_contents:
-                # print(long_seq)
                 find_long_info = re.findall(long_name_compile, long_seq)
                 #print("finding long seq info")
                 if find_long_info:
-                #    print("found long seq info")
+                    long_file_count+=1
                     long_seq_name = find_long_info[0]
                     if long_seq_name == manip_taxon:
                         print("taxon match")
@@ -427,13 +427,13 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
                         open_long_seq.close()
                         open_manip_file.close()
                     
-                    else:
-                        #print("didnt find match between method sequences")
-                        #print(manip_taxon + '    ' + long_seq_name)
-                        long_file_count+=1
-                        if long_file_count == num_long_files:
-                            print("couldnt find match for this short file")
-                            print(manip_taxon)
+                    # else:
+                    #     #print("didnt find match between method sequences")
+                    #     #print(manip_taxon + '    ' + long_seq_name)
+                    #     long_file_count+=1
+                    #     if long_file_count == num_long_files:
+                    #         print("couldnt find match for this short file")
+                    #         print(manip_taxon)
 
 
                 else:
@@ -444,6 +444,10 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
         else:
             print("didnt find manip match")
             print(file_info_compile)
+
+    print("number of files identified by regex methods")
+    print(manip_file_count)
+    print(long_file_count)
 
 
 

@@ -405,7 +405,7 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
 
                         find_seq_location = find_boundaries(convert_manip[match_maker], long_contiguous)
 
-                        check_boundaries = assess_boundaries(read_manip_file, find_seq_location)
+                        #check_boundaries = assess_boundaries(read_manip_file, find_seq_location)
 
                         trimmed_long = long_contiguous[find_seq_location[0]:find_seq_location[1] + 100]
 

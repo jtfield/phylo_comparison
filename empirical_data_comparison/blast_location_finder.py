@@ -429,7 +429,8 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
                         #print(manip_taxon + '    ' + long_seq_name)
                         long_file_count+=1
                         if long_file_count == num_long_files:
-                            print(long_seq_name)
+                            print("couldnt find match for this short file")
+                            print(manip_taxon)
 
 
                 else:

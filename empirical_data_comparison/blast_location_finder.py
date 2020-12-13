@@ -355,6 +355,9 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
 
     num_long_files = len(long_seqs_folder_contents)
     num_short_files = len(manip_folder_contents)
+    print("number of files")
+    print(num_long_files)
+    print(num_short_files)
 
     manip_file_count = 0
     

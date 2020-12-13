@@ -353,6 +353,12 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
     long_name_regex = r'single_tax_snippy-fixed_core.full.aln-(\w+)$'
     long_name_compile = re.compile(long_name_regex)
 
+    num_long_files = len(long_seqs_folder_contents)
+    num_short_files = len(manip_folder_contents)
+
+    manip_file_count = 0
+    
+
     print("iterate over manip files")
     for manip_file in manip_folder_contents:
         # print(manip_file)
@@ -363,6 +369,7 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
             print(manip_taxon)
             print(manip_locus)
             print("iterate over long files")
+            long_file_count = 0
             for long_seq in long_seqs_folder_contents:
                 # print(long_seq)
                 find_long_info = re.findall(long_name_compile, long_seq)
@@ -418,8 +425,11 @@ def match_long_with_loci(manip_seq_path, long_seq_path, output_dir):
                         open_manip_file.close()
                     
                     else:
-                        print("didnt find match between method sequences")
-                        print(manip_taxon + '    ' + long_seq_name)
+                        #print("didnt find match between method sequences")
+                        #print(manip_taxon + '    ' + long_seq_name)
+                        long_file_count+=1
+                        if long_file_count = num_long_files:
+                            print(long_seq_name)
 
 
                 else:

@@ -215,7 +215,7 @@ def basecall_comparison(path_to_files):
 
     ##########################################################################################################
     #BASECALL COMPARISON
-    print("\n\n")
+    print("\n\n\n")
     print("rapup to gon_phy results")
     rapup_to_gon_phy_basecall_check = gon_rap_basecall_checker(rapup_to_gon_phy_results, rapup_to_gon_phy_alignment_result_files, rapup_to_gon_phy_miscall_df, rapup_to_gon_phy_gap_df, rapup_to_gon_phy_identical_nucs_df, rapup_to_gon_phy_total_nucs_df)
     # print(rapup_to_gon_phy_miscall_df)
@@ -269,20 +269,114 @@ def basecall_comparison(path_to_files):
     print("rapup gaps per base")
     print(rapup_per_base_gap)
 
-
+    print("\n\n\n")
     print("snippy to gon_phy results")
     snippy_to_gon_phy_basecall_check = snippy_basecall_checker(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files, snippy_to_gon_phy_miscall_df, snippy_to_gon_phy_gap_df, snippy_to_gon_phy_identical_nucs_df, snippy_to_gon_phy_total_nucs_df)
     # print(snippy_to_gon_phy_miscall_df)
     # print(snippy_to_gon_phy_gap_df)
     # print(snippy_to_gon_phy_identical_nucs_df)
 
+    snippy_to_gon_phy_avg_miscalled = snippy_to_gon_phy_miscall_df['sums'].mean()
+    print("average miscalls", snippy_to_gon_phy_avg_miscalled)
+    snippy_to_gon_phy_miscalled_std = snippy_to_gon_phy_miscall_df.loc[:,"sums"].std()
+    print("miscall standard deviation", snippy_to_gon_phy_miscalled_std)
+    snippy_to_gon_phy_total_miscalls = snippy_to_gon_phy_miscall_df.loc[:,"sums"].sum()
+    print("total miscalls", snippy_to_gon_phy_total_miscalls)
+    #print(rapup_basecall_check['sums'])
+    # rapup_to_gon_phy_basecall_check = rapup_to_gon_phy_miscall_df.rename(columns={'sums' : 'rapup_sums'})
+
+    snippy_to_gon_phy_avg_gap = snippy_to_gon_phy_gap_df['sums'].mean()
+    print("average gaps", snippy_to_gon_phy_avg_gap)
+    snippy_to_gon_phy_gap_std = snippy_to_gon_phy_gap_df.loc[:,"sums"].std()
+    print("gaps standard deviasion", snippy_to_gon_phy_gap_std)
+    snippy_to_gon_phy_total_gaps = snippy_to_gon_phy_gap_df.loc[:,"sums"].sum()
+    print("total gaps", snippy_to_gon_phy_total_gaps)
+    #print(rapup_basecall_check['sums'])
+    # rapup_to_gon_phy_gap_check = rapup_to_gon_phy_gap_check.rename(columns={'sums' : 'rapup_sums'})
+
+    snippy_to_gon_phy_avg_identical_nuc = snippy_to_gon_phy_identical_nucs_df['sums'].mean()
+    print("average identical nuleotides per taxon nuleotides", snippy_to_gon_phy_avg_identical_nuc)
+    snippy_to_gon_phy_identical_nuc_std = snippy_to_gon_phy_identical_nucs_df.loc[:,"sums"].std()
+    print("identical nucleotides standard deviation per taxon", snippy_to_gon_phy_identical_nuc_std)
+    snippy_to_gon_phy_total_identical_nuc = snippy_to_gon_phy_identical_nucs_df.loc[:,"sums"].sum()
+    print("identical nucleotides summed", snippy_to_gon_phy_total_identical_nuc)
+    #print(rapup_basecall_check['sums'])
+    # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
+
+    #print(rapup_total_check)
+    snippy_to_gon_phy_avg_total_nuc = snippy_to_gon_phy_total_nucs_df['sums'].mean()
+    print("average all nuleotides per taxon nuleotides", snippy_to_gon_phy_avg_total_nuc)
+    snippy_to_gon_phy_total_nuc_std = snippy_to_gon_phy_total_nucs_df.loc[:,"sums"].std()
+    print("total nucleotides standard deviation per taxon", snippy_to_gon_phy_total_nuc_std)
+    snippy_to_gon_phy_total_total_nuc = snippy_to_gon_phy_total_nucs_df.loc[:,"sums"].sum()
+    print("total nucleotides summed", snippy_to_gon_phy_total_total_nuc)
+    #print(rapup_basecall_check['sums'])
+    # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
+
+    #per-base results
+    snippy_per_base_miscall = snippy_to_gon_phy_total_miscalls / snippy_to_gon_phy_total_total_nuc 
+    snippy_per_base_gap = snippy_to_gon_phy_total_gaps / snippy_to_gon_phy_total_total_nuc
+    #print(rapup_total_miscalls)
+    #print(rapup_total_total_nuc)
+    print("snippy to gon_phyling miscalls per base")
+    print(snippy_per_base_miscall)
+    print("snippy to gon_phyling gaps per base")
+    print(snippy_per_base_gap)
 
 
+    print("\n\n\n")
     print("rapup to snippy results")
     snippy_to_rapup_basecall_check = snippy_basecall_checker(snippy_to_rapup_results, snippy_to_rapup_alignment_result_files, snippy_to_rapup_miscall_df, snippy_to_rapup_gap_df, snippy_to_rapup_identical_nucs_df, snippy_to_rapup_total_nucs_df) 
     # print(snippy_to_rapup_miscall_df)
     # print(snippy_to_rapup_gap_df)
     # print(snippy_to_rapup_identical_nucs_df)
+
+    snippy_to_rapup_avg_miscalled = snippy_to_rapup_miscall_df['sums'].mean()
+    print("average miscalls", snippy_to_rapup_avg_miscalled)
+    snippy_to_rapup_miscalled_std = snippy_to_rapup_miscall_df.loc[:,"sums"].std()
+    print("miscall standard deviation", snippy_to_rapup_miscalled_std)
+    snippy_to_rapup_total_miscalls = snippy_to_rapup_miscall_df.loc[:,"sums"].sum()
+    print("total miscalls", snippy_to_rapup_total_miscalls)
+    #print(rapup_basecall_check['sums'])
+    # rapup_to_gon_phy_basecall_check = rapup_to_gon_phy_miscall_df.rename(columns={'sums' : 'rapup_sums'})
+
+    snippy_to_rapup_avg_gap = snippy_to_rapup_gap_df['sums'].mean()
+    print("average gaps", snippy_to_rapup_avg_gap)
+    snippy_to_rapup_gap_std = snippy_to_rapup_gap_df.loc[:,"sums"].std()
+    print("gaps standard deviasion", snippy_to_rapup_gap_std)
+    snippy_to_rapup_total_gaps = snippy_to_rapup_gap_df.loc[:,"sums"].sum()
+    print("total gaps", snippy_to_rapup_total_gaps)
+    #print(rapup_basecall_check['sums'])
+    # rapup_to_gon_phy_gap_check = rapup_to_gon_phy_gap_check.rename(columns={'sums' : 'rapup_sums'})
+
+    snippy_to_rapup_avg_identical_nuc = snippy_to_rapup_identical_nucs_df['sums'].mean()
+    print("average identical nuleotides per taxon nuleotides", snippy_to_rapup_avg_identical_nuc)
+    snippy_to_rapup_identical_nuc_std = snippy_to_rapup_identical_nucs_df.loc[:,"sums"].std()
+    print("identical nucleotides standard deviation per taxon", snippy_to_rapup_identical_nuc_std)
+    snippy_to_rapup_total_identical_nuc = snippy_to_rapup_identical_nucs_df.loc[:,"sums"].sum()
+    print("identical nucleotides summed", snippy_to_rapup_total_identical_nuc)
+    #print(rapup_basecall_check['sums'])
+    # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
+
+    #print(rapup_total_check)
+    snippy_to_rapup_avg_total_nuc = snippy_to_rapup_total_nucs_df['sums'].mean()
+    print("average all nuleotides per taxon nuleotides", snippy_to_rapup_avg_total_nuc)
+    snippy_to_rapup_total_nuc_std = snippy_to_rapup_total_nucs_df.loc[:,"sums"].std()
+    print("total nucleotides standard deviation per taxon", snippy_to_rapup_total_nuc_std)
+    snippy_to_rapup_total_total_nuc = snippy_to_rapup_total_nucs_df.loc[:,"sums"].sum()
+    print("total nucleotides summed", snippy_to_rapup_total_total_nuc)
+    #print(rapup_basecall_check['sums'])
+    # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
+
+    #per-base results
+    snip_rap_per_base_miscall = snippy_to_rapup_total_miscalls / snippy_to_rapup_total_total_nuc 
+    snip_rap_per_base_gap = snippy_to_rapup_total_gaps / snippy_to_rapup_total_total_nuc
+    #print(rapup_total_miscalls)
+    #print(rapup_total_total_nuc)
+    print("snippy to rapup miscalls per base")
+    print(snip_rap_per_base_miscall)
+    print("snippy to rapup gaps per base")
+    print(snip_rap_per_base_gap)
 
 def main():
     args = parse_args()

@@ -41,7 +41,8 @@ def make_df(folder_path, input_folder):
     cluster_len = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
     cluster_compile = re.compile(cluster_names)
     len_compile = re.compile(cluster_len)
-    taxon_name = "basecall_results-cluster\d+-(.+)-.txt"
+    # taxon_name = "basecall_results-cluster\d+-(.+)-.txt"
+    taxon_name = "-cluster\d+--(.+)$"
     name_compile = re.compile(taxon_name)
     
     taxa_names = []
@@ -80,7 +81,8 @@ def basecall_identical_nucs_checker(folder_path, input_folder, df):
     cluster_len = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
     cluster_compile = re.compile(cluster_names)
     len_compile = re.compile(cluster_len)
-    taxon_name = "basecall_results-cluster\d+-(.+)-.txt"
+    # taxon_name = "basecall_results-cluster\d+-(.+)-.txt"
+    taxon_name = "-cluster\d+--(.+)$"
     name_compile = re.compile(taxon_name)
 
     taxa_names = []
@@ -120,7 +122,8 @@ def basecall_gap_checker(folder_path, input_folder, df):
     cluster_len = "<BlastOutput_query-len>(\d+)</BlastOutput_query-len>"
     cluster_compile = re.compile(cluster_names)
     len_compile = re.compile(cluster_len)
-    taxon_name = "basecall_results-cluster\d+-(.+)-.txt"
+    #taxon_name = "basecall_results-cluster\d+-(.+)-.txt"
+    taxon_name = "-cluster\d+--(.+)$"
     name_compile = re.compile(taxon_name)
 
     taxa_names = []
@@ -174,6 +177,7 @@ def basecall_method_checker(folder_path, input_folder, df):
         cluster_name_search = re.findall(cluster_compile, file_name)
 
         read_results = open(folder_path + "/" + file_name, "r")
+        # print(file_name)
         results_string = read_results.read()
         #split_file = results_string.split('\n')
 
@@ -528,9 +532,13 @@ def main():
     rapup_to_gon_phy_total_nucs_df = make_df(rapup_to_gon_phy_results,rapup_to_gon_phy_alignment_result_files)
     #print(rapup_total_nucs_df)
 
-    snippy_to_gon_phy_miscall_df = snippy_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
-    snippy_to_gon_phy_gap_df = snippy_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
-    snippy_to_gon_phy_total_nucs_df = snippy_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
+    # snippy_to_gon_phy_miscall_df = snippy_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
+    # snippy_to_gon_phy_gap_df = snippy_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
+    # snippy_to_gon_phy_total_nucs_df = snippy_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
+
+    snippy_to_gon_phy_miscall_df = make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
+    snippy_to_gon_phy_gap_df = make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
+    snippy_to_gon_phy_total_nucs_df = make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
     #print(snippy_total_nucs_df)
 
     snippy_to_rapup_miscall_df = make_df(snippy_to_rapup_results, snippy_to_rapup_alignment_result_files)

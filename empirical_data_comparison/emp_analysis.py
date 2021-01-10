@@ -378,6 +378,48 @@ def basecall_comparison(path_to_files):
     print("snippy to rapup gaps per base")
     print(snip_rap_per_base_gap)
 
+    #############################################################################
+    # Write full tables to csv
+    rapup_to_gon_phy_gap_df.to_csv("rapup_to_gon_phy_gaps.csv", sep='\t')
+    rapup_to_gon_phy_identical_nucs_df.to_csv("rapup_to_gon_phy_identical_nucs.csv", sep='\t')
+    rapup_to_gon_phy_total_nucs_df.to_csv("rapup_to_gon_phy_total_nucs.csv", sep='\t')
+    rapup_to_gon_phy_miscall_df.to_csv("rapup_to_gon_phy_miscalls.csv", sep='\t')
+
+    snippy_to_gon_phy_miscall_df.to_csv("snippy_to_gon_phy_miscals.csv", sep='\t')
+    snippy_to_gon_phy_gap_df.to_csv("snippy_to_gon_phy_gaps.csv", sep='\t')
+    snippy_to_gon_phy_identical_nucs_df.to_csv("snippy_to_gon_phy_identical_nucs.csv", '\t')
+    snippy_to_gon_phy_total_nucs_df.to_csv("snippy_to_gon_phy_total_nucs.csv", sep='\t')
+
+    snippy_to_rapup_miscall_df.to_csv("snippy_to_rapup_miscalls.csv", sep='\t')
+    snippy_to_rapup_gap_df.to_csv("snippy_to_rapup_gaps.csv", sep='\t')
+    snippy_to_rapup_identical_nucs_df.to_csv("snippy_to_rapup_identical_nucs.csv", sep='\t')
+    snippy_to_rapup_total_nucs_df.to_csv("snippy_to_rapup_total_nucs.csv", sep='\t')    
+
+
+
+
+def phylogeny_comparison(path_to_files):
+    gon_phy_tree = open(path_to_files + '/fixed_gon_phy_MR.tre', 'r').read()
+    rapup_tree = open(path_to_files + '/fixed_rapup_MR.tre','r').read()
+    snippy_tree = open(path_to_files + '/fixed_snippy_MR.tre','r').read()
+
+    # tns = dendropy.TaxonNamespace()
+
+    read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', preserve_underscores=True)
+    read_snippy_tree = dendropy.Tree.get(data = snippy_tree, schema='newick', preserve_underscores=True)
+    read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', preserve_underscores=True)
+
+    # tree_list = dendropy.TreeList()
+    # tree_list.read(data=gon_phy_tree, schema="newick", preserve_underscores=True)
+    # print(len(tree_list.taxon_namespace))
+    # tree_list.read(data=rapup_tree, schema="newick", preserve_underscores=True)
+    # print(len(tree_list.taxon_namespace))
+    # tree_list.read(data=snippy_tree, schema="newick", preserve_underscores=True)
+    # print(len(tree_list.taxon_namespace))
+
+
+
+
 def main():
     args = parse_args()
 
@@ -386,103 +428,7 @@ def main():
 
     basecall_comparison(path_to_output_folder)
     
-    # # go through each methods output folder and get blast result files, tree files and the reference sequence file
-    # rapup_to_gon_phy_results = path_to_output_folder + '/gon_phy_to_rapup/assessment_output'
-    # snippy_to_gon_phy_results = path_to_output_folder + '/gon_phy_to_snippy/assessment_output'
-    # snippy_to_rapup_results = path_to_output_folder + '/rapup_to_snippy/assessment_output'
-
-    # rapup_to_gon_phy_alignment_result_files = os.listdir(rapup_to_gon_phy_results)
-    # snippy_to_gon_phy_alignment_result_files = os.listdir(snippy_to_gon_phy_results)
-    # snippy_to_rapup_alignment_result_files = os.listdir(snippy_to_rapup_results)
-
-
-    # ##################################################################################################
-    # # making DFs
-    # rapup_to_gon_phy_miscall_df = gon_rap_make_df(rapup_to_gon_phy_results,rapup_to_gon_phy_alignment_result_files)
-    # rapup_to_gon_phy_gap_df = gon_rap_make_df(rapup_to_gon_phy_results,rapup_to_gon_phy_alignment_result_files)
-    # rapup_to_gon_phy_identical_nucs_df = gon_rap_make_df(rapup_to_gon_phy_results,rapup_to_gon_phy_alignment_result_files)
-    # rapup_to_gon_phy_total_nucs_df = gon_rap_make_df(rapup_to_gon_phy_results,rapup_to_gon_phy_alignment_result_files)
-
-    # snippy_to_gon_phy_miscall_df = snip_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
-    # snippy_to_gon_phy_gap_df = snip_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
-    # snippy_to_gon_phy_identical_nucs_df = snip_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
-    # snippy_to_gon_phy_total_nucs_df = snip_make_df(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files)
-
-    # snippy_to_rapup_miscall_df = snip_make_df(snippy_to_rapup_results, snippy_to_rapup_alignment_result_files)
-    # snippy_to_rapup_gap_df = snip_make_df(snippy_to_rapup_results, snippy_to_rapup_alignment_result_files)
-    # snippy_to_rapup_identical_nucs_df = snip_make_df(snippy_to_rapup_results, snippy_to_rapup_alignment_result_files)
-    # snippy_to_rapup_total_nucs_df = snip_make_df(snippy_to_rapup_results, snippy_to_rapup_alignment_result_files)
-
-    # ##########################################################################################################
-    # #BASECALL COMPARISON
-    # print("\n\n")
-    # print("rapup to gon_phy results")
-    # rapup_to_gon_phy_basecall_check = gon_rap_basecall_checker(rapup_to_gon_phy_results, rapup_to_gon_phy_alignment_result_files, rapup_to_gon_phy_miscall_df, rapup_to_gon_phy_gap_df, rapup_to_gon_phy_identical_nucs_df, rapup_to_gon_phy_total_nucs_df)
-    # # print(rapup_to_gon_phy_miscall_df)
-    # # print(rapup_to_gon_phy_gap_df)
-    # # print(rapup_to_gon_phy_identical_nucs_df)
-
-    # rapup_to_gon_phy_avg_miscalled = rapup_to_gon_phy_miscall_df['sums'].mean()
-    # print("average miscalls", rapup_to_gon_phy_avg_miscalled)
-    # rapup_to_gon_phy_miscalled_std = rapup_to_gon_phy_miscall_df.loc[:,"sums"].std()
-    # print("miscall standard deviation", rapup_to_gon_phy_miscalled_std)
-    # rapup_to_gon_phy_total_miscalls = rapup_to_gon_phy_miscall_df.loc[:,"sums"].sum()
-    # print("total miscalls", rapup_to_gon_phy_total_miscalls)
-    # #print(rapup_basecall_check['sums'])
-    # # rapup_to_gon_phy_basecall_check = rapup_to_gon_phy_miscall_df.rename(columns={'sums' : 'rapup_sums'})
-
-    # rapup_to_gon_phy_avg_gap = rapup_to_gon_phy_gap_df['sums'].mean()
-    # print("average gaps", rapup_to_gon_phy_avg_gap)
-    # rapup_to_gon_phy_gap_std = rapup_to_gon_phy_gap_df.loc[:,"sums"].std()
-    # print("gaps standard deviasion", rapup_to_gon_phy_gap_std)
-    # rapup_to_gon_phy_total_gaps = rapup_to_gon_phy_gap_df.loc[:,"sums"].sum()
-    # print("total gaps", rapup_to_gon_phy_total_gaps)
-    # #print(rapup_basecall_check['sums'])
-    # # rapup_to_gon_phy_gap_check = rapup_to_gon_phy_gap_check.rename(columns={'sums' : 'rapup_sums'})
-
-    # rapup_to_gon_phy_avg_identical_nuc = rapup_to_gon_phy_identical_nucs_df['sums'].mean()
-    # print("average identical nuleotides per taxon nuleotides", rapup_to_gon_phy_avg_identical_nuc)
-    # rapup_to_gon_phy_identical_nuc_std = rapup_to_gon_phy_identical_nucs_df.loc[:,"sums"].std()
-    # print("identical nucleotides standard deviation per taxon", rapup_to_gon_phy_identical_nuc_std)
-    # rapup_to_gon_phy_total_identical_nuc = rapup_to_gon_phy_identical_nucs_df.loc[:,"sums"].sum()
-    # print("identical nucleotides summed", rapup_to_gon_phy_total_identical_nuc)
-    # #print(rapup_basecall_check['sums'])
-    # # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
-
-    # #print(rapup_total_check)
-    # rapup_to_gon_phy_avg_total_nuc = rapup_to_gon_phy_total_nucs_df['sums'].mean()
-    # print("average all nuleotides per taxon nuleotides", rapup_to_gon_phy_avg_total_nuc)
-    # rapup_to_gon_phy_total_nuc_std = rapup_to_gon_phy_total_nucs_df.loc[:,"sums"].std()
-    # print("total nucleotides standard deviation per taxon", rapup_to_gon_phy_total_nuc_std)
-    # rapup_to_gon_phy_total_total_nuc = rapup_to_gon_phy_total_nucs_df.loc[:,"sums"].sum()
-    # print("total nucleotides summed", rapup_to_gon_phy_total_total_nuc)
-    # #print(rapup_basecall_check['sums'])
-    # # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
-
-    # #per-base results
-    # rapup_per_base_miscall = rapup_to_gon_phy_total_miscalls / rapup_to_gon_phy_total_total_nuc 
-    # rapup_per_base_gap = rapup_to_gon_phy_total_gaps / rapup_to_gon_phy_total_total_nuc
-    # #print(rapup_total_miscalls)
-    # #print(rapup_total_total_nuc)
-    # print("rapup miscalls per base")
-    # print(rapup_per_base_miscall)
-    # print("rapup gaps per base")
-    # print(rapup_per_base_gap)
-
-
-    # print("snippy to gon_phy results")
-    # snippy_to_gon_phy_basecall_check = snippy_basecall_checker(snippy_to_gon_phy_results, snippy_to_gon_phy_alignment_result_files, snippy_to_gon_phy_miscall_df, snippy_to_gon_phy_gap_df, snippy_to_gon_phy_identical_nucs_df, snippy_to_gon_phy_total_nucs_df)
-    # # print(snippy_to_gon_phy_miscall_df)
-    # # print(snippy_to_gon_phy_gap_df)
-    # # print(snippy_to_gon_phy_identical_nucs_df)
-
-
-
-    # print("rapup to snippy results")
-    # snippy_to_rapup_basecall_check = snippy_basecall_checker(snippy_to_rapup_results, snippy_to_rapup_alignment_result_files, snippy_to_rapup_miscall_df, snippy_to_rapup_gap_df, snippy_to_rapup_identical_nucs_df, snippy_to_rapup_total_nucs_df) 
-    # # print(snippy_to_rapup_miscall_df)
-    # # print(snippy_to_rapup_gap_df)
-    # # print(snippy_to_rapup_identical_nucs_df)
+    # phylogeny_comparison(path_to_output_folder)
 
 
 

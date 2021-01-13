@@ -347,6 +347,10 @@ if [[ $basecall == "ON" ]]; then
 	mkdir ${outdir}/${rapup_basecall}/rapup_basecall_align
 	mkdir ${outdir}/${snippy_basecall}/snippy_basecall_align
 
+	mkdir ${outdir}/${rapup_basecall}/assessment_output
+	mkdir ${outdir}/${gon_phy_basecall}/assessment_output
+	mkdir ${outdir}/${snippy_basecall}/assessment_output
+
 	
 	# SEPARATE EACH LOCUS ALIGNMENT INTO INDIVIDUAL SEQUENCES (SNIPPY SEQS STAY FULL SIZE)
 	for j in $(ls ${outdir}/${gon_phy_basecall}/sep_loci/*.fasta);
@@ -390,21 +394,78 @@ if [[ $basecall == "ON" ]]; then
 					--ref_select $i
 	        done
 	done
-		
-	${program_path}/simulated_data_comparison/blast_location_finder.py \
+	
+	${program_path}/simulated_data_comparison/sim_orientation_finder.py \
+	--manipulate_seqs_folder ${outdir}/${rapup_basecall}/sep_loci/individual_tax \
+	--long_seqs_folder ${ref_folder} \
+	--output_dir ${outdir}/${rapup_basecall}/rapup_basecall_align
+
+	${program_path}/simulated_data_comparison/sim_orientation_finder.py \
 	--long_seqs_folder ${ref_folder} \
 	--manipulate_seqs_folder ${outdir}/${gon_phy_basecall}/sep_loci/individual_tax \
 	--output_dir ${outdir}/${gon_phy_basecall}/gon_phy_basecall_align
-
-	${program_path}/simulated_data_comparison/blast_location_finder.py \
+	
+	${program_path}/simulated_data_comparison/sim_snippy_seq_combiner.py \
 	--long_seqs_folder ${ref_folder} \
-	--manipulate_seqs_folder ${outdir}/${rapup_basecall}/sep_loci/individual_tax \
-	--output_dir ${outdir}/${rapup_basecall}/rapup_basecall_align
+	--manipulate_seqs_folder ${outdir}/${snippy_basecall}/sep_loci/individual_tax \
+	--output_dir ${outdir}/${snippy_basecall}/snippy_basecall_align
 
-	# ${program_path}/simulated_data_comparison/blast_location_finder.py \
-	# --long_seqs_folder ${ref_folder} \
-	# --manipulate_seqs_folder ${outdir}/${snippy_basecall}/sep_loci/individual_tax \
-	# --output_dir ${outdir}/${snippy_basecall}/snippy_basecall_align/align_files
+	for i in $(ls ${outdir}/${rapup_basecall}/rapup_basecall_align);
+	do
+		mafft \
+		--thread $align_threads \
+		--op 5 \
+		--lexp -0.5 \
+		${outdir}/${rapup_basecall}/rapup_basecall_align/${i} \
+		> \
+		${outdir}/${rapup_basecall}/rapup_basecall_align/aligned_${i}
+
+
+		${program_path}/simulated_data_comparison/sim_snippy_gapped_align_compared.py \
+		-t \
+		--align_1 ${outdir}/${rapup_basecall}/rapup_basecall_align/aligned_${i} \
+		--output_stub rapup_assessment_${i} \
+		--output_dir ${outdir}/${rapup_basecall}/assessment_output
+
+	done
+
+	for i in $(ls ${outdir}/${gon_phy_basecall}/gon_phy_basecall_align);
+	do
+		mafft \
+		--thread $align_threads \
+		--op 5 \
+		--lexp -0.5 \
+		${outdir}/${gon_phy_basecall}/gon_phy_basecall_align/${i} \
+		> \
+		${outdir}/${gon_phy_basecall}/gon_phy_basecall_align/aligned_${i}
+
+
+		${program_path}/simulated_data_comparison/sim_snippy_gapped_align_compared.py \
+		-t \
+		--align_1 ${outdir}/${gon_phy_basecall}/gon_phy_basecall_align/aligned_${i} \
+		--output_stub gon_phy_assessment_${i} \
+		--output_dir ${outdir}/${gon_phy_basecall}/assessment_output
+
+	done
+
+	for i in $(ls ${outdir}/${snippy_basecall}/snippy_basecall_align);
+	do
+		mafft \
+		--thread $align_threads \
+		--op 5 \
+		--lexp -0.5 \
+		${outdir}/${snippy_basecall}/snippy_basecall_align/${i} \
+		> \
+		${outdir}/${snippy_basecall}/snippy_basecall_align/aligned_${i}
+
+
+		${program_path}/simulated_data_comparison/sim_snippy_gapped_align_compared.py \
+		-t \
+		--align_1 ${outdir}/${snippy_basecall}/snippy_basecall_align/aligned_${i} \
+		--output_stub snippy_assessment_${i} \
+		--output_dir ${outdir}/${snippy_basecall}/assessment_output
+
+	done
 	
 	
 	

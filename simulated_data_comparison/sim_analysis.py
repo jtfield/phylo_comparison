@@ -44,8 +44,9 @@ def gon_rap_make_df(folder_path, input_folder):
     return df
 
 def snip_make_df(folder_path, input_folder):
-    cluster_names = 'cluster\d+'
-    cluster_compile = re.compile(cluster_names)
+    # cluster_names = 'cluster\d+'
+    column_index = ['whole_genome']
+    # cluster_compile = re.compile(cluster_names)
     # taxon_name = "basecall_results-cluster\d+-(.+)-.txt"
     taxon_name = "-cluster\d+--(.+)$"
     name_compile = re.compile(taxon_name)
@@ -56,16 +57,16 @@ def snip_make_df(folder_path, input_folder):
     file_count = 0
     for file_name in input_folder:
         taxon_name_search = re.findall(name_compile, file_name)
-        cluster_name_search = re.findall(cluster_compile, file_name)
-        if cluster_name_search:
-            if cluster_name_search[0] not in cluster_names:
-                cluster_names.append(cluster_name_search[0])
+        # cluster_name_search = re.findall(cluster_compile, file_name)
+        # if cluster_name_search:
+            # if cluster_name_search[0] not in cluster_names:
+                # cluster_names.append(cluster_name_search[0])
         if taxon_name_search:
             if taxon_name_search[0] not in taxa_names:
                 taxa_names.append(taxon_name_search[0])
     
     
-    df = pd.DataFrame(columns=cluster_names, index=taxa_names)
+    df = pd.DataFrame(columns=column_index, index=taxa_names)
     # print(df)
 
     return df
@@ -135,6 +136,7 @@ def snippy_basecall_checker(folder_path, input_folder, miscall_df, gap_df, ident
     # cluster_names = 'cluster\d+'
     # cluster_compile = re.compile(cluster_names)
     
+    column_index = ['whole_genome']
     taxon_name = "--(.+)$"
     name_compile = re.compile(taxon_name)
 
@@ -161,10 +163,10 @@ def snippy_basecall_checker(folder_path, input_folder, miscall_df, gap_df, ident
                     # print(file_name)
                     # print(miscalled_bases)
                     # add miscalled data to df under cluster and taxon name
-                miscall_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(miscalled_bases)
-                gap_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(gaps)
-                identical_nuc_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(identical_nucs)
-                total_nuc_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(total_nucs)
+                miscall_df.loc[taxon_name_search[0], column_index] = int(miscalled_bases)
+                gap_df.loc[taxon_name_search[0], column_index] = int(gaps)
+                identical_nuc_df.loc[taxon_name_search[0], column_index] = int(identical_nucs)
+                total_nuc_df.loc[taxon_name_search[0], column_index] = int(total_nucs)
     
     
     # df = df.astype(int)
@@ -210,10 +212,10 @@ def basecall_comparison(path_to_files):
     snippy_identical_df = snip_make_df(snippy_results, snippy_results_files)
     snippy_total_nucs_df = snip_make_df(snippy_results, snippy_results_files)
 
-    rapup_miscall_df = snip_make_df(rapup_results, rapup_results_files)
-    rapup_gap_df = snip_make_df(rapup_results, rapup_results_files)
-    snippy_identical_df = snip_make_df(rapup_results, rapup_results_files)
-    snippy_total_nucs_df = snip_make_df(rapup_results, rapup_results_files)
+    rapup_miscall_df = gon_rap_make_df(rapup_results, rapup_results_files)
+    rapup_gap_df = gon_rap_make_df(rapup_results, rapup_results_files)
+    rapup_identical_df = gon_rap_make_df(rapup_results, rapup_results_files)
+    rapup_total_nucs_df = gon_rap_make_df(rapup_results, rapup_results_files)
 
     ##########################################################################################################
     #BASECALL COMPARISON
@@ -266,9 +268,9 @@ def basecall_comparison(path_to_files):
     rapup_per_base_gap = rapup_to_gon_phy_total_gaps / rapup_to_gon_phy_total_total_nuc
     #print(rapup_total_miscalls)
     #print(rapup_total_total_nuc)
-    print("rapup miscalls per base")
+    print("gon_phy miscalls per base")
     print(rapup_per_base_miscall)
-    print("rapup gaps per base")
+    print("gon_phy gaps per base")
     print(rapup_per_base_gap)
 
     print("\n\n\n")
@@ -320,15 +322,15 @@ def basecall_comparison(path_to_files):
     snippy_per_base_gap = snippy_to_gon_phy_total_gaps / snippy_to_gon_phy_total_total_nuc
     #print(rapup_total_miscalls)
     #print(rapup_total_total_nuc)
-    print("snippy to gon_phyling miscalls per base")
+    print("snippy miscalls per base")
     print(snippy_per_base_miscall)
-    print("snippy to gon_phyling gaps per base")
+    print("snippy gaps per base")
     print(snippy_per_base_gap)
 
 
     print("\n\n\n")
     print("rapup results")
-    snippy_to_rapup_basecall_check = snippy_basecall_checker(rapup_results, rapup_results_files, rapup_miscall_df, rapup_gap_df, snippy_identical_df, snippy_total_nucs_df) 
+    snippy_to_rapup_basecall_check = gon_rap_basecall_checker(rapup_results, rapup_results_files, rapup_miscall_df, rapup_gap_df, rapup_identical_df, rapup_total_nucs_df) 
     # print(rapup_miscall_df)
     # print(rapup_gap_df)
     # print(snippy_identical_df)
@@ -351,21 +353,21 @@ def basecall_comparison(path_to_files):
     #print(rapup_basecall_check['sums'])
     # rapup_to_gon_phy_gap_check = rapup_to_gon_phy_gap_check.rename(columns={'sums' : 'rapup_sums'})
 
-    snippy_to_rapup_avg_identical_nuc = snippy_identical_df['sums'].mean()
+    snippy_to_rapup_avg_identical_nuc = rapup_identical_df['sums'].mean()
     print("average identical nuleotides per taxon nuleotides", snippy_to_rapup_avg_identical_nuc)
-    snippy_to_rapup_identical_nuc_std = snippy_identical_df.loc[:,"sums"].std()
+    snippy_to_rapup_identical_nuc_std = rapup_identical_df.loc[:,"sums"].std()
     print("identical nucleotides standard deviation per taxon", snippy_to_rapup_identical_nuc_std)
-    snippy_to_rapup_total_identical_nuc = snippy_identical_df.loc[:,"sums"].sum()
+    snippy_to_rapup_total_identical_nuc = rapup_identical_df.loc[:,"sums"].sum()
     print("identical nucleotides summed", snippy_to_rapup_total_identical_nuc)
     #print(rapup_basecall_check['sums'])
     # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
 
     #print(rapup_total_check)
-    snippy_to_rapup_avg_total_nuc = snippy_total_nucs_df['sums'].mean()
+    snippy_to_rapup_avg_total_nuc = rapup_total_nucs_df['sums'].mean()
     print("average all nuleotides per taxon nuleotides", snippy_to_rapup_avg_total_nuc)
-    snippy_to_rapup_total_nuc_std = snippy_total_nucs_df.loc[:,"sums"].std()
+    snippy_to_rapup_total_nuc_std = rapup_total_nucs_df.loc[:,"sums"].std()
     print("total nucleotides standard deviation per taxon", snippy_to_rapup_total_nuc_std)
-    snippy_to_rapup_total_total_nuc = snippy_total_nucs_df.loc[:,"sums"].sum()
+    snippy_to_rapup_total_total_nuc = rapup_total_nucs_df.loc[:,"sums"].sum()
     print("total nucleotides summed", snippy_to_rapup_total_total_nuc)
     #print(rapup_basecall_check['sums'])
     # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
@@ -375,27 +377,27 @@ def basecall_comparison(path_to_files):
     snip_rap_per_base_gap = snippy_to_rapup_total_gaps / snippy_to_rapup_total_total_nuc
     #print(rapup_total_miscalls)
     #print(rapup_total_total_nuc)
-    print("snippy to rapup miscalls per base")
+    print("rapup miscalls per base")
     print(snip_rap_per_base_miscall)
-    print("snippy to rapup gaps per base")
+    print("rapup gaps per base")
     print(snip_rap_per_base_gap)
 
     #############################################################################
     # Write full tables to csv
-    gon_phy_gap_df.to_csv("rapup_to_gon_phy_gaps.csv", sep='\t')
-    gon_phy_identical_df.to_csv("rapup_to_gon_phy_identical_nucs.csv", sep='\t')
-    gon_phy_total_nucs_df.to_csv("rapup_to_gon_phy_total_nucs.csv", sep='\t')
-    gon_phy_miscall_df.to_csv("rapup_to_gon_phy_miscalls.csv", sep='\t')
+    gon_phy_gap_df.to_csv("gon_phy_gaps.csv", sep='\t')
+    gon_phy_identical_df.to_csv("gon_phy_identical_nucs.csv", sep='\t')
+    gon_phy_total_nucs_df.to_csv("gon_phy_total_nucs.csv", sep='\t')
+    gon_phy_miscall_df.to_csv("gon_phy_miscalls.csv", sep='\t')
 
-    snippy_miscall_df.to_csv("snippy_to_gon_phy_miscals.csv", sep='\t')
-    snippy_gap_df.to_csv("snippy_to_gon_phy_gaps.csv", sep='\t')
-    snippy_identical_df.to_csv("snippy_to_gon_phy_identical_nucs.csv", '\t')
-    snippy_total_nucs_df.to_csv("snippy_to_gon_phy_total_nucs.csv", sep='\t')
+    snippy_miscall_df.to_csv("snippy_miscals.csv", sep='\t')
+    snippy_gap_df.to_csv("snippy_gaps.csv", sep='\t')
+    snippy_identical_df.to_csv("snippy_identical_nucs.csv", '\t')
+    snippy_total_nucs_df.to_csv("snippy_total_nucs.csv", sep='\t')
 
-    rapup_miscall_df.to_csv("snippy_to_rapup_miscalls.csv", sep='\t')
-    rapup_gap_df.to_csv("snippy_to_rapup_gaps.csv", sep='\t')
-    snippy_identical_df.to_csv("snippy_to_rapup_identical_nucs.csv", sep='\t')
-    snippy_total_nucs_df.to_csv("snippy_to_rapup_total_nucs.csv", sep='\t')    
+    rapup_miscall_df.to_csv("rapup_miscalls.csv", sep='\t')
+    rapup_gap_df.to_csv("rapup_gaps.csv", sep='\t')
+    rapup_identical_df.to_csv("rapup_identical_nucs.csv", sep='\t')
+    rapup_total_nucs_df.to_csv("rapup_total_nucs.csv", sep='\t')    
 
 
 
@@ -404,20 +406,30 @@ def phylogeny_comparison(path_to_files):
     gon_phy_tree = open(path_to_files + '/fixed_gon_phy_MR.tre', 'r').read()
     rapup_tree = open(path_to_files + '/fixed_rapup_MR.tre','r').read()
     snippy_tree = open(path_to_files + '/fixed_snippy_MR.tre','r').read()
+    true_tree = open(path_to_files + '/simtree.tre','r').read()
+    
+    tns = dendropy.TaxonNamespace()
 
-    # tns = dendropy.TaxonNamespace()
+    read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', preserve_underscores=True, taxon_namespace=tns)
+    read_snippy_tree = dendropy.Tree.get(data = snippy_tree, schema='newick', preserve_underscores=True, taxon_namespace=tns)
+    read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', preserve_underscores=True, taxon_namespace=tns)
+    read_true_tree = dendropy.Tree.get(data = true_tree, schema='newick', preserve_underscores=True, taxon_namespace=tns)
 
-    read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', preserve_underscores=True)
-    read_snippy_tree = dendropy.Tree.get(data = snippy_tree, schema='newick', preserve_underscores=True)
-    read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', preserve_underscores=True)
+    print("rapup tree RF to true tree")
+    print(treecompare.symmetric_difference(read_rapup_tree, read_true_tree))
+    print("gon_phy tree RF to true tree")
+    print(treecompare.symmetric_difference(read_gon_phy_tree, read_true_tree))
+    print("snippy tree RF to true tree")
+    print(treecompare.symmetric_difference(read_snippy_tree, read_true_tree))
 
-    # tree_list = dendropy.TreeList()
-    # tree_list.read(data=gon_phy_tree, schema="newick", preserve_underscores=True)
-    # print(len(tree_list.taxon_namespace))
-    # tree_list.read(data=rapup_tree, schema="newick", preserve_underscores=True)
-    # print(len(tree_list.taxon_namespace))
-    # tree_list.read(data=snippy_tree, schema="newick", preserve_underscores=True)
-    # print(len(tree_list.taxon_namespace))
+
+    #tree_list = dendropy.TreeList()
+    #tree_list.read(data=gon_phy_tree, schema="newick", preserve_underscores=True)
+    #print(len(tree_list.taxon_namespace))
+    #tree_list.read(data=rapup_tree, schema="newick", preserve_underscores=True)
+    #print(len(tree_list.taxon_namespace))
+    #tree_list.read(data=snippy_tree, schema="newick", preserve_underscores=True)
+    #print(len(tree_list.taxon_namespace))
 
 
 
@@ -430,7 +442,7 @@ def main():
 
     basecall_comparison(path_to_output_folder)
     
-    # phylogeny_comparison(path_to_output_folder)
+    phylogeny_comparison(path_to_output_folder)
 
 
 

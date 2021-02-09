@@ -2,6 +2,9 @@
 import argparse
 import os
 import re
+import csv
+import numpy
+import pandas as pd
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -36,6 +39,7 @@ def loci_len_check(path_to_loci, loci_folder_contents, suffix):
 
 def organize_and_describe(list_of_lengths):
     output_values = {}
+    loci_lens_dict = {}
     min_len = min(list_of_lengths)
     max_len = max(list_of_lengths)
     num_loci = len(list_of_lengths)
@@ -44,7 +48,15 @@ def organize_and_describe(list_of_lengths):
     output_values['max'] = max_len
     output_values['avg'] = avg_len
     output_values['num'] = num_loci
+    # output_values['lengths'] = list_of_lengths
     print(output_values)
+
+    loci_lens_dict['lengths'] = list_of_lengths
+
+    df = pd.DataFrame(loci_lens_dict)
+
+    df.to_csv('loci_lengths.csv')
+
 
 
 def main():

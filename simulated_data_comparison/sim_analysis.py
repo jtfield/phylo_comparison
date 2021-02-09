@@ -4,6 +4,7 @@ import os
 import re
 from collections import defaultdict
 import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
 import dendropy
 from dendropy.calculate import treecompare
@@ -431,8 +432,34 @@ def phylogeny_comparison(path_to_files):
     #tree_list.read(data=snippy_tree, schema="newick", preserve_underscores=True)
     #print(len(tree_list.taxon_namespace))
 
+def fig_gen(miscalls, gaps, identical, total):
+    miscall_df = pd.read_csv(miscalls, sep='\t')
+    gaps_df = pd.read_csv(gaps, sep='\t')
+    identical_df = pd.read_csv(identical, sep='\t')
+    total_df = pd.read_csv(total, sep='\t')
 
+    miscall_sum = miscall_df.loc[:,"sums"].sum()
+    print(miscall_sum)
 
+    gaps_sum = gaps_df.loc[:,"sums"].sum()
+    print(gaps_sum)
+
+    identical_sum = identical_df.loc[:,"sums"].sum()
+    print(identical_sum)
+
+    total_sum = total_df.loc[:,"sums"].sum()
+    print(total_sum)
+    
+    height = [miscall_sum, gaps_sum, identical_sum]
+    bars = ['miscall_sum', 'gaps_sum', 'identical_sum']
+    explode = (0.1, 0, 0)  # explode 1st slice
+    colors = ['gold', 'yellowgreen', 'lightcoral']
+
+    plt.pie(height, explode=explode, labels=bars, colors=colors,
+    autopct='%1.1f%%', shadow=True, startangle=140)
+    
+    plt.axis('equal')
+    plt.show()
 
 def main():
     args = parse_args()
@@ -440,11 +467,12 @@ def main():
     # get path to folder that contains all blast outputs for each method
     path_to_output_folder = os.path.realpath(args.output_folder)
 
-    basecall_comparison(path_to_output_folder)
+    # basecall_comparison(path_to_output_folder)
     
-    phylogeny_comparison(path_to_output_folder)
+    # phylogeny_comparison(path_to_output_folder)
 
-
+    fig_gen("rapup_miscalls.csv", "rapup_gaps.csv", "rapup_identical_nucs.csv", "rapup_total_nucs.csv")
+    fig_gen("snippy_miscalls.csv", "snippy_gaps.csv", "snippy_identical_nucs.csv", "snippy_total_nucs.csv")
 
 
 

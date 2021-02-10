@@ -7,6 +7,9 @@ import numpy as np
 import pandas as pd
 import dendropy
 from dendropy.calculate import treecompare
+import matplotlib.pyplot as plt
+from matplotlib import colors
+from matplotlib.ticker import PercentFormatter
 
 
 def parse_args():
@@ -403,22 +406,56 @@ def phylogeny_comparison(path_to_files):
     rapup_tree = open(path_to_files + '/fixed_rapup_MR.tre','r').read()
     snippy_tree = open(path_to_files + '/fixed_snippy_MR.tre','r').read()
 
-    # tns = dendropy.TaxonNamespace()
-
-    read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', preserve_underscores=True)
-    read_snippy_tree = dendropy.Tree.get(data = snippy_tree, schema='newick', preserve_underscores=True)
-    read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', preserve_underscores=True)
-
-    # tree_list = dendropy.TreeList()
-    # tree_list.read(data=gon_phy_tree, schema="newick", preserve_underscores=True)
-    # print(len(tree_list.taxon_namespace))
-    # tree_list.read(data=rapup_tree, schema="newick", preserve_underscores=True)
-    # print(len(tree_list.taxon_namespace))
-    # tree_list.read(data=snippy_tree, schema="newick", preserve_underscores=True)
-    # print(len(tree_list.taxon_namespace))
+    tns = dendropy.TaxonNamespace()
 
 
+    read_rapup_tree = dendropy.Tree.get(data = rapup_tree, schema='newick', preserve_underscores=True, taxon_namespace=tns)
+    read_snippy_tree = dendropy.Tree.get(data = snippy_tree, schema='newick', preserve_underscores=True, taxon_namespace=tns)
+    read_gon_phy_tree = dendropy.Tree.get(data = gon_phy_tree, schema='newick', preserve_underscores=True, taxon_namespace=tns)
 
+    print("rapup tree RF to gon_phy tree")
+    print(treecompare.symmetric_difference(read_rapup_tree, read_gon_phy_tree))
+    print("gon_phy tree RF to snippy tree")
+    print(treecompare.symmetric_difference(read_gon_phy_tree, read_snippy_tree))
+    print("snippy tree RF to rapup tree")
+    print(treecompare.symmetric_difference(read_snippy_tree, read_rapup_tree))
+
+
+def locus_range_fig_gen(csv_file_1, csv_file_2):
+    # n_bins = 25
+    # n_bins = [100, 300, 500, 700, 800, 900, 1000, 1200, 1500, 1800, 2000, 2300, 2500, 2800, 3000, 3300, 3600, 3900, 4400, 4800, 5200, 5600, 6000, 7000, 8000, 10000, 13000, 16000, 20000, 30000, 40000, 50000]
+    n_bins = []
+    start = 0
+    while (start <= 42000):
+        n_bins.append(start)
+        start = start + 1000
+    
+    length_data_1 = pd.read_csv(csv_file_1)
+    length_data_2 = pd.read_csv(csv_file_2)
+    fig, axs = plt.subplots(1, 2, tight_layout=True, sharey=True, figsize=(10,10))
+    # fig.subplots_adjust(bottom=0.1, left=0.1)
+    fig.suptitle('Dataset Fragmentation', fontsize=18, fontweight='bold')
+    
+    plt.ylim(0,260)
+    axs[0].hist(length_data_1["lengths"], bins=n_bins, range=(-100, length_data_1["lengths"].max()), label="A")
+    axs[0].set_title('Extensiphy', fontsize=16)
+    axs[1].hist(length_data_2["lengths"], bins=n_bins, range=(-100, length_data_1["lengths"].max()), label="B")
+    axs[1].set_title('De novo', fontsize=16)
+    
+    fig.text(0.5, 0.01, 'Loci Lengths', ha='center', va='center', fontsize=14)
+    # fig.text(0.5, 0.04, 'common xlabel', ha='center', va='center')
+    fig.text(0.01, 0.5, 'Number of Loci', ha='center', va='center', rotation='vertical', fontsize=14)
+    
+    # fig.subplots_adjust(bottom=1, left=1)
+    
+
+    # fig, axs = plt.subplots(1, 2, tight_layout=True)
+    # axs[0].hist(length_data_1["lengths"], bins=n_bins)
+    # axs[1].hist(length_data_2["lengths"], bins=n_bins)
+
+    plt.show()
+
+    
 
 def main():
     args = parse_args()
@@ -426,9 +463,11 @@ def main():
     # get path to folder that contains all blast outputs for each method
     path_to_output_folder = os.path.realpath(args.output_folder)
 
-    basecall_comparison(path_to_output_folder)
+    # basecall_comparison(path_to_output_folder)
     
     # phylogeny_comparison(path_to_output_folder)
+
+    locus_range_fig_gen("EP_loci_lengths.csv", "gon_phy_loci_lengths.csv")
 
 
 

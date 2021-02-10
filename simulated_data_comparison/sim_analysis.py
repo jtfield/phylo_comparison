@@ -473,6 +473,7 @@ def main():
 
     fig_gen("rapup_miscalls.csv", "rapup_gaps.csv", "rapup_identical_nucs.csv", "rapup_total_nucs.csv")
     fig_gen("snippy_miscalls.csv", "snippy_gaps.csv", "snippy_identical_nucs.csv", "snippy_total_nucs.csv")
+    fig_gen("gon_phy_miscalls.csv", "gon_phy_gaps.csv", "gon_phy_identical_nucs.csv", "gon_phy_total_nucs.csv")
 
 
 

@@ -10,6 +10,7 @@ from dendropy.calculate import treecompare
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.ticker import PercentFormatter
+import seaborn as sns
 
 
 def parse_args():
@@ -422,8 +423,6 @@ def phylogeny_comparison(path_to_files):
 
 
 def locus_range_fig_gen(csv_file_1, csv_file_2):
-    # n_bins = 25
-    # n_bins = [100, 300, 500, 700, 800, 900, 1000, 1200, 1500, 1800, 2000, 2300, 2500, 2800, 3000, 3300, 3600, 3900, 4400, 4800, 5200, 5600, 6000, 7000, 8000, 10000, 13000, 16000, 20000, 30000, 40000, 50000]
     n_bins = []
     start = 0
     while (start <= 42000):
@@ -432,28 +431,33 @@ def locus_range_fig_gen(csv_file_1, csv_file_2):
     
     length_data_1 = pd.read_csv(csv_file_1)
     length_data_2 = pd.read_csv(csv_file_2)
-    fig, axs = plt.subplots(1, 2, tight_layout=True, sharey=True, figsize=(10,10))
-    # fig.subplots_adjust(bottom=0.1, left=0.1)
-    fig.suptitle('Dataset Fragmentation', fontsize=18, fontweight='bold')
+    # fig, axs = plt.subplots(1, 2, tight_layout=True, sharey=True, figsize=(10,10))
+    # fig.suptitle('Dataset Fragmentation', fontsize=18, fontweight='bold')
     
-    plt.ylim(0,260)
-    axs[0].hist(length_data_1["lengths"], bins=n_bins, range=(-100, length_data_1["lengths"].max()), label="A")
-    axs[0].set_title('Extensiphy', fontsize=16)
-    axs[1].hist(length_data_2["lengths"], bins=n_bins, range=(-100, length_data_1["lengths"].max()), label="B")
-    axs[1].set_title('De novo', fontsize=16)
+    # plt.ylim(0,260)
+    # axs[0].hist(length_data_1["lengths"], bins=n_bins, range=(-100, length_data_1["lengths"].max()), label="A")
+    # axs[0].set_title('Extensiphy', fontsize=16)
+    # axs[1].hist(length_data_2["lengths"], bins=n_bins, range=(-100, length_data_1["lengths"].max()), label="B")
+    # axs[1].set_title('De novo', fontsize=16)
     
-    fig.text(0.5, 0.01, 'Loci Lengths', ha='center', va='center', fontsize=14)
-    # fig.text(0.5, 0.04, 'common xlabel', ha='center', va='center')
-    fig.text(0.01, 0.5, 'Number of Loci', ha='center', va='center', rotation='vertical', fontsize=14)
-    
-    # fig.subplots_adjust(bottom=1, left=1)
-    
+    # fig.text(0.5, 0.01, 'Loci Lengths', ha='center', va='center', fontsize=14)
+    # fig.text(0.01, 0.5, 'Number of Loci', ha='center', va='center', rotation='vertical', fontsize=14)
+    # plt.show()
 
-    # fig, axs = plt.subplots(1, 2, tight_layout=True)
-    # axs[0].hist(length_data_1["lengths"], bins=n_bins)
-    # axs[1].hist(length_data_2["lengths"], bins=n_bins)
-
+    
+    length_data_1['method'] = 'Extensiphy'
+    length_data_2['method'] = 'De novo'
+    frames = [length_data_1, length_data_2]
+    combined_df = pd.concat(frames)
+    combined_df.reset_index(drop=True, inplace=True)
+    # print(combined_df)
+    ax = sns.stripplot(x="method", y="lengths", data=combined_df, linewidth=1, jitter=0.3, color=".6")
+    ax = sns.boxplot(x="method", y="lengths", data=combined_df, whis=np.inf)
+    ax.set_title( "Effect of Dataset Fragmentation" , size = 18 )
+    ax.set_xlabel( "Method" , size = 12 )
+    ax.set_ylabel( "Loci Lengths (bp)" , size = 12 ) 
     plt.show()
+
 
     
 

@@ -105,7 +105,7 @@ def fig_gen(ep_times, gon_phy_times, snippy_times):
     gon_phy_df['method'] = 'De novo'
     snippy_df['method'] = 'Snippy'
 
-    frames = [ep_df, snippy_df, gon_phy_df]
+    frames = [ep_df, gon_phy_df, snippy_df]
 
     combined_df = pd.concat(frames)
     # print(combined_df)
@@ -115,8 +115,9 @@ def fig_gen(ep_times, gon_phy_times, snippy_times):
     # print(combined_df)
 
     # ax = sns.violinplot(x='method', y="minutes", data=combined_df, inner=None, color=".8")
-    ax = sns.stripplot(x="method", y="Minutes", data=combined_df, linewidth=1, jitter=0.3, color=".6")
-    ax = sns.boxplot(x="method", y="Minutes", data=combined_df, whis=np.inf)
+    # ax = sns.stripplot(x="method", y="Minutes", data=combined_df, linewidth=1, jitter=0.3, color=".6")
+    ax = sns.stripplot(x="method", y="Minutes", data=combined_df, linewidth=1, jitter=0.3)
+    # ax = sns.boxplot(x="method", y="Minutes", data=combined_df, whis=np.inf)
     ax.set_title( "Time for Individual Sequence Assembly" , size = 18 )
     ax.set_xlabel( "Method" , size = 12 )
     ax.set_ylabel( "Minutes per Assembly" , size = 12 ) 

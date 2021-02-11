@@ -10,6 +10,7 @@ from dendropy.calculate import treecompare
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.ticker import PercentFormatter
+import seaborn as sns
 
 
 def parse_args():
@@ -93,42 +94,87 @@ def fig_gen(ep_times, gon_phy_times, snippy_times):
     del ep_times[-1]
     del ep_times[-1]
 
-    columns = ["times_in_seconds"]
-    ep_df = pd.DataFrame(ep_times, columns=columns)
-    gon_phy_df = pd.DataFrame(gon_phy_times, columns=columns)
-    snippy_df = pd.DataFrame(snippy_times, columns=columns)
+    ep_columns = ["time"]
+    snip_columns = ["time"]
+    gon_phy_columns = ["time"]
+    ep_df = pd.DataFrame(ep_times, columns=ep_columns)
+    gon_phy_df = pd.DataFrame(gon_phy_times, columns=gon_phy_columns)
+    snippy_df = pd.DataFrame(snippy_times, columns=snip_columns)
 
-    ep_avg = ep_df['times_in_seconds'].mean()
-    snip_avg = snippy_df['times_in_seconds'].mean()
-    gon_avg = gon_phy_df['times_in_seconds'].mean()
+    ep_df['method'] = 'Extensiphy'
+    gon_phy_df['method'] = 'De novo'
+    snippy_df['method'] = 'Snippy'
 
-    print(ep_avg / 60)
-    print(gon_avg / 60)
-    print(snip_avg / 60)
+    frames = [ep_df, snippy_df, gon_phy_df]
 
-    ep_min_df = ep_df.div(60)
-    snip_min_df = snippy_df.div(60)
-    gon_min_df = gon_phy_df.div(60)
+    combined_df = pd.concat(frames)
+    # print(combined_df)
+    combined_df.reset_index(drop=True, inplace=True)
+    # print(combined_df)
+    combined_df['Minutes'] = combined_df['time'].div(60)
+    # print(combined_df)
 
-    n_bins = 60
-
-    fig, axs = plt.subplots(1, 3, tight_layout=True, sharey=True, figsize=(10,10))
-    fig.suptitle('Individual Sequences Time-to-assemble', fontsize=18, fontweight='bold')
-    plt.ylim(0,400)
-
-    axs[0].hist(ep_min_df['times_in_seconds'], bins=n_bins, label="A")
-    axs[0].set_title('Extensiphy', fontsize=16)
-
-    axs[1].hist(gon_min_df['times_in_seconds'], bins=n_bins, label="B")
-    axs[1].set_title('De novo assembly', fontsize=16)
-
-    axs[2].hist(snip_min_df['times_in_seconds'], bins=n_bins, label="C")
-    axs[2].set_title('Snippy', fontsize=16)
-
-    fig.text(0.5, 0.01, 'Minutes Per Assembly', ha='center', va='center', fontsize=14)
-    fig.text(0.01, 0.5, 'Number of Sequences', ha='center', va='center', rotation='vertical', fontsize=14)
-
+    # ax = sns.violinplot(x='method', y="minutes", data=combined_df, inner=None, color=".8")
+    ax = sns.stripplot(x="method", y="Minutes", data=combined_df, linewidth=1, jitter=0.3)
+    ax.set_title( "Time for Individual Sequence Assembly" , size = 18 )
+    ax.set_xlabel( "Method" , size = 12 )
+    ax.set_ylabel( "Minutes per Assembly" , size = 12 ) 
     plt.show()
+
+    # ep_avg = ep_df['ep_time'].mean()
+    # snip_avg = snippy_df['snip_time'].mean()
+    # gon_avg = gon_phy_df['gon_phy_time'].mean()
+
+    # print(ep_avg / 60)
+    # print(gon_avg / 60)
+    # print(snip_avg / 60)
+
+    # ep_df['time'].div(60)
+    # snip_min_df = snippy_df['time'].div(60)
+    # gon_min_df = gon_phy_df['time'].div(60)
+
+    # print(ep_df)
+
+    # combined_df = pd.DataFrame([ep_min_df['ep_time'], snip_min_df['snip_time'], gon_min_df['gon_phy_time']]).transpose()
+    # combined_df.dropna(axis=0, how='any', inplace=True)
+    
+    # ax = sns.stripplot(x=combined_df.index, y=combined_df.values)
+    
+    # plt.show()
+
+
+    # fig=plt.figure()
+    # ax=fig.add_axes([0,0,1,1])
+    # ax.scatter(combined_df['gon_phy_time'].max(), combined_df['ep_time'], color='r')
+    # ax.scatter(combined_df['gon_phy_time'].max(), combined_df['snip_time'], color='b')
+    # ax.scatter(combined_df['gon_phy_time'].max(), combined_df['gon_phy_time'], color='y')
+    # ax.set_xlabel('time to assemble')
+    # ax.set_ylabel('number of assemblies')
+    # ax.set_title('scatter plot')
+
+    # plt.show()
+
+    # print(combined_df)
+
+    # n_bins = 60
+
+    # fig, axs = plt.subplots(1, 3, tight_layout=True, sharey=True, figsize=(10,10))
+    # fig.suptitle('Individual Sequences Time-to-assemble', fontsize=18, fontweight='bold')
+    # plt.ylim(0,400)
+
+    # axs[0].hist(ep_min_df['times_in_seconds'], bins=n_bins, label="A")
+    # axs[0].set_title('Extensiphy', fontsize=16)
+
+    # axs[1].hist(gon_min_df['times_in_seconds'], bins=n_bins, label="B")
+    # axs[1].set_title('De novo assembly', fontsize=16)
+
+    # axs[2].hist(snip_min_df['times_in_seconds'], bins=n_bins, label="C")
+    # axs[2].set_title('Snippy', fontsize=16)
+
+    # fig.text(0.5, 0.01, 'Minutes Per Assembly', ha='center', va='center', fontsize=14)
+    # fig.text(0.01, 0.5, 'Number of Sequences', ha='center', va='center', rotation='vertical', fontsize=14)
+
+    # plt.show()
 
 def main():
     args = parse_args()

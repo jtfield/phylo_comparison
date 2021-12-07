@@ -37,7 +37,7 @@ def process_times(time_file):
     snippy_id_compile = re.compile(snippy_id)
     ep_and_gon_id = "real"
     ep_gon_id_compile = re.compile(ep_and_gon_id)
-    
+
     ep_gon_time = "\d+m\d+"
     ep_gon_time_compile = re.compile(ep_gon_time)
     snippy_minutes = "\d+\sminutes"
@@ -61,8 +61,8 @@ def process_times(time_file):
                     # print(ep_gon_time_find)
                     time_per_run = ep_gon_process_times(ep_gon_time_find)
                     ep_gon_time_in_seconds_list.append(time_per_run)
-            
-            
+
+
             elif snippy_find:
                 run_time = []
                 run_time_in_seconds = 0
@@ -81,13 +81,13 @@ def process_times(time_file):
                 elif len(run_time) == 1:
                     run_time_in_seconds = run_time[0]
                     snippy_time_in_seconds_list.append(run_time_in_seconds)
-                
+
     if len(ep_gon_time_in_seconds_list) > 0:
         return ep_gon_time_in_seconds_list
     elif len(snippy_time_in_seconds_list) > 0:
         return snippy_time_in_seconds_list
-    
-    
+
+
 def fig_gen(ep_times, gon_phy_times, snippy_times):
 
     del ep_times[-1]
@@ -100,6 +100,14 @@ def fig_gen(ep_times, gon_phy_times, snippy_times):
     ep_df = pd.DataFrame(ep_times, columns=ep_columns)
     gon_phy_df = pd.DataFrame(gon_phy_times, columns=gon_phy_columns)
     snippy_df = pd.DataFrame(snippy_times, columns=snip_columns)
+
+    print("EP summed time hours: ", (ep_df["time"].sum() / 60) / 60)
+    print("Snippy summed time hours: ", (snippy_df["time"].sum() / 60) / 60)
+    print("gon_phy summed time hours: ", (gon_phy_df["time"].sum() / 60) / 60 )
+
+    print("EP mean time minutes: ", ep_df["time"].mean()/ 60 )
+    print("Snippy mean time minutes: ", snippy_df["time"].mean() / 60)
+    print("gon_phy mean time minutes: ", gon_phy_df["time"].mean() / 60)
 
     ep_df['method'] = 'Extensiphy'
     gon_phy_df['method'] = 'De novo'
@@ -114,14 +122,19 @@ def fig_gen(ep_times, gon_phy_times, snippy_times):
     combined_df['Minutes'] = combined_df['time'].div(60)
     # print(combined_df)
 
+    fig = plt.figure(figsize=(6,6))
     # ax = sns.violinplot(x='method', y="minutes", data=combined_df, inner=None, color=".8")
     # ax = sns.stripplot(x="method", y="Minutes", data=combined_df, linewidth=1, jitter=0.3, color=".6")
     ax = sns.stripplot(x="method", y="Minutes", data=combined_df, linewidth=1, jitter=0.3)
     # ax = sns.boxplot(x="method", y="Minutes", data=combined_df, whis=np.inf)
     ax.set_title( "Time for Individual Sequence Assembly" , size = 18 )
     ax.set_xlabel( "Method" , size = 12 )
-    ax.set_ylabel( "Minutes per Assembly" , size = 12 ) 
+    ax.set_ylabel( "Minutes per Assembly" , size = 12 )
+    fig.tight_layout()
+    fig.set_dpi(300.0)
+    plt.savefig('time_for_individual_sequence_assembly', dpi=300)
     plt.show()
+
 
     # ep_avg = ep_df['ep_time'].mean()
     # snip_avg = snippy_df['snip_time'].mean()
@@ -139,9 +152,9 @@ def fig_gen(ep_times, gon_phy_times, snippy_times):
 
     # combined_df = pd.DataFrame([ep_min_df['ep_time'], snip_min_df['snip_time'], gon_min_df['gon_phy_time']]).transpose()
     # combined_df.dropna(axis=0, how='any', inplace=True)
-    
+
     # ax = sns.stripplot(x=combined_df.index, y=combined_df.values)
-    
+
     # plt.show()
 
 

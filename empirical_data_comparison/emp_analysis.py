@@ -25,7 +25,7 @@ def gon_rap_make_df(folder_path, input_folder):
     # taxon_name = "basecall_results-cluster\d+-(.+)-.txt"
     taxon_name = "--(.+)$"
     name_compile = re.compile(taxon_name)
-    
+
     taxa_names = []
     cluster_names = []
 
@@ -39,8 +39,8 @@ def gon_rap_make_df(folder_path, input_folder):
         if taxon_name_search:
             if taxon_name_search[0] not in taxa_names:
                 taxa_names.append(taxon_name_search[0])
-    
-    
+
+
     df = pd.DataFrame(columns=cluster_names, index=taxa_names)
     # print(df)
 
@@ -52,7 +52,7 @@ def snip_make_df(folder_path, input_folder):
     # taxon_name = "basecall_results-cluster\d+-(.+)-.txt"
     taxon_name = "-cluster\d+--(.+)$"
     name_compile = re.compile(taxon_name)
-    
+
     taxa_names = []
     cluster_names = []
 
@@ -66,8 +66,8 @@ def snip_make_df(folder_path, input_folder):
         if taxon_name_search:
             if taxon_name_search[0] not in taxa_names:
                 taxa_names.append(taxon_name_search[0])
-    
-    
+
+
     df = pd.DataFrame(columns=cluster_names, index=taxa_names)
     # print(df)
 
@@ -79,7 +79,7 @@ def gon_rap_basecall_checker(folder_path, input_folder, miscall_df, gap_df, iden
     # LIST CLUSTERS/LOCI IN THIS ANALYSIS
     cluster_names = 'cluster\d+-cluster\d+'
     cluster_compile = re.compile(cluster_names)
-    
+
     taxon_name = "--(.+)$"
     name_compile = re.compile(taxon_name)
 
@@ -110,8 +110,8 @@ def gon_rap_basecall_checker(folder_path, input_folder, miscall_df, gap_df, iden
                     gap_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(gaps)
                     identical_nuc_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(identical_nucs)
                     total_nuc_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(total_nucs)
-    
-    
+
+
     # df = df.astype(int)
     miscall_df['sums'] = miscall_df.sum(axis=1)
     miscall_df['mean'] = miscall_df.mean(axis=1)
@@ -136,7 +136,7 @@ def snippy_basecall_checker(folder_path, input_folder, miscall_df, gap_df, ident
     # LIST CLUSTERS/LOCI IN THIS ANALYSIS
     cluster_names = 'cluster\d+'
     cluster_compile = re.compile(cluster_names)
-    
+
     taxon_name = "--(.+)$"
     name_compile = re.compile(taxon_name)
 
@@ -167,8 +167,8 @@ def snippy_basecall_checker(folder_path, input_folder, miscall_df, gap_df, ident
                     gap_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(gaps)
                     identical_nuc_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(identical_nucs)
                     total_nuc_df.loc[taxon_name_search[0], cluster_name_search[0]] = int(total_nucs)
-    
-    
+
+
     # df = df.astype(int)
     miscall_df['sums'] = miscall_df.sum(axis=1)
     miscall_df['mean'] = miscall_df.mean(axis=1)
@@ -264,7 +264,7 @@ def basecall_comparison(path_to_files):
     # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
 
     #per-base results
-    rapup_per_base_miscall = rapup_to_gon_phy_total_miscalls / rapup_to_gon_phy_total_total_nuc 
+    rapup_per_base_miscall = rapup_to_gon_phy_total_miscalls / rapup_to_gon_phy_total_total_nuc
     rapup_per_base_gap = rapup_to_gon_phy_total_gaps / rapup_to_gon_phy_total_total_nuc
     #print(rapup_total_miscalls)
     #print(rapup_total_total_nuc)
@@ -318,7 +318,7 @@ def basecall_comparison(path_to_files):
     # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
 
     #per-base results
-    snippy_per_base_miscall = snippy_to_gon_phy_total_miscalls / snippy_to_gon_phy_total_total_nuc 
+    snippy_per_base_miscall = snippy_to_gon_phy_total_miscalls / snippy_to_gon_phy_total_total_nuc
     snippy_per_base_gap = snippy_to_gon_phy_total_gaps / snippy_to_gon_phy_total_total_nuc
     #print(rapup_total_miscalls)
     #print(rapup_total_total_nuc)
@@ -330,7 +330,7 @@ def basecall_comparison(path_to_files):
 
     print("\n\n\n")
     print("rapup to snippy results")
-    snippy_to_rapup_basecall_check = snippy_basecall_checker(snippy_to_rapup_results, snippy_to_rapup_alignment_result_files, snippy_to_rapup_miscall_df, snippy_to_rapup_gap_df, snippy_to_rapup_identical_nucs_df, snippy_to_rapup_total_nucs_df) 
+    snippy_to_rapup_basecall_check = snippy_basecall_checker(snippy_to_rapup_results, snippy_to_rapup_alignment_result_files, snippy_to_rapup_miscall_df, snippy_to_rapup_gap_df, snippy_to_rapup_identical_nucs_df, snippy_to_rapup_total_nucs_df)
     # print(snippy_to_rapup_miscall_df)
     # print(snippy_to_rapup_gap_df)
     # print(snippy_to_rapup_identical_nucs_df)
@@ -373,7 +373,7 @@ def basecall_comparison(path_to_files):
     # rapup_to_gon_phy_total_check = rapup_to_gon_phy_total_check.rename(columns={'sums' : 'rapup_sums'})
 
     #per-base results
-    snip_rap_per_base_miscall = snippy_to_rapup_total_miscalls / snippy_to_rapup_total_total_nuc 
+    snip_rap_per_base_miscall = snippy_to_rapup_total_miscalls / snippy_to_rapup_total_total_nuc
     snip_rap_per_base_gap = snippy_to_rapup_total_gaps / snippy_to_rapup_total_total_nuc
     #print(rapup_total_miscalls)
     #print(rapup_total_total_nuc)
@@ -397,7 +397,7 @@ def basecall_comparison(path_to_files):
     snippy_to_rapup_miscall_df.to_csv("snippy_to_rapup_miscalls.csv", sep='\t')
     snippy_to_rapup_gap_df.to_csv("snippy_to_rapup_gaps.csv", sep='\t')
     snippy_to_rapup_identical_nucs_df.to_csv("snippy_to_rapup_identical_nucs.csv", sep='\t')
-    snippy_to_rapup_total_nucs_df.to_csv("snippy_to_rapup_total_nucs.csv", sep='\t')    
+    snippy_to_rapup_total_nucs_df.to_csv("snippy_to_rapup_total_nucs.csv", sep='\t')
 
 
 
@@ -428,39 +428,43 @@ def locus_range_fig_gen(csv_file_1, csv_file_2):
     while (start <= 42000):
         n_bins.append(start)
         start = start + 1000
-    
+
     length_data_1 = pd.read_csv(csv_file_1)
     length_data_2 = pd.read_csv(csv_file_2)
     # fig, axs = plt.subplots(1, 2, tight_layout=True, sharey=True, figsize=(10,10))
     # fig.suptitle('Dataset Fragmentation', fontsize=18, fontweight='bold')
-    
+
     # plt.ylim(0,260)
     # axs[0].hist(length_data_1["lengths"], bins=n_bins, range=(-100, length_data_1["lengths"].max()), label="A")
     # axs[0].set_title('Extensiphy', fontsize=16)
     # axs[1].hist(length_data_2["lengths"], bins=n_bins, range=(-100, length_data_1["lengths"].max()), label="B")
     # axs[1].set_title('De novo', fontsize=16)
-    
+
     # fig.text(0.5, 0.01, 'Loci Lengths', ha='center', va='center', fontsize=14)
     # fig.text(0.01, 0.5, 'Number of Loci', ha='center', va='center', rotation='vertical', fontsize=14)
     # plt.show()
 
-    
+
     length_data_1['method'] = 'Extensiphy'
     length_data_2['method'] = 'De novo'
     frames = [length_data_1, length_data_2]
     combined_df = pd.concat(frames)
     combined_df.reset_index(drop=True, inplace=True)
     # print(combined_df)
+    fig = plt.figure(figsize = (6, 6))
     ax = sns.stripplot(x="method", y="lengths", data=combined_df, linewidth=1, jitter=0.3)
     # ax = sns.stripplot(x="method", y="lengths", data=combined_df, linewidth=1, jitter=0.3, color=".6")
     # ax = sns.boxplot(x="method", y="lengths", data=combined_df, whis=np.inf)
     ax.set_title( "Effect of Loci Fragmentation" , size = 18 )
     ax.set_xlabel( "Method" , size = 12 )
-    ax.set_ylabel( "Loci Lengths (bp)" , size = 12 ) 
+    ax.set_ylabel( "Loci Lengths (bp)" , size = 12 )
+    plt.tight_layout()
+    fig.set_dpi(300.0)
+    plt.savefig('effect_of_loci_fragmentation', dpi=300)
     plt.show()
 
 
-    
+
 
 def main():
     args = parse_args()
@@ -469,7 +473,7 @@ def main():
     path_to_output_folder = os.path.realpath(args.output_folder)
 
     # basecall_comparison(path_to_output_folder)
-    
+
     # phylogeny_comparison(path_to_output_folder)
 
     locus_range_fig_gen("EP_loci_lengths.csv", "gon_phy_loci_lengths.csv")
